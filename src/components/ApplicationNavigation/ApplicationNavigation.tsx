@@ -12,8 +12,6 @@ import { store } from '@/store/store'
 export function ApplicationNavigation() {
 	const { user } = useStore(store)
 
-	console.log(store.state)
-
 	return (
 		<Box gridColumn={'span 2'}>
 			<Card>
