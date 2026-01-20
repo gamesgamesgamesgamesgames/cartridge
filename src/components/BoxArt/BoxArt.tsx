@@ -48,7 +48,7 @@ export function BoxArt(props: Props) {
 
 					<Box pt={'3'}>
 						<Skeleton loading={!game}>
-							<Text>{game?.name ?? 'Game name'}</Text>
+							<Text>{game?.record.name ?? 'Game name'}</Text>
 						</Skeleton>
 					</Box>
 				</Link>

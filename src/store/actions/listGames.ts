@@ -1,11 +1,9 @@
 // Local imports
-import { type Game } from '@/typedefs/Game'
+import { type GameRecord } from '@/typedefs/GameRecord'
 import { store } from '@/store/store'
 
 export async function listGames() {
-	store.set(() => ({ gamesCatalogState: 'active' }))
-
-	const { quicksliceClient } = store.state
+	const { gamesCatalogCursor, quicksliceClient } = store.state
 
 	if (!quicksliceClient) {
 		throw new Error('Cannot list games before logging in.')
@@ -14,32 +12,48 @@ export async function listGames() {
 	const result = await quicksliceClient.query<{
 		gamesGamesgamesgamesgamesGame: {
 			edges: {
-				node: Game
+				node: GameRecord
 			}[]
+			pageInfo: {
+				endCursor: null | string
+				hasNextPage: boolean
+			}
 		}
-	}>(`
-		query {
+	}>(
+		`
+		query ListGames ($cursor: String) {
 			gamesGamesgamesgamesgamesGame(
 				first: 20
+				after: $cursor
+				sortBy: [{ field: name, direction: DESC }]
 			) {
 				edges {
 					node {
 						uri
-						did
 						name
-						summary
-						type
-						modes
 					}
+				}
+				pageInfo {
+					hasNextPage
+					endCursor
 				}
 			}
 		}
-	`)
+		`,
+		{ cursor: gamesCatalogCursor },
+	)
 
-	store.set(() => ({
-		gamesCatalog: result.gamesGamesgamesgamesgamesGame.edges.map(
-			(edge) => edge.node,
-		),
-		gamesCatalogState: 'idle',
+	const { edges, pageInfo } = result.gamesGamesgamesgamesgamesGame
+
+	store.set((previousState) => ({
+		gamesCatalog: [
+			...(previousState.gamesCatalog || []),
+			...edges.map((edge) => ({
+				isHydrated: false,
+				record: edge.node,
+			})),
+		],
+		gamesCatalogCursor: pageInfo.endCursor,
+		gamesCatalogHasNextPage: pageInfo.hasNextPage,
 	}))
 }

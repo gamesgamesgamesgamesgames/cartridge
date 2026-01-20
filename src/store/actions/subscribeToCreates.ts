@@ -2,22 +2,18 @@
 import { type Client } from 'graphql-ws'
 
 // Local imports
-import { type Game } from '@/typedefs/Game'
+import { type GameRecord } from '@/typedefs/GameRecord'
 import { store } from '@/store/store'
 
 export async function subscribeToCreates(client: Client) {
 	const subscription = client.iterate<{
-		gamesGamesgamesgamesgamesGameCreated: Game
+		gamesGamesgamesgamesgamesGameCreated: GameRecord
 	}>({
 		query: `
 			subscription {
 				gamesGamesgamesgamesgamesGameCreated {
 					uri
-					did
 					name
-					summary
-					type
-					modes
 				}
 			}
 		`,
@@ -31,7 +27,11 @@ export async function subscribeToCreates(client: Client) {
 		store.set((previousState) => ({
 			gamesCatalog: [
 				...(previousState.gamesCatalog || []),
-				event.data?.gamesGamesgamesgamesgamesGameCreated as Game,
+				{
+					isHydrated: false,
+					record: event.data
+						?.gamesGamesgamesgamesgamesGameCreated as GameRecord,
+				},
 			],
 		}))
 	}

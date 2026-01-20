@@ -3,7 +3,7 @@ import { type Client } from 'graphql-ws'
 
 // Local imports
 import { type ATURI } from '@/typedefs/ATURI'
-import { type Game } from '@/typedefs/Game'
+import { type GameRecord } from '@/typedefs/GameRecord'
 import { store } from '@/store/store'
 
 export async function subscribeToDeletes(client: Client) {
@@ -26,13 +26,15 @@ export async function subscribeToDeletes(client: Client) {
 
 		store.set((previousState) => {
 			const updatedGame = event.data
-				?.gamesGamesgamesgamesgamesGameUpdated as Game
+				?.gamesGamesgamesgamesgamesGameUpdated as GameRecord
 
 			const newCatalog = previousState.gamesCatalog
 				? [...previousState.gamesCatalog]
 				: []
 
-			const index = newCatalog.findIndex((game) => game.uri === updatedGame.uri)
+			const index = newCatalog.findIndex(
+				(game) => game.record.uri === updatedGame.uri,
+			)
 
 			newCatalog.splice(index, 1)
 

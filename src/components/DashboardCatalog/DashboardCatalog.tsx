@@ -2,7 +2,7 @@
 
 // Module imports
 import { Box, Button, Flex, Grid, Heading, Separator } from '@radix-ui/themes'
-import { useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useStore } from 'statery'
 
 // Local imports
@@ -16,7 +16,14 @@ import { store } from '@/store/store'
 const NULL_GAMES = Array(20).fill(null)
 
 export function DashboardCatalog() {
-	const { gamesCatalog, gamesCatalogState } = useStore(store)
+	const { gamesCatalog, gamesCatalogHasNextPage } = useStore(store)
+
+	const [state, setState] = useState<'idle' | 'active' | 'error'>('idle')
+
+	const loadGames = useCallback(() => {
+		setState('active')
+		listGames().then(() => setState('idle'))
+	}, [])
 
 	const gamesElements = useMemo(() => {
 		if (gamesCatalog === null) {
@@ -54,13 +61,13 @@ export function DashboardCatalog() {
 				))}
 			</Grid>
 		)
-	}, [gamesCatalog, gamesCatalogState])
+	}, [gamesCatalog, state])
 
 	useEffect(() => {
-		if (gamesCatalog === null && gamesCatalogState === 'idle') {
-			listGames()
+		if (gamesCatalog === null && state === 'idle') {
+			loadGames()
 		}
-	}, [gamesCatalog, gamesCatalogState])
+	}, [gamesCatalog, loadGames, state])
 
 	return (
 		<DashboardMainWrapper>
@@ -75,6 +82,23 @@ export function DashboardCatalog() {
 			</Box>
 
 			{gamesElements}
+
+			<Flex
+				align={'stretch'}
+				width={'100%'}>
+				{state !== 'active' && gamesCatalogHasNextPage && (
+					<Box
+						asChild
+						flexGrow={'1'}
+						mt={'4'}>
+						<Button
+							onClick={loadGames}
+							variant={'outline'}>
+							{'Load more'}
+						</Button>
+					</Box>
+				)}
+			</Flex>
 		</DashboardMainWrapper>
 	)
 }

@@ -1,12 +1,7 @@
 // Local imports
-import { type ATURI } from '@/typedefs/ATURI'
-import { type DID } from '@/typedefs/DID'
+import { type GameRecord } from '@/typedefs/GameRecord'
 
 export interface Game {
-	did: DID
-	uri: ATURI
-	name: string
-	summary?: string
-	type?: string
-	modes?: string[]
+	isHydrated: boolean
+	record: GameRecord
 }

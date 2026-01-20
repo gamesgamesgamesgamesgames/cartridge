@@ -2,13 +2,13 @@
 import { type Client } from 'graphql-ws'
 
 // Local imports
-import { type Game } from '@/typedefs/Game'
+import { type GameRecord } from '@/typedefs/GameRecord'
 import { wait } from '@/helpers/wait'
 import { store } from '@/store/store'
 
 export async function subscribeToUpdates(client: Client) {
 	const subscription = client.iterate<{
-		gamesGamesgamesgamesgamesGameUpdated: Game
+		gamesGamesgamesgamesgamesGameUpdated: GameRecord
 	}>({
 		query: `
 			subscription {
@@ -32,14 +32,18 @@ export async function subscribeToUpdates(client: Client) {
 		await wait(1000)
 
 		store.set((previousState) => {
-			const updatedGame = event.data
-				?.gamesGamesgamesgamesgamesGameUpdated as Game
+			const updatedGame = {
+				isHydrated: false,
+				record: event.data?.gamesGamesgamesgamesgamesGameUpdated as GameRecord,
+			}
 
 			const newCatalog = previousState.gamesCatalog
 				? [...previousState.gamesCatalog]
 				: []
 
-			const index = newCatalog.findIndex((game) => game.uri === updatedGame.uri)
+			const index = newCatalog.findIndex(
+				(game) => game.record.uri === updatedGame.record.uri,
+			)
 
 			if (index !== -1) {
 				newCatalog[index] = updatedGame
