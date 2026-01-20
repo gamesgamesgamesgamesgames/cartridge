@@ -1,0 +1,32 @@
+{
+  "id": "games.gamesgamesgamesgames.mode",
+  "defs": {
+    "mmo": {
+      "type": "token",
+      "description": "Massively Multiplayer Online (MMO)"
+    },
+    "cooperative": {
+      "type": "token",
+      "description": "Co-operative"
+    },
+    "multiplayer": {
+      "type": "token",
+      "description": "Multiplayer"
+    },
+    "splitScreen": {
+      "type": "token",
+      "description": "Split Screen"
+    },
+    "battleRoyale": {
+      "type": "token",
+      "description": "Battle Royale"
+    },
+    "singlePlayer": {
+      "type": "token",
+      "description": "Single Player"
+    }
+  },
+  "$type": "com.atproto.lexicon.schema",
+  "lexicon": 1,
+  "description": ""
+}

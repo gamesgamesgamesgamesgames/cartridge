@@ -22,6 +22,7 @@
     "statery": "^0.7.1"
   },
   "devDependencies": {
+    "@atproto/lex": "^0.0.11",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

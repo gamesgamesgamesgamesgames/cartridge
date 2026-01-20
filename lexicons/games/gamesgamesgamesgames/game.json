@@ -1,0 +1,70 @@
+{
+  "id": "games.gamesgamesgamesgames.game",
+  "defs": {
+    "main": {
+      "key": "literal:self",
+      "type": "record",
+      "record": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "modes": {
+            "type": "array",
+            "items": {
+              "ref": "games.gamesgamesgamesgames.defs#mode",
+              "type": "ref"
+            }
+          },
+          "genres": {
+            "type": "array",
+            "items": {
+              "ref": "games.gamesgamesgamesgames.defs#genre",
+              "type": "ref"
+            }
+          },
+          "parent": {
+            "type": "string",
+            "format": "at-uri"
+          },
+          "themes": {
+            "type": "array",
+            "items": {
+              "ref": "games.gamesgamesgamesgames.defs#theme",
+              "type": "ref"
+            }
+          },
+          "summary": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "releaseDates": {
+            "type": "array",
+            "items": {
+              "ref": "games.gamesgamesgamesgames.defs#releaseDate",
+              "type": "ref"
+            }
+          },
+          "applicationType": {
+            "ref": "games.gamesgamesgamesgames.defs#applicationType",
+            "type": "ref"
+          },
+          "playerPerspectives": {
+            "type": "array",
+            "items": {
+              "ref": "games.gamesgamesgamesgames.defs#playerPerspective",
+              "type": "ref"
+            }
+          }
+        }
+      },
+      "description": "A video game."
+    }
+  },
+  "$type": "com.atproto.lexicon.schema",
+  "lexicon": 1
+}

@@ -1,0 +1,37 @@
+{
+  "version": 1,
+  "lexicons": [
+    "games.gamesgamesgamesgames.applicationType",
+    "games.gamesgamesgamesgames.game"
+  ],
+  "resolutions": {
+    "games.gamesgamesgamesgames.applicationType": {
+      "uri": "at://did:plc:il7eua5zbt4s2ly2jskjfz2t/com.atproto.lexicon.schema/games.gamesgamesgamesgames.applicationType",
+      "cid": "bafyreidxv2ua6t6gb55tlvgexwxw3w54p43gxoyz6alu3icttoujmeufg4"
+    },
+    "games.gamesgamesgamesgames.defs": {
+      "uri": "at://did:plc:il7eua5zbt4s2ly2jskjfz2t/com.atproto.lexicon.schema/games.gamesgamesgamesgames.defs",
+      "cid": "bafyreidzb4pqelngwph4ggrysqysnphopmalerhjzujeodvkr5m2fe6hm4"
+    },
+    "games.gamesgamesgamesgames.game": {
+      "uri": "at://did:plc:il7eua5zbt4s2ly2jskjfz2t/com.atproto.lexicon.schema/games.gamesgamesgamesgames.game",
+      "cid": "bafyreieqbmp5orpgtf4dnprjmfawwhibdlvqws7qktqjf2gluthb3kwq6u"
+    },
+    "games.gamesgamesgamesgames.genre": {
+      "uri": "at://did:plc:il7eua5zbt4s2ly2jskjfz2t/com.atproto.lexicon.schema/games.gamesgamesgamesgames.genre",
+      "cid": "bafyreia3woiqeqzjiz3f7r2mso6yhcvcd6kq73suzyesva3fmeakndoox4"
+    },
+    "games.gamesgamesgamesgames.mode": {
+      "uri": "at://did:plc:il7eua5zbt4s2ly2jskjfz2t/com.atproto.lexicon.schema/games.gamesgamesgamesgames.mode",
+      "cid": "bafyreihvyel7xhgpt6t4wvrvrgzfffxxylsu4thpguksvcfbcxklhs7kde"
+    },
+    "games.gamesgamesgamesgames.playerPerspective": {
+      "uri": "at://did:plc:il7eua5zbt4s2ly2jskjfz2t/com.atproto.lexicon.schema/games.gamesgamesgamesgames.playerPerspective",
+      "cid": "bafyreidahglmsol53k22qdzrrp6rmk2ztkbspqbgscfqabs6ii6e5bovey"
+    },
+    "games.gamesgamesgamesgames.theme": {
+      "uri": "at://did:plc:il7eua5zbt4s2ly2jskjfz2t/com.atproto.lexicon.schema/games.gamesgamesgamesgames.theme",
+      "cid": "bafyreidiscaztvspyaji2gprtdo7rspvwab5cifu6igjle5kxsdakatyai"
+    }
+  }
+}

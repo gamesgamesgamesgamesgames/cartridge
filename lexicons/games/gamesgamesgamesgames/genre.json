@@ -1,0 +1,48 @@
+{
+  "id": "games.gamesgamesgamesgames.genre",
+  "defs": {
+    "rpg": {
+      "type": "token",
+      "description": "Role-playing (RPG)"
+    },
+    "rts": {
+      "type": "token",
+      "description": "Real Time Strategy (RTS)"
+    },
+    "music": {
+      "type": "token",
+      "description": "Music"
+    },
+    "puzzle": {
+      "type": "token",
+      "description": "Puzzle"
+    },
+    "racing": {
+      "type": "token",
+      "description": "Racing"
+    },
+    "shooter": {
+      "type": "token",
+      "description": "Shooter"
+    },
+    "fighting": {
+      "type": "token",
+      "description": "Fighting"
+    },
+    "platform": {
+      "type": "token",
+      "description": "Platform"
+    },
+    "simulator": {
+      "type": "token",
+      "description": "Simulator"
+    },
+    "pointAndClick": {
+      "type": "token",
+      "description": "Point-and-click"
+    }
+  },
+  "$type": "com.atproto.lexicon.schema",
+  "lexicon": 1,
+  "description": ""
+}
