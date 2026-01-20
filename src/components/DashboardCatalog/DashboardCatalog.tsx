@@ -10,6 +10,7 @@ import { BoxArt } from '@/components/BoxArt/BoxArt'
 import { DashboardMainWrapper } from '@/components/DashboardMainWrapper/DashboardMainWrapper'
 import { listGames } from '@/store/actions/listGames'
 import { NewGameDialog } from '@/components/NewGameDialog/NewGameDialog'
+import { type State } from '@/typedefs/State'
 import { store } from '@/store/store'
 
 // Constants
@@ -18,7 +19,7 @@ const NULL_GAMES = Array(20).fill(null)
 export function DashboardCatalog() {
 	const { gamesCatalog, gamesCatalogHasNextPage } = useStore(store)
 
-	const [state, setState] = useState<'idle' | 'active' | 'error'>('idle')
+	const [state, setState] = useState<State>('idle')
 
 	const loadGames = useCallback(() => {
 		setState('active')

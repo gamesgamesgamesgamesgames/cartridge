@@ -11,7 +11,7 @@ import { ReactNode, useCallback, useState } from 'react'
 import { useStore } from 'statery'
 
 // Local imports
-import { FormLabel } from '@/components/FormLabel/FormLabel'
+import { type State } from '@/typedefs/State'
 import { store } from '@/store/store'
 
 // Types
@@ -21,7 +21,7 @@ export function LoginDialog(props: Props) {
 	const { trigger } = props
 
 	const [isOpen, setIsOpen] = useState(false)
-	const [state, setSaveState] = useState<'idle' | 'active' | 'error'>('idle')
+	const [state, setSaveState] = useState<State>('idle')
 
 	const { quicksliceClient } = useStore(store)
 

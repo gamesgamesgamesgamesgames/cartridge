@@ -14,6 +14,7 @@ import { type ReactNode, useCallback, useState } from 'react'
 import { FormLabel } from '@/components/FormLabel/FormLabel'
 import { GameModesDropdown } from '@/components/NewGameDialog/GameModesDropdown'
 import { GameTypesDropdown } from '@/components/NewGameDialog/GameTypesDropdown'
+import { type State } from '@/typedefs/State'
 import { putGame } from '@/store/actions/putGame'
 
 // Types
@@ -23,7 +24,7 @@ export function NewGameDialog(props: Props) {
 	const { trigger } = props
 
 	const [isOpen, setIsOpen] = useState(false)
-	const [state, setState] = useState<'idle' | 'active' | 'error'>('idle')
+	const [state, setState] = useState<State>('idle')
 
 	const handleSubmit = useCallback((formData: FormData) => {
 		setState('active')
