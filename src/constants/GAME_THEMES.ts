@@ -1,6 +1,6 @@
 // Local imports
 import { Theme } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
-import ThemeLexicon from '@/lexicons/games/gamesgamesgamesgames/genre.json'
+import ThemeLexicon from '@/lexicons/games/gamesgamesgamesgames/theme.json'
 
 // Types
 type ThemeLexiconIDs = keyof typeof ThemeLexicon.defs
