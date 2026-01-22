@@ -26,7 +26,10 @@ export function NewGameDialog(props: Props) {
 	const handleSubmit = useCallback((formData: FormData) => {
 		setState('active')
 		const result: Record<string, unknown> = Object.fromEntries(formData)
+		result.genres = formData.getAll('genres')
 		result.modes = formData.getAll('modes')
+		result.playerPerspectives = formData.getAll('playerPerspectives')
+		result.themes = formData.getAll('themes')
 		putGame(result).then(() => {
 			setIsOpen(false)
 			setState('idle')
@@ -56,13 +59,13 @@ export function NewGameDialog(props: Props) {
 
 							{/* parent */}
 
-							<ModesField disabled={state === 'active'} />
+							<PlayerPerspectivesField disabled={state === 'active'} />
 
 							<GenresField disabled={state === 'active'} />
 
-							<ThemesField disabled={state === 'active'} />
+							<ModesField disabled={state === 'active'} />
 
-							<PlayerPerspectivesField disabled={state === 'active'} />
+							<ThemesField disabled={state === 'active'} />
 
 							{/* releaseDates */}
 						</Flex>
