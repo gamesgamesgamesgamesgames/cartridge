@@ -1,17 +1,22 @@
+'use client'
+
 // Moduile imports
 import {
 	createContext,
+	useCallback,
 	useContext,
 	useMemo,
 	useState,
 	type PropsWithChildren,
 } from 'react'
+import { useRouter } from 'next/navigation'
 
 // Local imports
-import { type DID } from '@/typedefs/DID'
 import { type GameRecord } from '@/typedefs/GameRecord'
-import { useParams } from 'next/navigation'
 import { type State } from '@/typedefs/State'
+import { createGame } from '@/store/actions/createGame'
+import { AtUriString } from '@atproto/lex'
+import { parseATURI } from '@/helpers/parseATURI'
 
 type Props = PropsWithChildren
 
@@ -19,6 +24,8 @@ export const DashboardCatalogNewGameContext = createContext<
 	Partial<GameRecord> & {
 		isPublishable: boolean
 		isSaveable: boolean
+		publishGame: () => void
+		saveGameDraft: () => void
 		setApplicationType: (applicationType: GameRecord['applicationType']) => void
 		setGenres: (genres: GameRecord['genres']) => void
 		setModes: (modes: GameRecord['modes']) => void
@@ -35,6 +42,8 @@ export const DashboardCatalogNewGameContext = createContext<
 	applicationType: 'games.gamesgamesgamesgames.applicationType#game',
 	isPublishable: false,
 	isSaveable: false,
+	publishGame: () => {},
+	saveGameDraft: () => {},
 	setApplicationType: () => {},
 	setGenres: () => {},
 	setModes: () => {},
@@ -49,13 +58,8 @@ export const DashboardCatalogNewGameContext = createContext<
 export function DashboardCatalogNewGameContextProvider(props: Props) {
 	const { children } = props
 
-	const params = useParams<{
-		did: DID
-		rkey: string
-	}>()
+	const router = useRouter()
 
-	const did = decodeURIComponent(params.did)
-	const rkey = decodeURIComponent(params.rkey)
 	// const gameURI: AtUriString = `at://${did}/games.gamesgamesgamesgames.game/${rkey}`
 
 	const [state, setState] = useState<State>('idle')
@@ -75,6 +79,44 @@ export function DashboardCatalogNewGameContextProvider(props: Props) {
 		GameRecord['playerPerspectives']
 	>([])
 
+	const saveGame = useCallback(
+		(shouldPublish: boolean) => {
+			if (state === 'idle') {
+				setState('active')
+				createGame(
+					{
+						applicationType,
+						genres,
+						modes,
+						name,
+						playerPerspectives,
+						releaseDates,
+						summary,
+						themes,
+					},
+					{ shouldPublish },
+				).then((recordURI: AtUriString) => {
+					const { did, rkey } = parseATURI(recordURI)
+					router.push(`/dashboard/catalog/${did}/${rkey}/overview`)
+				})
+			}
+		},
+		[
+			applicationType,
+			genres,
+			modes,
+			name,
+			playerPerspectives,
+			releaseDates,
+			state,
+			summary,
+			themes,
+		],
+	)
+
+	const publishGame = useCallback(() => saveGame(true), [saveGame])
+	const saveGameDraft = useCallback(() => saveGame(false), [saveGame])
+
 	const providerValue = useMemo(
 		() => ({
 			isPublishable:
@@ -82,8 +124,7 @@ export function DashboardCatalogNewGameContextProvider(props: Props) {
 				Boolean(summary) &&
 				genres!.length > 0 &&
 				modes!.length > 0 &&
-				playerPerspectives!.length > 0 &&
-				themes!.length > 0,
+				playerPerspectives!.length > 0,
 			isSaveable: Boolean(name),
 
 			applicationType,
@@ -95,6 +136,9 @@ export function DashboardCatalogNewGameContextProvider(props: Props) {
 			state,
 			summary,
 			themes,
+
+			publishGame,
+			saveGameDraft,
 			setApplicationType,
 			setGenres,
 			setModes,
@@ -105,6 +149,9 @@ export function DashboardCatalogNewGameContextProvider(props: Props) {
 			setThemes,
 		}),
 		[
+			publishGame,
+			saveGameDraft,
+
 			applicationType,
 			genres,
 			modes,
