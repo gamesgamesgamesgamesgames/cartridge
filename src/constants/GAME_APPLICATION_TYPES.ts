@@ -5,7 +5,7 @@ import ApplicationTypeLexicon from '@/lexicons/games/gamesgamesgamesgames/applic
 // Types
 type ApplicationTypeLexiconIDs = keyof typeof ApplicationTypeLexicon.defs
 
-export const GAME_TYPES = Object.entries(ApplicationTypeLexicon.defs).reduce(
+export const GAME_APPLICATION_TYPES = Object.entries(ApplicationTypeLexicon.defs).reduce(
 	(accumulator, kv) => {
 		const [id, { description: name }] = kv as [
 			ApplicationTypeLexiconIDs,

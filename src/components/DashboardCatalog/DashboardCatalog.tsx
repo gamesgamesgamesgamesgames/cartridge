@@ -7,8 +7,8 @@ import { useStore } from 'statery'
 
 // Local imports
 import { BoxArt } from '@/components/BoxArt/BoxArt'
+import { Link } from '@/components/Link/Link'
 import { listGames } from '@/store/actions/listGames'
-import { NewGameDialog } from '@/components/NewGameDialog/NewGameDialog'
 import { type State } from '@/typedefs/State'
 import { store } from '@/store/store'
 
@@ -16,7 +16,7 @@ import { store } from '@/store/store'
 const NULL_GAMES = Array(20).fill(null)
 
 export function DashboardCatalog() {
-	const { gamesCatalog, gamesCatalogHasNextPage } = useStore(store)
+	const { gamesCatalog, gamesCatalogHasNextPage, user } = useStore(store)
 
 	const [state, setState] = useState<State>('idle')
 
@@ -74,7 +74,13 @@ export function DashboardCatalog() {
 			<Flex justify={'between'}>
 				<Heading as={'h2'}>{'Games'}</Heading>
 
-				<NewGameDialog trigger={<Button>{'Add Game'}</Button>} />
+				{Boolean(user?.did) && (
+					<Link
+						asChild
+						href={`/dashboard/catalog/new-game/general`}>
+						<Button>{'Add Game'}</Button>
+					</Link>
+				)}
 			</Flex>
 
 			<Box py={'4'}>

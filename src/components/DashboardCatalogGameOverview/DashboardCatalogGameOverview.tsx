@@ -6,7 +6,7 @@ import { ReactNode, useMemo } from 'react'
 
 // Local imports
 import { GAME_MODES } from '@/constants/GAME_MODES'
-import { GAME_TYPES } from '@/constants/GAME_TYPES'
+import { GAME_APPLICATION_TYPES } from '@/constants/GAME_APPLICATION_TYPES'
 import { Link } from '@/components/Link/Link'
 import { useDashboardCatalogGameContext } from '@/context/DashboardCatalogGameContext/DashboardCatalogGameContext'
 
@@ -18,8 +18,9 @@ export function DashboardCatalogGameOverview() {
 	const typeValue = useMemo(() => {
 		if (gameRecord.applicationType) {
 			return (
-				<Link href={`/dashboard/catalog?applicationType=${gameRecord.applicationType}`}>
-					<Text>{GAME_TYPES[gameRecord.applicationType].name}</Text>
+				<Link
+					href={`/dashboard/catalog?applicationType=${gameRecord.applicationType}`}>
+					<Text>{GAME_APPLICATION_TYPES[gameRecord.applicationType].name}</Text>
 				</Link>
 			)
 		}

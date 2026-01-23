@@ -28,3 +28,5 @@ export const GAME_GENRES = Object.entries(GenreLexicon.defs).reduce(
 		name: string,
 	}>,
 )
+
+console.log(GAME_GENRES)

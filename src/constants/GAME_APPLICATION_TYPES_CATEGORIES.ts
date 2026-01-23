@@ -1,10 +1,10 @@
 // Local imports
-import { type GAME_TYPES } from '@/constants/GAME_TYPES'
+import { type GAME_APPLICATION_TYPES } from '@/constants/GAME_APPLICATION_TYPES'
 
 // Types
-type ApplicationTypeID = keyof typeof GAME_TYPES
+type ApplicationTypeID = keyof typeof GAME_APPLICATION_TYPES
 
-export const GAME_TYPES_CATEGORIES: {
+export const GAME_APPLICATION_TYPES_CATEGORIES: {
 	label: string
 	items: ApplicationTypeID[]
 }[] = [
