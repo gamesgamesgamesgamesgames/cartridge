@@ -11,11 +11,11 @@
     },
     "games.gamesgamesgamesgames.defs": {
       "uri": "at://did:plc:il7eua5zbt4s2ly2jskjfz2t/com.atproto.lexicon.schema/games.gamesgamesgamesgames.defs",
-      "cid": "bafyreidzkors5gmhb4suqgsfmwb5vtt7w2vud7uv5nm2efp3b2wj6wpxse"
+      "cid": "bafyreig7aa3rao2klytl6r7obxjwdcjt53mjtkc73axfih33ekxn4krywy"
     },
     "games.gamesgamesgamesgames.game": {
       "uri": "at://did:plc:il7eua5zbt4s2ly2jskjfz2t/com.atproto.lexicon.schema/games.gamesgamesgamesgames.game",
-      "cid": "bafyreieqbmp5orpgtf4dnprjmfawwhibdlvqws7qktqjf2gluthb3kwq6u"
+      "cid": "bafyreibaunzo3jbwhlg7rgvg572qahvsalwbz3qs3gxyupsyf7djwpqfhq"
     },
     "games.gamesgamesgamesgames.genre": {
       "uri": "at://did:plc:il7eua5zbt4s2ly2jskjfz2t/com.atproto.lexicon.schema/games.gamesgamesgamesgames.genre",
@@ -27,7 +27,7 @@
     },
     "games.gamesgamesgamesgames.playerPerspective": {
       "uri": "at://did:plc:il7eua5zbt4s2ly2jskjfz2t/com.atproto.lexicon.schema/games.gamesgamesgamesgames.playerPerspective",
-      "cid": "bafyreidahglmsol53k22qdzrrp6rmk2ztkbspqbgscfqabs6ii6e5bovey"
+      "cid": "bafyreiaodm7htg374kc6lsrcwqqznqhxbuquqkd6ca5gnbu2isyqxoc3rq"
     },
     "games.gamesgamesgamesgames.theme": {
       "uri": "at://did:plc:il7eua5zbt4s2ly2jskjfz2t/com.atproto.lexicon.schema/games.gamesgamesgamesgames.theme",

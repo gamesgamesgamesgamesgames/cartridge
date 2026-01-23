@@ -6,6 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "build-lexicons": "lex build --lexicons ./src/lexicons --out ./src/helpers/lexicons --clear",
+    "update-lexicons": "lex install --lexicons ./src/lexicons --update",
+    "prebuild": "bun run build-lexicons",
     "start": "next start",
     "lint": "eslint"
   },
