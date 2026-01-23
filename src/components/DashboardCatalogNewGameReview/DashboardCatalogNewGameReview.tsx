@@ -137,7 +137,7 @@ export function DashboardCatalogNewGameReview() {
 				</DataList.Item>
 			</DataList.Root>
 
-			<DashboardCatalogNewGameFooter />
+			<DashboardCatalogNewGameFooter previous={'releases'} />
 		</>
 	)
 }
