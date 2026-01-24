@@ -21,7 +21,7 @@
     "graphql-ws": "^6.0.6",
     "motion": "^12.26.2",
     "next": "16.1.2",
-    "quickslice-client-js": "^0.3.0",
+    "quickslice-client-js": "^0.3.1",
     "radix-ui": "^1.4.3",
     "react": "19.2.3",
     "react-dom": "19.2.3",
