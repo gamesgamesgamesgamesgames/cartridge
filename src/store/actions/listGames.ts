@@ -46,15 +46,31 @@ export async function listGames() {
 
 	const { edges, pageInfo } = result.gamesGamesgamesgamesgamesGame
 
-	store.set((previousState) => ({
-		gamesCatalog: [
-			...(previousState.gamesCatalog || []),
-			...edges.map((edge) => ({
-				isHydrated: false,
-				record: edge.node,
-			})),
-		],
-		gamesCatalogCursor: pageInfo.endCursor,
-		gamesCatalogHasNextPage: pageInfo.hasNextPage,
-	}))
+	store.set((previousState) => {
+		const newCatalog = [...(previousState.gamesCatalog || [])]
+
+		edges.forEach(({ node }) => {
+			const index = newCatalog.findIndex(
+				(catalogItem) => catalogItem.record.uri === node.uri,
+			)
+
+			if (index !== -1) {
+				newCatalog[index] = {
+					isHydrated: false,
+					record: node,
+				}
+			} else {
+				newCatalog.push({
+					isHydrated: false,
+					record: node,
+				})
+			}
+		})
+
+		return {
+			gamesCatalog: newCatalog,
+			gamesCatalogCursor: pageInfo.endCursor,
+			gamesCatalogHasNextPage: pageInfo.hasNextPage,
+		}
+	})
 }
