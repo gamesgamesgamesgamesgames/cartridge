@@ -1,12 +1,26 @@
+// Module imports
+import { type QueryOptions } from 'quickslice-client-js'
+
 // Local imports
 import { type GameRecord } from '@/typedefs/GameRecord'
 import { store } from '@/store/store'
 
-export async function listGames() {
+// Types
+type Options = QueryOptions & {}
+
+export async function listGames(options: Options = {}) {
+	const { signal } = options
 	const { gamesCatalogCursor, quicksliceClient } = store.state
 
 	if (!quicksliceClient) {
 		throw new Error('Cannot list games before logging in.')
+	}
+
+	const queryVariables = { cursor: gamesCatalogCursor }
+	const queryOptions: QueryOptions = {}
+
+	if (signal) {
+		queryOptions.signal = signal
 	}
 
 	const result = await quicksliceClient.query<{
@@ -41,7 +55,8 @@ export async function listGames() {
 			}
 		}
 		`,
-		{ cursor: gamesCatalogCursor },
+		queryVariables,
+		queryOptions,
 	)
 
 	const { edges, pageInfo } = result.gamesGamesgamesgamesgamesGame
