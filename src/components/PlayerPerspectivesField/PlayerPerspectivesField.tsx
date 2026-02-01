@@ -1,13 +1,13 @@
 // Local imports
 import { CheckboxCardsField } from '@/components/CheckboxCardsField/CheckboxCardsField'
 import { GAME_PLAYER_PERSPECTIVES } from '@/constants/GAME_PLAYER_PERSPECTIVES'
-import { type Theme } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
+import { type PlayerPerspective } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 
 // Types
 type Props = Readonly<{
 	disabled: boolean
-	onChange: (value: Theme[]) => void
-	value: Theme[]
+	onChange: (id: PlayerPerspective) => (isChecked: boolean) => void
+	value: Set<PlayerPerspective>
 }>
 
 export function PlayerPerspectivesField(props: Props) {
@@ -17,7 +17,7 @@ export function PlayerPerspectivesField(props: Props) {
 		<CheckboxCardsField
 			data={GAME_PLAYER_PERSPECTIVES}
 			disabled={disabled}
-			fieldName={'playerPerspectives'}
+			fieldPrefix={'playerPerspective'}
 			label={'Player Perspectives'}
 			onChange={onChange}
 			value={value}

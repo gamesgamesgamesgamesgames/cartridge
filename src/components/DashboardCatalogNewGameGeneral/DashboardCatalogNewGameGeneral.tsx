@@ -1,13 +1,12 @@
 'use client'
 
 // Module imports
-import { Flex } from '@radix-ui/themes'
 import { type ChangeEventHandler, useCallback } from 'react'
 
 // Local imports
 import { type ApplicationType } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 import { ApplicationTypeField } from '@/components/ApplicationTypeField/ApplicationTypeField'
-import { DashboardCatalogNewGameFooter } from '@/components/DashboardCatalogNewGameFooter/DashboardCatalogNewGameFooter'
+import { Card, CardContent } from '@/components/ui/card'
 import { NameField } from '@/components/NameField/NameField'
 import { SummaryField } from '@/components/SummaryField/SummaryField'
 import { useDashboardCatalogNewGameContext } from '@/context/DashboardCatalogNewGameContext/DashboardCatalogNewGameContext'
@@ -43,32 +42,40 @@ export function DashboardCatalogNewGameGeneral() {
 	const isDisabled = state === 'active'
 
 	return (
-		<>
-			<Flex direction={'column'}>
-				<NameField
-					disabled={isDisabled}
-					onChange={handleNameChange}
-					value={name ?? ''}
-				/>
+		<div className={'flex flex-col gap-4'}>
+			<Card>
+				{/* <CardHeader>
+				<CardTitle>{label}</CardTitle>
+			</CardHeader> */}
 
-				<SummaryField
-					disabled={isDisabled}
-					onChange={handleSummaryChange}
-					value={summary ?? ''}
-				/>
+				<CardContent className={'flex flex-col gap-4'}>
+					<NameField
+						disabled={isDisabled}
+						onChange={handleNameChange}
+						value={name ?? ''}
+					/>
 
-				<ApplicationTypeField
-					disabled={isDisabled}
-					onChange={handleApplicationTypeChange}
-					value={
-						applicationType ?? 'games.gamesgamesgamesgames.applicationType#game'
-					}
-				/>
+					<SummaryField
+						disabled={isDisabled}
+						onChange={handleSummaryChange}
+						value={summary ?? ''}
+					/>
+				</CardContent>
+			</Card>
+			<Card>
+				<CardContent>
+					<ApplicationTypeField
+						disabled={isDisabled}
+						onChange={handleApplicationTypeChange}
+						value={
+							applicationType ??
+							'games.gamesgamesgamesgames.applicationType#game'
+						}
+					/>
 
-				{/* parent */}
-			</Flex>
-
-			<DashboardCatalogNewGameFooter next={'categorization'} />
-		</>
+					{/* parent */}
+				</CardContent>
+			</Card>
+		</div>
 	)
 }

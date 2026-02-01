@@ -1,14 +1,20 @@
 'use client'
 
 // Module imports
-import { Box, Button, Flex, Grid, Heading, Separator } from '@radix-ui/themes'
+import { Flex, Grid } from '@radix-ui/themes'
+import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useStore } from 'statery'
 
 // Local imports
 import { BoxArt } from '@/components/BoxArt/BoxArt'
-import { Link } from '@/components/Link/Link'
+import { Button } from '@/components/ui/button'
+import { Container } from '@/components/Container/Container'
+import { DashboardHeader } from '@/components/DashboardHeader/DashboardHeader'
+import { faEdit, faPlus } from '@fortawesome/free-solid-svg-icons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { listGames } from '@/store/actions/listGames'
+import { parseATURI } from '@/helpers/parseATURI'
 import { type State } from '@/typedefs/State'
 import { store } from '@/store/store'
 
@@ -24,6 +30,32 @@ export function DashboardCatalog() {
 		setState('active')
 		listGames().then(() => setState('idle'))
 	}, [])
+
+	const breadcrumbs = useMemo(
+		() => [
+			{
+				label: 'My Catalog',
+				url: '/dashboard/catalog',
+			},
+		],
+		[],
+	)
+
+	const controls = useMemo(
+		() => (
+			<Button
+				asChild
+				className={'hidden sm:flex'}
+				size={'sm'}
+				variant={'secondary'}>
+				<Link href={`/dashboard/catalog/new-game`}>
+					<FontAwesomeIcon icon={faPlus} />
+					{'Add Game'}
+				</Link>
+			</Button>
+		),
+		[],
+	)
 
 	const gamesElements = useMemo(() => {
 		if (gamesCatalog === null) {
@@ -50,16 +82,52 @@ export function DashboardCatalog() {
 		}
 
 		return (
-			<Grid
-				columns={'5'}
-				gap={'6'}>
-				{gamesCatalog.map((game, index) => (
-					<BoxArt
-						key={index}
-						game={game}
-					/>
-				))}
-			</Grid>
+			<div
+				className={
+					'auto-rows-min gap-4 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 grid-flow-row'
+				}>
+				{gamesCatalog.map((game) => {
+					const { did, rkey } = parseATURI(game.record.uri)
+
+					return (
+						<div
+							key={rkey}
+							className={
+								'duration-[0.1s] group hover:scale-[1.1] relative shadow-md hover:shadow-xl transition-all'
+							}>
+							<BoxArt
+								key={parseATURI(game.record.uri).rkey}
+								game={game}
+							/>
+
+							<div
+								className={
+									'absolute inset-0 opacity-0 group-hover:opacity-100 transition-[opacity]'
+								}>
+								<div className={'absolute flex gap-2 right-2 top-2'}>
+									<Button
+										asChild
+										size={'icon'}>
+										<Link href={`/dashboard/catalog/${did}/${rkey}/overview`}>
+											<FontAwesomeIcon icon={faEdit} />
+										</Link>
+									</Button>
+								</div>
+
+								<div
+									className={'absolute align-end bottom-0 flex left-0 right-0'}>
+									<div
+										className={
+											'absolute inset-0 bg-linear-to-b from-transparent opacity-70 to-background'
+										}
+									/>
+									<div className={'relative p-2'}>{game.record.name}</div>
+								</div>
+							</div>
+						</div>
+					)
+				})}
+			</div>
 		)
 	}, [gamesCatalog, state])
 
@@ -71,40 +139,23 @@ export function DashboardCatalog() {
 
 	return (
 		<>
-			<Flex justify={'between'}>
-				<Heading as={'h2'}>{'Games'}</Heading>
+			<DashboardHeader
+				breadcrumbs={breadcrumbs}
+				controls={controls}
+			/>
 
-				{Boolean(user?.did) && (
-					<Link
-						asChild
-						href={`/dashboard/catalog/new-game/general`}>
-						<Button>{'Add Game'}</Button>
-					</Link>
-				)}
-			</Flex>
+			<Container className={'p-4'}>
+				{gamesElements}
 
-			<Box py={'4'}>
-				<Separator size={'4'} />
-			</Box>
-
-			{gamesElements}
-
-			<Flex
-				align={'stretch'}
-				width={'100%'}>
 				{state !== 'active' && gamesCatalogHasNextPage && (
-					<Box
-						asChild
-						flexGrow={'1'}
-						mt={'4'}>
-						<Button
-							onClick={loadGames}
-							variant={'outline'}>
-							{'Load more'}
-						</Button>
-					</Box>
+					<Button
+						className={'w-full'}
+						onClick={loadGames}
+						variant={'outline'}>
+						{'Load more'}
+					</Button>
 				)}
-			</Flex>
+			</Container>
 		</>
 	)
 }

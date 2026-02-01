@@ -7,8 +7,8 @@ import { Theme } from '@radix-ui/themes'
 import '@radix-ui/themes/styles.css'
 
 // Local imports
-import { AuthManager } from '@/components/AuthManager/AuthManager'
 import { RootLayout } from '@/components/RootLayout/RootLayout'
+import { ThemeProvider } from '@/context/ThemeProvider/ThemeProvider'
 
 import './globals.css'
 
@@ -34,17 +34,21 @@ export default function RootLayoutWrapper(props: Props) {
 	const { children } = props
 
 	return (
-		<html lang='en'>
+		<html
+			lang={'en'}
+			suppressHydrationWarning>
 			<body className={`${geistSans.variable} ${geistMono.variable}`}>
-				<AuthManager />
-
-				<Theme
-					// accentColor={'sky'}
-					appearance={'dark'}
-					// radius={'none'}
-				>
-					<RootLayout>{children}</RootLayout>
-				</Theme>
+				<ThemeProvider
+					attribute={'class'}
+					defaultTheme={'system'}
+					enableSystem
+					disableTransitionOnChange>
+					<Theme
+						appearance={'dark'}
+						radius={'none'}>
+						<RootLayout>{children}</RootLayout>
+					</Theme>
+				</ThemeProvider>
 			</body>
 		</html>
 	)

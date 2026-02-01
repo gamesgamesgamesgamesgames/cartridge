@@ -6,8 +6,8 @@ import { type Theme } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.d
 // Types
 type Props = Readonly<{
 	disabled: boolean
-	onChange: (value: Theme[]) => void
-	value: Theme[]
+	onChange: (id: Theme) => (isChecked: boolean) => void
+	value: Set<Theme>
 }>
 
 export function ThemesField(props: Props) {
@@ -17,7 +17,7 @@ export function ThemesField(props: Props) {
 		<CheckboxCardsField
 			data={GAME_THEMES}
 			disabled={disabled}
-			fieldName={'themes'}
+			fieldPrefix={'themes'}
 			label={'Themes'}
 			onChange={onChange}
 			value={value}

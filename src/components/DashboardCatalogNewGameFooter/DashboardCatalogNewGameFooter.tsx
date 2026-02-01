@@ -1,29 +1,53 @@
 // Module imports
-import { Button, Flex } from '@radix-ui/themes'
-import { faSave, faUpload } from '@fortawesome/free-solid-svg-icons'
+import {
+	faSave,
+	faTriangleExclamation,
+	faUpload,
+} from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 // Local imports
-import { Link } from '@/components/Link/Link'
+import { Button } from '@/components/ui/button'
+import {
+	HoverCard,
+	HoverCardContent,
+	HoverCardTrigger,
+} from '@/components/ui/hover-card'
+import {
+	Item,
+	ItemContent,
+	ItemDescription,
+	ItemMedia,
+} from '@/components/ui/item'
+import { Spinner } from '@/components/ui/spinner'
 import { useDashboardCatalogNewGameContext } from '@/context/DashboardCatalogNewGameContext/DashboardCatalogNewGameContext'
-import { useCallback, useState } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 
-type Props = Readonly<{
-	next?: string
-	previous?: string
-}>
-
-export function DashboardCatalogNewGameFooter(props: Props) {
-	const { next, previous } = props
-
+export function DashboardCatalogNewGameFooter() {
 	const [isPublishing, setIsPublishing] = useState(false)
 	const [isSaving, setIsSaving] = useState(false)
 
-	const { isPublishable, isSaveable, publishGame, saveGameDraft, state } =
-		useDashboardCatalogNewGameContext()
+	const {
+		currentStepIndex,
+		hasNext,
+		hasPrevious,
+		nextStep,
+		previousStep,
+		publishErrors,
+		publishGame,
+		saveErrors,
+		saveGameDraft,
+		state,
+		steps,
+	} = useDashboardCatalogNewGameContext()
+
+	const isDisabled = state === 'active'
+
+	const handleNextClick = useCallback(() => nextStep(), [nextStep])
+	const handlePreviousClick = useCallback(() => previousStep(), [previousStep])
 
 	const handlePublishClick = useCallback(() => {
-		if (!isPublishable) {
+		if (publishErrors.length) {
 			throw new Error('Cannot publish game')
 		}
 
@@ -31,10 +55,57 @@ export function DashboardCatalogNewGameFooter(props: Props) {
 			setIsPublishing(true)
 			publishGame()
 		}
-	}, [isPublishable, isPublishing])
+	}, [isPublishing, publishErrors])
+
+	const nextButton = useMemo(() => {
+		if (hasNext) {
+			return (
+				<Button
+					disabled={isDisabled}
+					onClick={handleNextClick}>
+					{'Next'}
+				</Button>
+			)
+		}
+
+		return (
+			<HoverCard
+				closeDelay={100}
+				openDelay={10}>
+				<HoverCardTrigger>
+					<Button
+						color={'green'}
+						disabled={Boolean(publishErrors.length) || isDisabled}
+						onClick={handlePublishClick}>
+						{isPublishing && <Spinner data-icon={'inline-start'} />}
+						{!isPublishing && <FontAwesomeIcon icon={faUpload} />}
+						{'Publish'}
+					</Button>
+				</HoverCardTrigger>
+
+				{Boolean(publishErrors.length) && (
+					<HoverCardContent
+						className={'flex w-64 flex-col gap-0.5'}
+						side={'top'}>
+						{publishErrors.map((error, index) => (
+							<Item key={index}>
+								<ItemMedia variant={'icon'}>
+									<FontAwesomeIcon icon={faTriangleExclamation} />
+								</ItemMedia>
+
+								<ItemContent>
+									<ItemDescription>{error}</ItemDescription>
+								</ItemContent>
+							</Item>
+						))}
+					</HoverCardContent>
+				)}
+			</HoverCard>
+		)
+	}, [handleNextClick, handlePublishClick, isDisabled, publishErrors])
 
 	const handleSaveClick = useCallback(() => {
-		if (!isSaveable) {
+		if (saveErrors.length) {
 			throw new Error('Cannot publish game')
 		}
 
@@ -42,54 +113,68 @@ export function DashboardCatalogNewGameFooter(props: Props) {
 			setIsSaving(true)
 			saveGameDraft()
 		}
-	}, [isSaveable, isSaving])
+	}, [isSaving, saveErrors])
 
-	const isDisabled = state === 'active'
+	const saveButton = useMemo(
+		() => (
+			<HoverCard
+				closeDelay={100}
+				openDelay={10}>
+				<HoverCardTrigger>
+					<Button
+						disabled={Boolean(saveErrors.length) || isDisabled}
+						onClick={handleSaveClick}
+						variant={'outline'}>
+						{isSaving && <Spinner data-icon={'inline-start'} />}
+						{!isSaving && <FontAwesomeIcon icon={faSave} />}
+						{'Save Draft'}
+					</Button>
+				</HoverCardTrigger>
+
+				{Boolean(saveErrors.length) && (
+					<HoverCardContent
+						className={'flex w-64 flex-col gap-0.5'}
+						side={'top'}>
+						{saveErrors.map((error, index) => (
+							<Item key={index}>
+								<ItemMedia variant={'icon'}>
+									<FontAwesomeIcon icon={faTriangleExclamation} />
+								</ItemMedia>
+
+								<ItemContent>
+									<ItemDescription>{error}</ItemDescription>
+								</ItemContent>
+							</Item>
+						))}
+					</HoverCardContent>
+				)}
+			</HoverCard>
+		),
+		[handleSaveClick, isDisabled, saveErrors],
+	)
 
 	return (
-		<Flex
-			gap={'3'}
-			justify={'between'}
-			mt={'4'}>
-			<Flex gap={'3'}>
-				{Boolean(previous) && (
-					<Link
-						asChild
-						href={`/dashboard/catalog/new-game/${previous}`}>
-						<Button disabled={isDisabled}>{'Back'}</Button>
-					</Link>
-				)}
-			</Flex>
-
-			<Flex gap={'3'}>
-				<Button
-					disabled={!isSaveable || isDisabled}
-					loading={isSaving}
-					onClick={handleSaveClick}
-					variant={'outline'}>
-					<FontAwesomeIcon icon={faSave} />
-					{'Save Draft'}
-				</Button>
-
-				{!next && (
+		<div className={'items-center gap-4 grid grid-cols-3 mt-4'}>
+			<div className={'items-center flex gap-4'}>
+				{hasPrevious && (
 					<Button
-						color={'green'}
-						disabled={!isPublishable || isDisabled}
-						loading={isPublishing}
-						onClick={handlePublishClick}>
-						<FontAwesomeIcon icon={faUpload} />
-						{'Publish'}
+						disabled={isDisabled}
+						onClick={handlePreviousClick}
+						variant={'outline'}>
+						{'Back'}
 					</Button>
 				)}
+			</div>
 
-				{Boolean(next) && (
-					<Link
-						asChild
-						href={`/dashboard/catalog/new-game/${next}`}>
-						<Button disabled={isDisabled}>{'Continue'}</Button>
-					</Link>
-				)}
-			</Flex>
-		</Flex>
+			<div className={'flex justify-center text-muted-foreground text-sm'}>
+				<span>{`Step ${currentStepIndex + 1} of ${steps.length}`}</span>
+			</div>
+
+			<div className={'items-center flex gap-4 justify-end'}>
+				{saveButton}
+
+				{nextButton}
+			</div>
+		</div>
 	)
 }

@@ -4,7 +4,6 @@
 import { Flex } from '@radix-ui/themes'
 
 // Local imports
-import { DashboardCatalogNewGameFooter } from '@/components/DashboardCatalogNewGameFooter/DashboardCatalogNewGameFooter'
 import { useDashboardCatalogNewGameContext } from '@/context/DashboardCatalogNewGameContext/DashboardCatalogNewGameContext'
 
 export function DashboardCatalogNewGameReleases() {
@@ -12,14 +11,5 @@ export function DashboardCatalogNewGameReleases() {
 
 	const isDisabled = state === 'active'
 
-	return (
-		<>
-			<Flex direction={'column'}>{'WIP'}</Flex>
-
-			<DashboardCatalogNewGameFooter
-				previous={'categorization'}
-				next={'review'}
-			/>
-		</>
-	)
+	return <div className={'flex flex-col'}>{'WIP'}</div>
 }

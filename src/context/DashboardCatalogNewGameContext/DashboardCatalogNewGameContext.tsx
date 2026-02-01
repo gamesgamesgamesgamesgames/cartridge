@@ -3,6 +3,7 @@
 // Moduile imports
 import {
 	createContext,
+	type ReactNode,
 	useCallback,
 	useContext,
 	useMemo,
@@ -12,62 +13,125 @@ import {
 import { useRouter } from 'next/navigation'
 
 // Local imports
-import { type GameRecord } from '@/typedefs/GameRecord'
-import { type State } from '@/typedefs/State'
+import { type AtUriString } from '@atproto/lex'
 import { createGame } from '@/store/actions/createGame'
-import { AtUriString } from '@atproto/lex'
+import { type GameRecord } from '@/typedefs/GameRecord'
+import {
+	type Genre,
+	type Mode,
+	type PlayerPerspective,
+	type Theme,
+} from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
+import { GenreError } from '@/context/DashboardCatalogNewGameContext/GenreError'
+import { ModeError } from '@/context/DashboardCatalogNewGameContext/ModeError'
+import { NameError } from '@/context/DashboardCatalogNewGameContext/NameError'
+import { PlayerPerspectiveError } from '@/context/DashboardCatalogNewGameContext/PlayerPerspectiveError'
 import { parseATURI } from '@/helpers/parseATURI'
+import { type State } from '@/typedefs/State'
+import { type StepperStep } from '@/typedefs/StepperStep'
+import { SummaryError } from '@/context/DashboardCatalogNewGameContext/SummaryError'
 
-type Props = PropsWithChildren
+// Types
+type Props = Readonly<
+	PropsWithChildren<{
+		steps: StepperStep[]
+	}>
+>
+
+// publishErrors: [
+// 	name ? null : 'Name is required.',
+// 	summary ? null : 'Summary is required.',
+// 	genres!.size ? null : 'At least 1 Genre is required.',
+// 	modes!.size ? null : 'At least 1 Mode is required.',
+// 	playerPerspectives!.size
+// 		? null
+// 		: 'At least 1 Player Perspective is required.',
+// ].filter(Boolean) as string[],
+// saveErrors: [name ? null : 'Name is required.'].filter(
+// 	Boolean,
+// ) as string[],
 
 export const DashboardCatalogNewGameContext = createContext<
-	Partial<GameRecord> & {
-		isPublishable: boolean
-		isSaveable: boolean
+	Partial<
+		Omit<GameRecord, 'genres' | 'modes' | 'playerPerspectives' | 'themes'>
+	> & {
+		genres: Set<Genre>
+		modes: Set<Mode>
+		playerPerspectives: Set<PlayerPerspective>
+		themes: Set<Theme>
+
+		addGenre: (genre: Genre) => void
+		addMode: (mode: Mode) => void
+		addPlayerPerspective: (playerPerspective: PlayerPerspective) => void
+		addTheme: (theme: Theme) => void
+		currentStep: null | StepperStep
+		currentStepIndex: number
+		goToStepIndex: (stepIndex: number) => void
+		hasNext: boolean
+		hasPrevious: boolean
+		nextStep: () => void
+		previousStep: () => void
 		publishGame: () => void
+		publishErrors: ReactNode[]
+		removeGenre: (genre: Genre) => void
+		removeMode: (mode: Mode) => void
+		removePlayerPerspective: (playerPerspective: PlayerPerspective) => void
+		removeTheme: (theme: Theme) => void
+		saveErrors: ReactNode[]
 		saveGameDraft: () => void
 		setApplicationType: (applicationType: GameRecord['applicationType']) => void
-		setGenres: (genres: GameRecord['genres']) => void
-		setModes: (modes: GameRecord['modes']) => void
 		setName: (name: GameRecord['name']) => void
-		setPlayerPerspectives: (
-			playerPerspectives: GameRecord['playerPerspectives'],
-		) => void
 		setReleaseDates: (releaseDates: GameRecord['releaseDates']) => void
 		setSummary: (summary: GameRecord['summary']) => void
-		setThemes: (themes: GameRecord['themes']) => void
 		state: State
+		steps: StepperStep[]
 	}
 >({
+	genres: new Set(),
+	modes: new Set(),
+	playerPerspectives: new Set(),
+	themes: new Set(),
+
+	addGenre: () => {},
+	addMode: () => {},
+	addPlayerPerspective: () => {},
+	addTheme: () => {},
 	applicationType: 'games.gamesgamesgamesgames.applicationType#game',
-	isPublishable: false,
-	isSaveable: false,
+	currentStep: null,
+	currentStepIndex: 0,
+	goToStepIndex: () => {},
+	hasNext: false,
+	hasPrevious: false,
+	nextStep: () => {},
+	previousStep: () => {},
 	publishGame: () => {},
+	publishErrors: [],
+	removeGenre: () => {},
+	removeMode: () => {},
+	removePlayerPerspective: () => {},
+	removeTheme: () => {},
+	saveErrors: [],
 	saveGameDraft: () => {},
 	setApplicationType: () => {},
-	setGenres: () => {},
-	setModes: () => {},
 	setName: () => {},
-	setPlayerPerspectives: () => {},
 	setReleaseDates: () => {},
 	setSummary: () => {},
-	setThemes: () => {},
 	state: 'idle',
+	steps: [],
 })
 
 export function DashboardCatalogNewGameContextProvider(props: Props) {
-	const { children } = props
+	const { children, steps } = props
 
 	const router = useRouter()
 
-	// const gameURI: AtUriString = `at://${did}/games.gamesgamesgamesgames.game/${rkey}`
-
+	const [currentStepIndex, setCurrentStepIndex] = useState(0)
 	const [state, setState] = useState<State>('idle')
 
 	const [name, setName] = useState<GameRecord['name']>('')
-	const [modes, setModes] = useState<GameRecord['modes']>([])
-	const [genres, setGenres] = useState<GameRecord['genres']>([])
-	const [themes, setThemes] = useState<GameRecord['themes']>([])
+	const [genres, setGenres] = useState<Set<Genre>>(new Set())
+	const [modes, setModes] = useState<Set<Mode>>(new Set())
+	const [themes, setThemes] = useState<Set<Theme>>(new Set())
 	const [summary, setSummary] = useState<GameRecord['summary']>('')
 	const [releaseDates, setReleaseDates] = useState<GameRecord['releaseDates']>(
 		[],
@@ -76,8 +140,78 @@ export function DashboardCatalogNewGameContextProvider(props: Props) {
 		GameRecord['applicationType']
 	>('games.gamesgamesgamesgames.applicationType#game')
 	const [playerPerspectives, setPlayerPerspectives] = useState<
-		GameRecord['playerPerspectives']
-	>([])
+		Set<PlayerPerspective>
+	>(new Set())
+
+	const addGenre = useCallback((genre: Genre) => {
+		setGenres((previousState) => {
+			const newState = new Set(previousState)
+			newState.add(genre)
+			return newState
+		})
+	}, [])
+
+	const removeGenre = useCallback((genre: Genre) => {
+		setGenres((previousState) => {
+			const newState = new Set(previousState)
+			newState.delete(genre)
+			return newState
+		})
+	}, [])
+
+	const addMode = useCallback((mode: Mode) => {
+		setModes((previousState) => {
+			const newState = new Set(previousState)
+			newState.add(mode)
+			return newState
+		})
+	}, [])
+
+	const removeMode = useCallback((mode: Mode) => {
+		setModes((previousState) => {
+			const newState = new Set(previousState)
+			newState.delete(mode)
+			return newState
+		})
+	}, [])
+
+	const addPlayerPerspective = useCallback(
+		(playerPerspective: PlayerPerspective) => {
+			setPlayerPerspectives((previousState) => {
+				const newState = new Set(previousState)
+				newState.add(playerPerspective)
+				return newState
+			})
+		},
+		[],
+	)
+
+	const removePlayerPerspective = useCallback(
+		(playerPerspective: PlayerPerspective) => {
+			setPlayerPerspectives((previousState) => {
+				const newState = new Set(previousState)
+				newState.delete(playerPerspective)
+				return newState
+			})
+		},
+		[],
+	)
+
+	const addTheme = useCallback((theme: Theme) => {
+		setThemes((previousState) => {
+			const newState = new Set(previousState)
+			newState.add(theme)
+			return newState
+		})
+	}, [])
+
+	const removeTheme = useCallback((theme: Theme) => {
+		setThemes((previousState) => {
+			const newState = new Set(previousState)
+			newState.delete(theme)
+			return newState
+		})
+	}, [])
 
 	const saveGame = useCallback(
 		(shouldPublish: boolean) => {
@@ -86,13 +220,13 @@ export function DashboardCatalogNewGameContextProvider(props: Props) {
 				createGame(
 					{
 						applicationType,
-						genres,
-						modes,
+						genres: Array.from(genres || []),
+						modes: Array.from(modes || []),
 						name,
-						playerPerspectives,
+						playerPerspectives: Array.from(playerPerspectives || []),
 						releaseDates,
 						summary,
-						themes,
+						themes: Array.from(themes || []),
 					},
 					{ shouldPublish },
 				).then((recordURI: AtUriString) => {
@@ -114,53 +248,94 @@ export function DashboardCatalogNewGameContextProvider(props: Props) {
 		],
 	)
 
+	const nextStep = useCallback(
+		() => setCurrentStepIndex(currentStepIndex + 1),
+		[currentStepIndex],
+	)
+	const previousStep = useCallback(
+		() => setCurrentStepIndex(currentStepIndex - 1),
+		[currentStepIndex],
+	)
+	const goToStepIndex = useCallback(
+		(stepIndex: number) => setCurrentStepIndex(stepIndex),
+		[],
+	)
+
 	const publishGame = useCallback(() => saveGame(true), [saveGame])
 	const saveGameDraft = useCallback(() => saveGame(false), [saveGame])
 
 	const providerValue = useMemo(
 		() => ({
-			isPublishable:
-				Boolean(name) &&
-				Boolean(summary) &&
-				genres!.length > 0 &&
-				modes!.length > 0 &&
-				playerPerspectives!.length > 0,
-			isSaveable: Boolean(name),
+			currentStep: steps[currentStepIndex],
+			hasNext: currentStepIndex < steps.length - 1,
+			hasPrevious: currentStepIndex !== 0,
+			publishErrors: [
+				name ? null : <NameError />,
+				summary ? null : <SummaryError />,
+				genres!.size ? null : <GenreError />,
+				modes!.size ? null : <ModeError />,
+				playerPerspectives!.size ? null : <PlayerPerspectiveError />,
+			].filter(Boolean) as ReactNode[],
+			saveErrors: [name ? null : <NameError />].filter(Boolean) as ReactNode[],
 
 			applicationType,
+			currentStepIndex,
 			genres,
 			modes,
 			name,
 			playerPerspectives,
 			releaseDates,
 			state,
+			steps,
 			summary,
 			themes,
 
+			addGenre,
+			addMode,
+			addPlayerPerspective,
+			addTheme,
+			goToStepIndex,
+			nextStep,
+			previousStep,
 			publishGame,
+			removeGenre,
+			removeMode,
+			removePlayerPerspective,
+			removeTheme,
 			saveGameDraft,
 			setApplicationType,
-			setGenres,
-			setModes,
+			setCurrentStepIndex,
 			setName,
-			setPlayerPerspectives,
 			setReleaseDates,
 			setSummary,
-			setThemes,
 		}),
 		[
-			publishGame,
-			saveGameDraft,
-
 			applicationType,
+			currentStepIndex,
 			genres,
 			modes,
 			name,
 			playerPerspectives,
 			releaseDates,
 			state,
+			steps,
 			summary,
 			themes,
+
+			addGenre,
+			addMode,
+			addPlayerPerspective,
+			addTheme,
+			goToStepIndex,
+			nextStep,
+			previousStep,
+			publishGame,
+			removeGenre,
+			removeMode,
+			removePlayerPerspective,
+			removeTheme,
+			saveGameDraft,
+			setCurrentStepIndex,
 		],
 	)
 

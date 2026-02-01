@@ -1,67 +1,111 @@
 'use client'
 
 // Module imports
-import { Flex } from '@radix-ui/themes'
+import { useCallback } from 'react'
 
 // Local imports
-import { DashboardCatalogNewGameFooter } from '@/components/DashboardCatalogNewGameFooter/DashboardCatalogNewGameFooter'
-
 import { GenresField } from '@/components/GenresField/GenresField'
+import {
+	type Genre,
+	type Mode,
+	type PlayerPerspective,
+	type Theme,
+} from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 import { ModesField } from '@/components/ModesField/ModesField'
 import { PlayerPerspectivesField } from '@/components/PlayerPerspectivesField/PlayerPerspectivesField'
 import { ThemesField } from '@/components/ThemesField/ThemesField'
-
 import { useDashboardCatalogNewGameContext } from '@/context/DashboardCatalogNewGameContext/DashboardCatalogNewGameContext'
 
 export function DashboardCatalogNewGameCategorization() {
 	const {
+		addGenre,
+		addMode,
+		addPlayerPerspective,
+		addTheme,
 		genres,
 		modes,
 		playerPerspectives,
-		setGenres,
-		setModes,
-		setPlayerPerspectives,
-		setThemes,
+		removeGenre,
+		removeMode,
+		removePlayerPerspective,
+		removeTheme,
 		themes,
 		state,
 	} = useDashboardCatalogNewGameContext()
 
 	const isDisabled = state === 'active'
 
+	const handleGenresChange = useCallback(
+		(id: Genre) => (isChecked: boolean) => {
+			if (isChecked) {
+				addGenre(id)
+			} else {
+				removeGenre(id)
+			}
+		},
+		[],
+	)
+
+	const handleModesChange = useCallback(
+		(id: Mode) => (isChecked: boolean) => {
+			if (isChecked) {
+				addMode(id)
+			} else {
+				removeMode(id)
+			}
+		},
+		[],
+	)
+
+	const handlePlayerPerspectivesChange = useCallback(
+		(id: PlayerPerspective) => (isChecked: boolean) => {
+			if (isChecked) {
+				addPlayerPerspective(id)
+			} else {
+				removePlayerPerspective(id)
+			}
+		},
+		[],
+	)
+
+	const handleThemesChange = useCallback(
+		(id: Theme) => (isChecked: boolean) => {
+			if (isChecked) {
+				addTheme(id)
+			} else {
+				removeTheme(id)
+			}
+		},
+		[],
+	)
+
 	return (
-		<>
-			<Flex direction={'column'}>
-				<GenresField
-					disabled={isDisabled}
-					onChange={setGenres}
-					value={genres ?? []}
-				/>
-
-				<ThemesField
-					disabled={isDisabled}
-					onChange={setThemes}
-					value={themes ?? []}
-				/>
-
-				<PlayerPerspectivesField
-					disabled={isDisabled}
-					onChange={setPlayerPerspectives}
-					value={playerPerspectives ?? []}
-				/>
-
-				<ModesField
-					disabled={isDisabled}
-					onChange={setModes}
-					value={modes ?? []}
-				/>
-
-				{/* releaseDates */}
-			</Flex>
-
-			<DashboardCatalogNewGameFooter
-				next={'releases'}
-				previous={'general'}
+		<div className={'flex flex-col gap-4'}>
+			<GenresField
+				disabled={isDisabled}
+				onChange={handleGenresChange}
+				value={genres ?? new Set()}
 			/>
-		</>
+
+			<ThemesField
+				disabled={isDisabled}
+				onChange={handleThemesChange}
+				value={themes ?? new Set()}
+			/>
+
+			<PlayerPerspectivesField
+				disabled={isDisabled}
+				onChange={handlePlayerPerspectivesChange}
+				value={playerPerspectives ?? new Set()}
+			/>
+
+			<ModesField
+				disabled={isDisabled}
+				onChange={handleModesChange}
+				value={modes ?? new Set()}
+			/>
+
+			{/* releaseDates */}
+		</div>
 	)
 }

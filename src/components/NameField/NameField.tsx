@@ -1,8 +1,9 @@
 // Module imports
-import { Box, Flex, Text, TextField } from '@radix-ui/themes'
+import { type ChangeEventHandler } from 'react'
 
 // Local imports
-import { type ChangeEventHandler } from 'react'
+import { Field, FieldLabel } from '@/components/ui/field'
+import { Input } from '@/components/ui/input'
 
 // Types
 type Props = Readonly<{
@@ -15,19 +16,18 @@ export function NameField(props: Props) {
 	const { disabled, onChange, value } = props
 
 	return (
-		<Flex
-			asChild
-			direction={'column'}>
-			<Box mb={'5'}>
-				<Text>{'Name'}</Text>
-				<TextField.Root
-					autoComplete={'off'}
-					disabled={disabled}
-					onChange={onChange}
-					required
-					value={value}
-				/>
-			</Box>
-		</Flex>
+		<Field>
+			<FieldLabel htmlFor={'game-name'}>{'Name'}</FieldLabel>
+			<Input
+				autoComplete={'off'}
+				disabled={disabled}
+				id={'game-name'}
+				onChange={onChange}
+				placeholder={'The Ultimate RPG: A Role in Time'}
+				required
+				type={'text'}
+				value={value}
+			/>
+		</Field>
 	)
 }

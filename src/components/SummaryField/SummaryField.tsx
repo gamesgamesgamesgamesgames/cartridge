@@ -1,8 +1,9 @@
 // Module imports
-import { Box, Flex, Text, TextArea } from '@radix-ui/themes'
+import { type ChangeEventHandler } from 'react'
 
 // Local imports
-import { type ChangeEventHandler } from 'react'
+import { Field, FieldLabel } from '@/components/ui/field'
+import { Textarea } from '@/components/ui/textarea'
 
 // Types
 type Props = Readonly<{
@@ -15,18 +16,16 @@ export function SummaryField(props: Props) {
 	const { disabled, onChange, value } = props
 
 	return (
-		<Flex
-			asChild
-			direction={'column'}>
-			<Box mb={'5'}>
-				<Text>{'Summary'}</Text>
-				<TextArea
-					disabled={disabled}
-					onChange={onChange}
-					required
-					value={value}
-				/>
-			</Box>
-		</Flex>
+		<Field>
+			<FieldLabel htmlFor={'game-summary'}>{'Summary'}</FieldLabel>
+			<Textarea
+				autoComplete={'off'}
+				disabled={disabled}
+				id={'game-summary'}
+				onChange={onChange}
+				placeholder={'The Ultimate Showdown'}
+				value={value}
+			/>
+		</Field>
 	)
 }
