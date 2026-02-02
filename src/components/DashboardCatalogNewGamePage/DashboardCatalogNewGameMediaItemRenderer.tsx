@@ -10,6 +10,7 @@ import {
 } from 'react'
 
 // Local imports
+import { type BCP47LanguageCode } from '@/typedefs/BCP47LanguageCode'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
 import {
@@ -21,7 +22,8 @@ import { Field, FieldLabel } from '@/components/ui/field'
 import { formatBytes } from '@/helpers/formatBytes'
 import { Input } from '@/components/ui/input'
 import { Item, ItemContent, ItemHeader } from '@/components/ui/item'
-import { MediaItem } from '@/typedefs/MediaItem'
+import { LanguageSelect } from '@/components/LanguageSelect/LanguageSelect'
+import { type MediaItem } from '@/typedefs/MediaItem'
 import {
 	MediaPlayer,
 	MediaPlayerVideo,
@@ -35,7 +37,7 @@ import {
 	MediaPlayerSeek,
 	MediaPlayerTime,
 } from '@/components/ui/media-player'
-import { MediaType } from '@/typedefs/MediaType'
+import { type MediaType } from '@/typedefs/MediaType'
 import {
 	Select,
 	SelectContent,
@@ -97,6 +99,16 @@ export function DashboardCatalogNewGameMediaItemRenderer(
 			updateMedia({
 				...mediaItem,
 				mediaType: value,
+			})
+		},
+		[mediaItem, updateMedia],
+	)
+
+	const handleMediaItemLocaleChange = useCallback(
+		(value: null | BCP47LanguageCode) => {
+			updateMedia({
+				...mediaItem,
+				locale: value,
 			})
 		},
 		[mediaItem, updateMedia],
@@ -329,6 +341,14 @@ export function DashboardCatalogNewGameMediaItemRenderer(
 							</Select>
 						</Field>
 
+						<Field>
+							<FieldLabel>{'Locale'}</FieldLabel>
+
+							<LanguageSelect
+								onValueChange={handleMediaItemLocaleChange}
+								value={mediaItem.locale}
+							/>
+						</Field>
 
 						<div className={'flex justify-end mt-auto'}>
 							<Button variant={'destructive'}>

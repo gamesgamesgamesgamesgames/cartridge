@@ -1,5 +1,6 @@
 // Local imports
-import { MediaType } from '@/typedefs/MediaType'
+import { type BCP47LanguageCode } from '@/typedefs/BCP47LanguageCode'
+import { type MediaType } from '@/typedefs/MediaType'
 
 export type MediaItem = {
 	description: string
@@ -8,6 +9,7 @@ export type MediaItem = {
 		width: number
 	}
 	file: File
+	locale: null | BCP47LanguageCode
 	title: string
 	mediaType: null | MediaType
 }

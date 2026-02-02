@@ -253,6 +253,7 @@ export function DashboardCatalogNewGameContextProvider(props: Props) {
 							description: '',
 							dimensions: null,
 							file,
+							locale: null,
 							mediaType: null,
 							title: '',
 						})
