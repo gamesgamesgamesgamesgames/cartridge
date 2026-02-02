@@ -60,6 +60,7 @@ export const DashboardCatalogNewGameContext = createContext<
 		publishGame: () => void
 		publishErrors: ReactNode[]
 		removeGenre: (genre: Genre) => void
+		removeMedia: (mediaItem: MediaItem) => void
 		removeMode: (mode: Mode) => void
 		removePlayerPerspective: (playerPerspective: PlayerPerspective) => void
 		removeTheme: (theme: Theme) => void
@@ -96,6 +97,7 @@ export const DashboardCatalogNewGameContext = createContext<
 	publishGame: () => {},
 	publishErrors: [],
 	removeGenre: () => {},
+	removeMedia: () => {},
 	removeMode: () => {},
 	removePlayerPerspective: () => {},
 	removeTheme: () => {},
@@ -242,42 +244,46 @@ export function DashboardCatalogNewGameContextProvider(props: Props) {
 		],
 	)
 
-	const updateAllMedia = useCallback(
-		(files: File[]) => {
-			setMedia((previousState) => {
-				const newState = new Map(previousState)
+	const updateAllMedia = useCallback((files: File[]) => {
+		setMedia((previousState) => {
+			const newState = new Map(previousState)
 
-				files.forEach((file) => {
-					if (!newState.has(file)) {
-						newState.set(file, {
-							description: '',
-							dimensions: null,
-							file,
-							locale: null,
-							mediaType: null,
-							title: '',
-						})
-					}
-				})
-
-				return newState
+			files.forEach((file) => {
+				if (!newState.has(file)) {
+					newState.set(file, {
+						description: '',
+						dimensions: null,
+						file,
+						locale: null,
+						mediaType: null,
+						title: '',
+					})
+				}
 			})
-		},
-		[media],
-	)
 
-	const updateMedia = useCallback(
-		(mediaItem: MediaItem) => {
-			setMedia((previousState) => {
-				const newState = new Map(previousState)
+			return newState
+		})
+	}, [])
 
-				newState.set(mediaItem.file, mediaItem)
+	const updateMedia = useCallback((mediaItem: MediaItem) => {
+		setMedia((previousState) => {
+			const newState = new Map(previousState)
 
-				return newState
-			})
-		},
-		[media],
-	)
+			newState.set(mediaItem.file, mediaItem)
+
+			return newState
+		})
+	}, [])
+
+	const removeMedia = useCallback((mediaItem: MediaItem) => {
+		setMedia((previousState) => {
+			const newState = new Map(previousState)
+
+			newState.delete(mediaItem.file)
+
+			return newState
+		})
+	}, [])
 
 	const nextStep = useCallback(
 		() => setCurrentStepIndex(Math.min(steps.length - 1, currentStepIndex + 1)),
@@ -337,6 +343,7 @@ export function DashboardCatalogNewGameContextProvider(props: Props) {
 			previousStep,
 			publishGame,
 			removeGenre,
+			removeMedia,
 			removeMode,
 			removePlayerPerspective,
 			removeTheme,
@@ -353,6 +360,7 @@ export function DashboardCatalogNewGameContextProvider(props: Props) {
 			applicationType,
 			currentStepIndex,
 			genres,
+			media,
 			modes,
 			name,
 			playerPerspectives,
@@ -371,6 +379,7 @@ export function DashboardCatalogNewGameContextProvider(props: Props) {
 			previousStep,
 			publishGame,
 			removeGenre,
+			removeMedia,
 			removeMode,
 			removePlayerPerspective,
 			removeTheme,

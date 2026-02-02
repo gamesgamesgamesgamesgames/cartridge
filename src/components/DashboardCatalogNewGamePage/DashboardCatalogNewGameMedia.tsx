@@ -12,7 +12,7 @@ import {
 import { DashboardCatalogNewGameMediaItemRenderer } from '@/components/DashboardCatalogNewGamePage/DashboardCatalogNewGameMediaItemRenderer'
 import { Scroller } from '@/components/ui/scroller'
 import { toast } from 'sonner'
-import { useCallback } from 'react'
+import { useCallback, useMemo } from 'react'
 import { useDashboardCatalogNewGameContext } from '@/context/DashboardCatalogNewGameContext/DashboardCatalogNewGameContext'
 
 export function DashboardCatalogNewGameMedia() {
@@ -23,6 +23,15 @@ export function DashboardCatalogNewGameMedia() {
 			description: `"${file.name.length > 20 ? `${file.name.slice(0, 20)}...` : file.name}" has been rejected`,
 		})
 	}, [])
+
+	const mediaElements = useMemo(() => {
+		return Array.from(media.values()).map((mediaItem, index) => (
+			<DashboardCatalogNewGameMediaItemRenderer
+				key={index}
+				mediaItem={mediaItem}
+			/>
+		))
+	}, [media])
 
 	return (
 		<FileUpload
@@ -62,14 +71,7 @@ export function DashboardCatalogNewGameMedia() {
 			</FileUploadDropzone>
 
 			<Scroller>
-				<ul className={'flex flex-col gap-4'}>
-					{Array.from(media.values()).map((mediaItem, index) => (
-						<DashboardCatalogNewGameMediaItemRenderer
-							key={index}
-							mediaItem={mediaItem}
-						/>
-					))}
-				</ul>
+				<ul className={'flex flex-col gap-4'}>{mediaElements}</ul>
 			</Scroller>
 		</FileUpload>
 	)

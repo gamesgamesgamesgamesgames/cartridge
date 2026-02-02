@@ -61,7 +61,8 @@ export function DashboardCatalogNewGameMediaItemRenderer(
 ) {
 	const { mediaItem } = props
 
-	const { state, updateMedia } = useDashboardCatalogNewGameContext()
+	const { removeMedia, state, updateMedia } =
+		useDashboardCatalogNewGameContext()
 
 	const imageElementRef = useRef<HTMLImageElement>(null)
 	const videoElementRef = useRef<HTMLVideoElement>(null)
@@ -112,6 +113,11 @@ export function DashboardCatalogNewGameMediaItemRenderer(
 			})
 		},
 		[mediaItem, updateMedia],
+	)
+
+	const handleMediaItemRemove = useCallback(
+		() => removeMedia(mediaItem),
+		[mediaItem, removeMedia],
 	)
 
 	useEffect(() => {
@@ -253,7 +259,7 @@ export function DashboardCatalogNewGameMediaItemRenderer(
 							<Select
 								disabled={isDisabled}
 								onValueChange={handleMediaItemMediaTypeChange}
-								value={mediaItem.mediaType ?? undefined}>
+								value={mediaItem.mediaType ?? ''}>
 								<SelectTrigger>
 									<SelectValue placeholder={'Select a media type'} />
 								</SelectTrigger>
@@ -351,7 +357,9 @@ export function DashboardCatalogNewGameMediaItemRenderer(
 						</Field>
 
 						<div className={'flex justify-end mt-auto'}>
-							<Button variant={'destructive'}>
+							<Button
+								onClick={handleMediaItemRemove}
+								variant={'destructive'}>
 								<FontAwesomeIcon icon={faTimes} />
 								{'Remove'}
 							</Button>
