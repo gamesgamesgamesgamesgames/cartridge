@@ -25,7 +25,7 @@ export function DashboardCatalogNewGamePage() {
 		<DashboardCatalogNewGameContextProvider>
 			<DashboardHeader breadcrumbs={BREADCRUMBS} />
 
-			<Container>
+			<Container isScrollable={false}>
 				<div className={'items-stretch flex gap-4 h-full overflow-hidden'}>
 					<DashboardCatalogNewGamePageStepper />
 

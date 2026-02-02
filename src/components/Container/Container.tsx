@@ -6,18 +6,34 @@ import { twMerge } from 'tailwind-merge'
 import { Scroller } from '@/components/ui/scroller'
 
 // Types
-type Props = Readonly<ComponentProps<'div'>>
+type Props = Readonly<
+	ComponentProps<'div'> & {
+		isScrollable?: boolean
+	}
+>
 
 export function Container(props: Props) {
-	const { children, className } = props
+	const { children, className, isScrollable = true } = props
+
+	if (isScrollable) {
+		return (
+			<Scroller
+				className={twMerge(
+					'flex flex-col grow items-center overflow-auto p-4',
+					className,
+				)}>
+				<div className={'max-w-6xl size-full'}>{children}</div>
+			</Scroller>
+		)
+	}
 
 	return (
-		<Scroller
+		<div
 			className={twMerge(
 				'flex flex-col grow items-center overflow-auto p-4',
 				className,
 			)}>
 			<div className={'max-w-6xl size-full'}>{children}</div>
-		</Scroller>
+		</div>
 	)
 }
