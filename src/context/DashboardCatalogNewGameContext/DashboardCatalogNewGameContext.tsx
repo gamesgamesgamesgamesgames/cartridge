@@ -23,6 +23,7 @@ import {
 	type Theme,
 } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 import { GenreError } from '@/context/DashboardCatalogNewGameContext/GenreError'
+import { type MediaItem } from '@/typedefs/MediaItem'
 import { ModeError } from '@/context/DashboardCatalogNewGameContext/ModeError'
 import { NameError } from '@/context/DashboardCatalogNewGameContext/NameError'
 import { NEW_GAME_STEPS } from '@/constants/NEW_GAME_STEPS'
@@ -40,6 +41,7 @@ export const DashboardCatalogNewGameContext = createContext<
 		Omit<GameRecord, 'genres' | 'modes' | 'playerPerspectives' | 'themes'>
 	> & {
 		genres: Set<Genre>
+		media: Map<File, MediaItem>
 		modes: Set<Mode>
 		playerPerspectives: Set<PlayerPerspective>
 		themes: Set<Theme>
@@ -69,9 +71,12 @@ export const DashboardCatalogNewGameContext = createContext<
 		setSummary: (summary: GameRecord['summary']) => void
 		state: State
 		steps: StepperStep[]
+		updateAllMedia: (files: File[]) => void
+		updateMedia: (mediaItem: MediaItem) => void
 	}
 >({
 	genres: new Set(),
+	media: new Map(),
 	modes: new Set(),
 	playerPerspectives: new Set(),
 	themes: new Set(),
@@ -102,6 +107,8 @@ export const DashboardCatalogNewGameContext = createContext<
 	setSummary: () => {},
 	state: 'idle',
 	steps: [],
+	updateAllMedia: () => {},
+	updateMedia: () => {},
 })
 
 export function DashboardCatalogNewGameContextProvider(props: Props) {
@@ -115,6 +122,7 @@ export function DashboardCatalogNewGameContextProvider(props: Props) {
 	const [state, setState] = useState<State>('idle')
 
 	const [name, setName] = useState<GameRecord['name']>('')
+	const [media, setMedia] = useState<Map<File, MediaItem>>(new Map())
 	const [genres, setGenres] = useState<Set<Genre>>(new Set())
 	const [modes, setModes] = useState<Set<Mode>>(new Set())
 	const [themes, setThemes] = useState<Set<Theme>>(new Set())
@@ -234,6 +242,42 @@ export function DashboardCatalogNewGameContextProvider(props: Props) {
 		],
 	)
 
+	const updateAllMedia = useCallback(
+		(files: File[]) => {
+			setMedia((previousState) => {
+				const newState = new Map(previousState)
+
+				files.forEach((file) => {
+					if (!newState.has(file)) {
+						newState.set(file, {
+							description: '',
+							dimensions: null,
+							file,
+							mediaType: null,
+							title: '',
+						})
+					}
+				})
+
+				return newState
+			})
+		},
+		[media],
+	)
+
+	const updateMedia = useCallback(
+		(mediaItem: MediaItem) => {
+			setMedia((previousState) => {
+				const newState = new Map(previousState)
+
+				newState.set(mediaItem.file, mediaItem)
+
+				return newState
+			})
+		},
+		[media],
+	)
+
 	const nextStep = useCallback(
 		() => setCurrentStepIndex(Math.min(steps.length - 1, currentStepIndex + 1)),
 		[currentStepIndex, steps],
@@ -273,6 +317,7 @@ export function DashboardCatalogNewGameContextProvider(props: Props) {
 			applicationType,
 			currentStepIndex,
 			genres,
+			media,
 			modes,
 			name,
 			playerPerspectives,
@@ -300,6 +345,8 @@ export function DashboardCatalogNewGameContextProvider(props: Props) {
 			setName,
 			setReleaseDates,
 			setSummary,
+			updateAllMedia,
+			updateMedia,
 		}),
 		[
 			applicationType,
@@ -328,6 +375,8 @@ export function DashboardCatalogNewGameContextProvider(props: Props) {
 			removeTheme,
 			saveGameDraft,
 			setCurrentStepIndex,
+			updateAllMedia,
+			updateMedia,
 		],
 	)
 

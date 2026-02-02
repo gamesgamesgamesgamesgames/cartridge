@@ -1,7 +1,13 @@
 // Module imports
 import { faTimes } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import {
+	ChangeEventHandler,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+} from 'react'
 
 // Local imports
 import { Button } from '@/components/ui/button'
@@ -12,13 +18,10 @@ import {
 	DataListValue,
 } from '@/components/DataList/DataList'
 import { Field, FieldLabel } from '@/components/ui/field'
-import {
-	FileUploadItem,
-	FileUploadItemDelete,
-} from '@/components/ui/file-upload'
 import { formatBytes } from '@/helpers/formatBytes'
 import { Input } from '@/components/ui/input'
 import { Item, ItemContent, ItemHeader } from '@/components/ui/item'
+import { MediaItem } from '@/typedefs/MediaItem'
 import {
 	MediaPlayer,
 	MediaPlayerVideo,
@@ -32,6 +35,7 @@ import {
 	MediaPlayerSeek,
 	MediaPlayerTime,
 } from '@/components/ui/media-player'
+import { MediaType } from '@/typedefs/MediaType'
 import {
 	Select,
 	SelectContent,
@@ -43,71 +47,107 @@ import {
 	SelectValue,
 } from '@/components/ui/select'
 import { Textarea } from '@/components/ui/textarea'
+import { useDashboardCatalogNewGameContext } from '@/context/DashboardCatalogNewGameContext/DashboardCatalogNewGameContext'
 
 // Types
 type ItemRendererProps = Readonly<{
-	file: File
+	mediaItem: MediaItem
 }>
 
 export function DashboardCatalogNewGameMediaItemRenderer(
 	props: ItemRendererProps,
 ) {
-	const { file } = props
+	const { mediaItem } = props
 
-	console.log(file)
+	const { state, updateMedia } = useDashboardCatalogNewGameContext()
 
 	const imageElementRef = useRef<HTMLImageElement>(null)
 	const videoElementRef = useRef<HTMLVideoElement>(null)
 
-	const [dimensions, setDimensions] = useState<null | {
-		height: number
-		width: number
-	}>(null)
+	const url = useMemo(() => URL.createObjectURL(mediaItem.file), [mediaItem])
 
-	const url = useMemo(() => URL.createObjectURL(file), [file])
+	const keyPrefix = mediaItem.file.name.replace(' ', '-')
 
-	const keyPrefix = file.name.replace(' ', '-')
+	const handleMediaItemTitleChange = useCallback<
+		ChangeEventHandler<HTMLInputElement>
+	>(
+		(event) => {
+			updateMedia({
+				...mediaItem,
+				title: event.target.value,
+			})
+		},
+		[mediaItem, updateMedia],
+	)
+
+	const handleMediaItemDescriptionChange = useCallback<
+		ChangeEventHandler<HTMLTextAreaElement>
+	>(
+		(event) => {
+			updateMedia({
+				...mediaItem,
+				description: event.target.value,
+			})
+		},
+		[mediaItem, updateMedia],
+	)
+
+	const handleMediaItemMediaTypeChange = useCallback(
+		(value: MediaType) => {
+			updateMedia({
+				...mediaItem,
+				mediaType: value,
+			})
+		},
+		[mediaItem, updateMedia],
+	)
 
 	useEffect(() => {
 		const imageElement = imageElementRef.current
 		const videoElement = videoElementRef.current
 
-		if (!dimensions) {
+		if (!mediaItem.dimensions) {
 			if (imageElement) {
 				imageElement.onload = () => {
-					setDimensions({
-						height: imageElement.naturalHeight,
-						width: imageElement.naturalWidth,
+					updateMedia({
+						...mediaItem,
+						dimensions: {
+							height: imageElement.naturalHeight,
+							width: imageElement.naturalWidth,
+						},
 					})
 				}
 			} else if (videoElement) {
 				videoElement.addEventListener('loadedmetadata', () => {
-					setDimensions({
-						height: videoElement.videoHeight,
-						width: videoElement.videoWidth,
+					updateMedia({
+						...mediaItem,
+						dimensions: {
+							height: videoElement.videoHeight,
+							width: videoElement.videoWidth,
+						},
 					})
 				})
 			}
 		}
-	}, [dimensions])
+	}, [mediaItem])
+
+	const isDisabled = state === 'active'
 
 	return (
-		<FileUploadItem
-			className={'border-none p-0'}
-			value={file}>
+		<li className={'border-none p-0'}>
 			<Card className={'p-4 size-full'}>
-				<div className={'flex gap-4'}>
+				<div className={'flex gap-4 items-stretch'}>
 					<Item
 						className={'shrink-0 w-xs'}
 						variant={'outline'}>
 						<ItemHeader>
-							{file.type.startsWith('video/') && (
+							{mediaItem.file.type.startsWith('video/') && (
 								<MediaPlayer
 									className={'object-contain rounded-none size-full'}>
 									<MediaPlayerVideo ref={videoElementRef}>
 										<source
 											src={url}
-											type={file.type}
+											type={mediaItem.file.type}
 										/>
 									</MediaPlayerVideo>
 									<MediaPlayerLoading />
@@ -132,9 +172,9 @@ export function DashboardCatalogNewGameMediaItemRenderer(
 								</MediaPlayer>
 							)}
 
-							{file.type.startsWith('image/') && (
+							{mediaItem.file.type.startsWith('image/') && (
 								<img
-									alt={file.name}
+									alt={mediaItem.file.name}
 									className={'object-contain size-full'}
 									ref={imageElementRef}
 									src={url}
@@ -145,28 +185,38 @@ export function DashboardCatalogNewGameMediaItemRenderer(
 						<ItemContent>
 							<DataList>
 								<DataListLabel>{'Filename'}</DataListLabel>
-								<DataListValue>{file.name}</DataListValue>
+								<DataListValue>{mediaItem.file.name}</DataListValue>
 
 								<DataListLabel>{'Dimensions'}</DataListLabel>
-								<DataListValue>{`${dimensions?.width} × ${dimensions?.height}`}</DataListValue>
+								<DataListValue>
+									{mediaItem.dimensions ? (
+										`${mediaItem.dimensions.width} × ${mediaItem.dimensions.height}`
+									) : (
+										<span className={'text-muted-foreground'}>
+											{'Unavailable'}
+										</span>
+									)}
+								</DataListValue>
 
 								<DataListLabel>{'Size'}</DataListLabel>
-								<DataListValue>{formatBytes(file.size)}</DataListValue>
+								<DataListValue>
+									{formatBytes(mediaItem.file.size)}
+								</DataListValue>
 							</DataList>
 						</ItemContent>
 					</Item>
 
-					<div className={'flex flex-col gap-4 w-full'}>
+					<div className={'flex flex-col gap-4 grow w-full'}>
 						<Field>
 							<FieldLabel htmlFor={`${keyPrefix}-title`}>{'Title'}</FieldLabel>
 							<Input
 								autoComplete={'off'}
-								// disabled={disabled}
+								disabled={isDisabled}
 								id={`${keyPrefix}-title`}
-								// onChange={onChange}
+								onChange={handleMediaItemTitleChange}
 								required
 								type={'text'}
-								// value={value}
+								value={mediaItem.title}
 							/>
 						</Field>
 
@@ -176,11 +226,11 @@ export function DashboardCatalogNewGameMediaItemRenderer(
 							</FieldLabel>
 							<Textarea
 								autoComplete={'off'}
-								// disabled={disabled}
+								disabled={isDisabled}
 								id={`${keyPrefix}-description`}
-								// onChange={onChange}
+								onChange={handleMediaItemDescriptionChange}
 								required
-								// value={value}
+								value={mediaItem.description}
 							/>
 						</Field>
 
@@ -189,16 +239,15 @@ export function DashboardCatalogNewGameMediaItemRenderer(
 								{'Media Type'}
 							</FieldLabel>
 							<Select
-							// disabled={disabled}
-							// onValueChange={onChange}
-							// value={value}
-							>
+								disabled={isDisabled}
+								onValueChange={handleMediaItemMediaTypeChange}
+								value={mediaItem.mediaType ?? undefined}>
 								<SelectTrigger>
 									<SelectValue placeholder={'Select a media type'} />
 								</SelectTrigger>
 
 								<SelectContent>
-									{file.type.startsWith('video/') && (
+									{mediaItem.file.type.startsWith('video/') && (
 										<>
 											<SelectItem value={'trailer'}>{'Trailer'}</SelectItem>
 
@@ -229,7 +278,7 @@ export function DashboardCatalogNewGameMediaItemRenderer(
 											<SelectGroup>
 												<SelectLabel>{'Other'}</SelectLabel>
 												<SelectItem value={'teaser'}>{'Teaser'}</SelectItem>
-												<SelectItem value={'gameplay'}>
+												<SelectItem value={'gameplayImage'}>
 													{'Gameplay Footage'}
 												</SelectItem>
 												<SelectItem value={'devDiary'}>
@@ -241,7 +290,7 @@ export function DashboardCatalogNewGameMediaItemRenderer(
 										</>
 									)}
 
-									{file.type.startsWith('image/') && (
+									{mediaItem.file.type.startsWith('image/') && (
 										<>
 											<SelectItem value={'screenshot'}>
 												{'Screenshot'}
@@ -280,19 +329,16 @@ export function DashboardCatalogNewGameMediaItemRenderer(
 							</Select>
 						</Field>
 
-						<div>
-							<FileUploadItemDelete asChild>
-								<Button
-									variant={'ghost'}
-									size={'icon'}
-									className={'size-7'}>
-									<FontAwesomeIcon icon={faTimes} />
-								</Button>
-							</FileUploadItemDelete>
+
+						<div className={'flex justify-end mt-auto'}>
+							<Button variant={'destructive'}>
+								<FontAwesomeIcon icon={faTimes} />
+								{'Remove'}
+							</Button>
 						</div>
 					</div>
 				</div>
 			</Card>
-		</FileUploadItem>
+		</li>
 	)
 }

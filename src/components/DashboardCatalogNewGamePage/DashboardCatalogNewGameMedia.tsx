@@ -7,61 +7,16 @@ import { Button } from '@/components/ui/button'
 import {
 	FileUpload,
 	FileUploadDropzone,
-	FileUploadList,
-	FileUploadProps,
 	FileUploadTrigger,
 } from '@/components/ui/file-upload'
 import { DashboardCatalogNewGameMediaItemRenderer } from '@/components/DashboardCatalogNewGamePage/DashboardCatalogNewGameMediaItemRenderer'
 import { Scroller } from '@/components/ui/scroller'
 import { toast } from 'sonner'
-import { useCallback, useState } from 'react'
+import { useCallback } from 'react'
+import { useDashboardCatalogNewGameContext } from '@/context/DashboardCatalogNewGameContext/DashboardCatalogNewGameContext'
 
 export function DashboardCatalogNewGameMedia() {
-	const [files, setFiles] = useState<File[]>([])
-
-	const onUpload: NonNullable<FileUploadProps['onUpload']> = useCallback(
-		async (files, { onProgress, onSuccess, onError }) => {
-			try {
-				// Process each file individually
-				const uploadPromises = files.map(async (file) => {
-					try {
-						// Simulate file upload with progress
-						const totalChunks = 10
-						let uploadedChunks = 0
-
-						// Simulate chunk upload with delays
-						for (let i = 0; i < totalChunks; i++) {
-							// Simulate network delay (100-300ms per chunk)
-							await new Promise((resolve) =>
-								setTimeout(resolve, Math.random() * 200 + 100),
-							)
-
-							// Update progress for this specific file
-							uploadedChunks++
-							const progress = (uploadedChunks / totalChunks) * 100
-							onProgress(file, progress)
-						}
-
-						// Simulate server processing delay
-						await new Promise((resolve) => setTimeout(resolve, 500))
-						onSuccess(file)
-					} catch (error) {
-						onError(
-							file,
-							error instanceof Error ? error : new Error('Upload failed'),
-						)
-					}
-				})
-
-				// Wait for all uploads to complete
-				await Promise.all(uploadPromises)
-			} catch (error) {
-				// This handles any error that might occur outside the individual upload processes
-				console.error('Unexpected error during upload:', error)
-			}
-		},
-		[],
-	)
+	const { media, updateAllMedia } = useDashboardCatalogNewGameContext()
 
 	const onFileReject = useCallback((file: File, message: string) => {
 		toast(message, {
@@ -72,14 +27,13 @@ export function DashboardCatalogNewGameMedia() {
 	return (
 		<FileUpload
 			className={
-				'flex flex-col grow justify-stretch overflow-hidden shrink w-full'
+				'flex flex-col gap-4 grow justify-stretch overflow-hidden shrink w-full'
 			}
 			maxSize={5 * 1024 * 1024}
 			multiple
 			onFileReject={onFileReject}
-			onUpload={onUpload}
-			onValueChange={setFiles}
-			value={files}>
+			onValueChange={updateAllMedia}
+			value={Array.from(media.values()).map(({ file }) => file)}>
 			<FileUploadDropzone>
 				<div className={'flex flex-col items-center gap-1 text-center'}>
 					<div
@@ -108,14 +62,14 @@ export function DashboardCatalogNewGameMedia() {
 			</FileUploadDropzone>
 
 			<Scroller>
-				<FileUploadList>
-					{files.map((file, index) => (
+				<ul className={'flex flex-col gap-4'}>
+					{Array.from(media.values()).map((mediaItem, index) => (
 						<DashboardCatalogNewGameMediaItemRenderer
 							key={index}
-							file={file}
+							mediaItem={mediaItem}
 						/>
 					))}
-				</FileUploadList>
+				</ul>
 			</Scroller>
 		</FileUpload>
 	)

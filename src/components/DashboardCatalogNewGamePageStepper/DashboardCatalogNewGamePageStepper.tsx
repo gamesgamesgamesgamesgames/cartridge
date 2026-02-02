@@ -28,7 +28,7 @@ export function DashboardCatalogNewGamePageStepper() {
 			<Button
 				key={index}
 				asChild
-				className={'cursor-default'}
+				className={'cursor-default flex-nowrap'}
 				onClick={() => goToStepIndex(index)}
 				variant={'ghost'}>
 				<Item
