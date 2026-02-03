@@ -1,31 +1,22 @@
 // Module imports
-import {
-	Link as RadixLink,
-	type LinkProps as RadixLinkProps,
-} from '@radix-ui/themes'
-import NextLink from 'next/link'
-import { LinkProps as NextLinkProps } from 'next/link'
+import { type ComponentProps } from 'react'
+import NextLink, { type LinkProps as NextLinkProps } from 'next/link'
+import { twMerge } from 'tailwind-merge'
 
 // Types
-type Props = Readonly<
-	RadixLinkProps & {
-		href: NextLinkProps['href']
-		nextProps?: NextLinkProps
-	}
->
+type Props = Readonly<ComponentProps<'a'> & NextLinkProps & {}>
 
 export function Link(props: Props) {
-	const { children, nextProps } = props
+	const { children, className } = props
 
 	return (
-		<RadixLink
-			asChild
-			{...props}>
-			<NextLink
-				{...nextProps}
-				href={props.href}>
-				{children}
-			</NextLink>
-		</RadixLink>
+		<NextLink
+			{...props}
+			className={twMerge(
+				'no-underline text-blue-400 hover:underline',
+				className,
+			)}>
+			{children}
+		</NextLink>
 	)
 }
