@@ -132,7 +132,19 @@
       "type": "object",
       "properties": {
         "region": {
-          "type": "string"
+          "type": "string",
+          "knownValues": [
+            "worldwide",
+            "europe",
+            "northAmerica",
+            "australia",
+            "newZealand",
+            "japan",
+            "china",
+            "asia",
+            "korea",
+            "brazil"
+          ]
         },
         "status": {
           "type": "string",
