@@ -12,7 +12,7 @@ type Props = Readonly<
 export function Header(props: Props) {
 	const { children, className, level } = props
 
-	const baseClassName = `scroll-m-20 text-4xl font-extrabold tracking-tight text-balance`
+	const baseClassName = `scroll-m-20 font-extrabold tracking-tight text-balance`
 
 	switch (level) {
 		case 6:
@@ -22,15 +22,31 @@ export function Header(props: Props) {
 			return <h5 className={twMerge(baseClassName, className)}>{children}</h5>
 
 		case 4:
-			return <h4 className={twMerge(baseClassName, className)}>{children}</h4>
+			return (
+				<h4 className={twMerge('text-xl', baseClassName, className)}>
+					{children}
+				</h4>
+			)
 
 		case 3:
-			return <h3 className={twMerge(baseClassName, className)}>{children}</h3>
+			return (
+				<h3 className={twMerge('text-2xl', baseClassName, className)}>
+					{children}
+				</h3>
+			)
 
 		case 2:
-			return <h2 className={twMerge(baseClassName, className)}>{children}</h2>
+			return (
+				<h2 className={twMerge('text-3xl', baseClassName, className)}>
+					{children}
+				</h2>
+			)
 
 		default:
-			return <h1 className={twMerge(baseClassName, className)}>{children}</h1>
+			return (
+				<h1 className={twMerge('text-4xl', baseClassName, className)}>
+					{children}
+				</h1>
+			)
 	}
 }
