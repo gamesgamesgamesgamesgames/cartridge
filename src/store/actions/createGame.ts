@@ -31,9 +31,8 @@ export async function createGame(
 		...gameDetails,
 		createdAt: timestamp,
 		media: gameDetails.media.map((mediaItem) => {
-			const newMediaItem = { ...mediaItem }
-			delete newMediaItem.file
-			return newMediaItem
+			const { file: _file, id: _id, ...cleanedMediaItem } = mediaItem
+			return cleanedMediaItem
 		}),
 		// Strip internal IDs from releases before sending to API
 		releases: gameDetails.releases?.map((release) => {

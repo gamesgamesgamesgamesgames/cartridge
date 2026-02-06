@@ -30,10 +30,35 @@ export async function getGame(uri: string) {
 						uri
 						did
 						applicationType
+						createdAt
 						genres
+						media {
+							blob {
+								ref
+								mimeType
+								size
+								url
+							}
+							description
+							height
+							locale
+							mediaType
+							title
+							width
+						}
 						modes
 						name
 						playerPerspectives
+						publishedAt
+						releases {
+							platform
+							releaseDates {
+								region
+								releasedAt
+								releasedAtFormat
+								status
+							}
+						}
 						summary
 						themes
 					}

@@ -20,58 +20,44 @@ export async function putGame(uri: AtUriString, gameDetails: UnpublishedGame, op
 
 	const { rkey } = parseATURI(uri)
 
-	const mutationVariables: UnpublishedGame & {
+	const input: UnpublishedGame & {
 		publishedAt?: string
-		rkey: string
-	} = { 
+	} = {
 		...gameDetails,
-		rkey,
+		media: gameDetails.media.map((mediaItem) => {
+			const { file: _file, id: _id, ...cleanedMediaItem } = mediaItem
+			return cleanedMediaItem
+		}),
+		releases: gameDetails.releases?.map((release) => {
+			const { id: _releaseId, ...releaseWithoutId } = release as typeof release & { id?: string }
+			return {
+				...releaseWithoutId,
+				releaseDates: release.releaseDates?.map((rd) => {
+					const { id: _rdId, ...rdWithoutId } = rd as typeof rd & { id?: string }
+					return rdWithoutId
+				}),
+			}
+		}),
 	}
 
-	const timestamp = (new Date()).toISOString()
-
 	if (shouldPublish) {
-		mutationVariables.publishedAt = timestamp
+		input.publishedAt = new Date().toISOString()
 	}
 
 	const result = await quicksliceClient.mutate<{
-		gamesGamesgamesgamesgamesGame: {
-			edges: []
+		updateGamesGamesgamesgamesgamesGame: {
+			uri: AtUriString
 		}
 	}>(
 		`
-		mutation PutGame (
-			$rkey: String!
-			$createdAt: DateTime!
-			$publishedAt: DateTime!
-			$applicationType: String!,
-			$genres: [String!],
-			$modes: [String!],
-			$name: String!,
-			$playerPerspectives: [String!],
-			$summary: String,
-			$themes: [String!],
-		) {
-			updateGamesGamesgamesgamesgamesGame (
-				rkey: $rkey
-				input:  {
-					createdAt: $createdAt
-					publishedAt: $publishedAt
-					applicationType: $applicationType
-					genres: $genres
-					modes: $modes
-					name: $name
-					playerPerspectives: $playerPerspectives
-					summary: $summary
-					themes: $themes
-				}
-			) {
+		mutation PutGame ($rkey: String!, $input: GamesGamesgamesgamesgamesGameInput!) {
+			updateGamesGamesgamesgamesgamesGame (rkey: $rkey, input: $input) {
 				uri
 			}
 		}
 		`,
-		mutationVariables,
+		{ rkey, input },
 	)
 
-	return result
+	return result.updateGamesGamesgamesgamesgamesGame.uri
 }

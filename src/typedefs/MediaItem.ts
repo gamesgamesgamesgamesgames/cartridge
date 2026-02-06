@@ -9,9 +9,11 @@ export type MediaItem = MediaItemDef & {
 		ref: Cid
 		mimeType: string
 		size: number
+		url?: string
 	}
 	description: string
 	height: null | number
+	id: string
 	width: null | number
 	file?: File
 	locale: null | BCP47LanguageCode

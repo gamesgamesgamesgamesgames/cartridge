@@ -105,7 +105,7 @@ export function DashboardCatalog() {
 									<Button
 										asChild
 										size={'icon'}>
-										<Link href={`/dashboard/catalog/${did}/${rkey}/overview`}>
+										<Link href={`/dashboard/catalog/${did}/${rkey}`}>
 											<FontAwesomeIcon icon={faEdit} />
 										</Link>
 									</Button>
