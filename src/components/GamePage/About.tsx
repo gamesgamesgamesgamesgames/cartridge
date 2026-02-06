@@ -6,13 +6,7 @@ import { GAME_PLAYER_PERSPECTIVES } from '@/constants/GAME_PLAYER_PERSPECTIVES'
 import { GAME_THEMES } from '@/constants/GAME_THEMES'
 import { type GameRecord } from '@/typedefs/GameRecord'
 import { Header } from '@/components/Header/Header'
-import {
-	Item,
-	ItemContent,
-	ItemDescription,
-	ItemMedia,
-	ItemTitle,
-} from '@/components/ui/item'
+import { Item, ItemContent, ItemTitle } from '@/components/ui/item'
 import { Link } from '@/components/Link/Link'
 
 // Types
@@ -29,7 +23,7 @@ export function About(props: Props) {
 			<Card className={'p-4'}>
 				<Header level={3}>{'About'}</Header>
 
-				<div className={'gap-4 grid grid-cols-2'}>
+				<div className={'items-start gap-4 grid grid-cols-2'}>
 					<Item>
 						<ItemContent>
 							<ItemTitle>{'Genres'}</ItemTitle>
