@@ -19,7 +19,7 @@ export function Container(props: Props) {
 		return (
 			<Scroller
 				className={twMerge(
-					'flex flex-col grow items-center overflow-auto p-4',
+					'flex flex-col grow items-center max-h-full overflow-auto p-4',
 					className,
 				)}>
 				<div className={'max-w-6xl size-full'}>{children}</div>
