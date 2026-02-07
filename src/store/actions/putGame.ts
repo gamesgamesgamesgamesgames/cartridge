@@ -4,6 +4,7 @@ import { type AtUriString } from '@atproto/lex'
 // Local imports
 import { parseATURI } from '@/helpers/parseATURI'
 import { store } from '@/store/store'
+import { type MediaItem } from '@/typedefs/MediaItem'
 import { type UnpublishedGame } from '@/typedefs/UnpublishedGame'
 
 // Types
@@ -20,8 +21,9 @@ export async function putGame(uri: AtUriString, gameDetails: UnpublishedGame, op
 
 	const { rkey } = parseATURI(uri)
 
-	const input: UnpublishedGame & {
+	const input: Omit<UnpublishedGame, 'media'> & {
 		publishedAt?: string
+		media: Omit<MediaItem, 'id' | 'file'>[]
 	} = {
 		...gameDetails,
 		media: gameDetails.media.map((mediaItem) => {

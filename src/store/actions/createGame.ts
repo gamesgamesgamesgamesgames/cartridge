@@ -3,6 +3,7 @@ import { type AtUriString } from '@atproto/lex'
 
 // Local imports
 import { store } from '@/store/store'
+import { type MediaItem } from '@/typedefs/MediaItem'
 import { UnpublishedGame } from '@/typedefs/UnpublishedGame'
 
 // Types
@@ -24,9 +25,10 @@ export async function createGame(
 
 	const timestamp = new Date().toISOString()
 
-	const input: UnpublishedGame & {
+	const input: Omit<UnpublishedGame, 'media'> & {
 		createdAt?: string
 		publishedAt?: string
+		media: Omit<MediaItem, 'id' | 'file'>[]
 	} = {
 		...gameDetails,
 		createdAt: timestamp,
