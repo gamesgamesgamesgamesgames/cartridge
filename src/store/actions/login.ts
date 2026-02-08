@@ -1,7 +1,9 @@
 // Local imports
 import { clearAuthCookie } from '@/helpers/clearAuthCookie'
 import { setAuthCookie } from '@/helpers/setAuthCookie'
+import { getUserProfile } from '@/store/actions/getUserProfile'
 import { store } from '@/store/store'
+import { subscribe } from '@/store/subscribe'
 
 export async function login() {
 	const { quicksliceClient } = store.state
@@ -10,8 +12,13 @@ export async function login() {
 		throw new Error('Cannot login before client is initialized.')
 	}
 
-	await quicksliceClient.handleRedirectCallback()
-	setAuthCookie()
+	const session = await quicksliceClient.handleRedirectCallback()
+
+	if (session) {
+		setAuthCookie()
+		await getUserProfile()
+		subscribe()
+	}
 }
 
 export async function syncAuthCookie() {
