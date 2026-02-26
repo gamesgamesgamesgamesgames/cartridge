@@ -101,7 +101,7 @@ export const DashboardCatalogEditGameContext = createContext<
 	addPlayerPerspective: () => {},
 	addTheme: () => {},
 	isEditMode: false,
-	applicationType: 'games.gamesgamesgamesgames.applicationType#game',
+	applicationType: 'game',
 	currentStep: null,
 	currentStepIndex: 0,
 	goToStepIndex: () => {},
@@ -195,7 +195,7 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 	])
 	const [applicationType, setApplicationType] = useState<
 		GameRecord['applicationType']
-	>('games.gamesgamesgamesgames.applicationType#game')
+	>('game')
 	const [playerPerspectives, setPlayerPerspectives] = useState<
 		Set<PlayerPerspective>
 	>(new Set())
@@ -216,7 +216,7 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 			setSummary(record.summary ?? '')
 			setApplicationType(
 				record.applicationType ??
-					'games.gamesgamesgamesgames.applicationType#game',
+					'game',
 			)
 			setGenres(new Set((record.genres as Genre[]) ?? []))
 			setModes(new Set((record.modes as Mode[]) ?? []))

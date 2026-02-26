@@ -68,7 +68,7 @@ export function GeneralContent() {
 							onChange={handleApplicationTypeChange}
 							value={
 								applicationType ??
-								'games.gamesgamesgamesgames.applicationType#game'
+								'game'
 							}
 						/>
 
