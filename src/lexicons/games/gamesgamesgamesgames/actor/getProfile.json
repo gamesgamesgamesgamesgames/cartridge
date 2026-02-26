@@ -1,23 +1,23 @@
 {
-	"$type": "com.atproto.lexicon.schema",
-	"lexicon": 1,
-	"id": "games.gamesgamesgamesgames.actor.getProfile",
-	"defs": {
-		"main": {
-			"type": "query",
-			"description": "Get the authenticated user's actor profile.",
-			"output": {
-				"encoding": "application/json",
-				"schema": {
-					"type": "object",
-					"properties": {
-						"profile": {
-							"type": "ref",
-							"ref": "games.gamesgamesgamesgames.defs#actorProfileDetailView"
-						}
-					}
-				}
-			}
-		}
-	}
+  "id": "games.gamesgamesgamesgames.actor.getProfile",
+  "defs": {
+    "main": {
+      "type": "query",
+      "output": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "profile": {
+              "ref": "games.gamesgamesgamesgames.defs#actorProfileDetailView",
+              "type": "ref"
+            }
+          }
+        },
+        "encoding": "application/json"
+      },
+      "description": "Get the authenticated user's actor profile."
+    }
+  },
+  "$type": "com.atproto.lexicon.schema",
+  "lexicon": 1
 }

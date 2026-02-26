@@ -1,65 +1,74 @@
 {
-	"lexicon": 1,
-	"id": "games.gamesgamesgamesgames.org.profile",
-	"defs": {
-		"main": {
-			"type": "record",
-			"description": "A declaration of a Pentaract org profile.",
-			"key": "literal:self",
-			"record": {
-				"type": "object",
-				"properties": {
-					"displayName": {
-						"type": "string",
-						"maxLength": 640
-					},
-					"description": {
-						"type": "string",
-						"description": "Free-form profile description text.",
-						"maxLength": 3000
-					},
-					"country": { "type": "string" },
-					"status": {
-						"type": "string",
-						"knownValues": [
-							"active",
-							"inactive",
-							"merged",
-							"acquired",
-							"defunct"
-						]
-					},
-					"parent": {
-						"type": "string",
-						"format": "at-uri"
-					},
-					"foundedAt": {
-						"type": "string",
-						"format": "datetime"
-					},
-					"websites": {
-						"type": "array",
-						"items": {
-							"type": "ref",
-							"ref": "games.gamesgamesgamesgames.defs#website"
-						}
-					},
-					"media": {
-						"type": "array",
-						"items": {
-							"type": "ref",
-							"ref": "games.gamesgamesgamesgames.defs#mediaItem"
-						}
-					},
-					"avatar": {
-						"type": "blob",
-						"description": "Image to be displayed on profile page. AKA, 'profile picture'",
-						"accept": ["image/png", "image/jpeg"],
-						"maxSize": 10000000
-					},
-					"createdAt": { "type": "string", "format": "datetime" }
-				}
-			}
-		}
-	}
+  "id": "games.gamesgamesgamesgames.org.profile",
+  "defs": {
+    "main": {
+      "key": "literal:self",
+      "type": "record",
+      "record": {
+        "type": "object",
+        "properties": {
+          "media": {
+            "type": "array",
+            "items": {
+              "ref": "games.gamesgamesgamesgames.defs#mediaItem",
+              "type": "ref"
+            }
+          },
+          "avatar": {
+            "type": "blob",
+            "accept": [
+              "image/png",
+              "image/jpeg"
+            ],
+            "maxSize": 10000000,
+            "description": "Image to be displayed on profile page. AKA, 'profile picture'"
+          },
+          "parent": {
+            "type": "string",
+            "format": "at-uri"
+          },
+          "status": {
+            "type": "string",
+            "knownValues": [
+              "active",
+              "inactive",
+              "merged",
+              "acquired",
+              "defunct"
+            ]
+          },
+          "country": {
+            "type": "string"
+          },
+          "websites": {
+            "type": "array",
+            "items": {
+              "ref": "games.gamesgamesgamesgames.defs#website",
+              "type": "ref"
+            }
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "foundedAt": {
+            "type": "string",
+            "format": "datetime"
+          },
+          "description": {
+            "type": "string",
+            "maxLength": 3000,
+            "description": "Free-form profile description text."
+          },
+          "displayName": {
+            "type": "string",
+            "maxLength": 640
+          }
+        }
+      },
+      "description": "A declaration of a Pentaract org profile."
+    }
+  },
+  "$type": "com.atproto.lexicon.schema",
+  "lexicon": 1
 }
