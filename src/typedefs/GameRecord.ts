@@ -10,5 +10,6 @@ export type GameRecord = Omit<GameLexicon, 'media'> & {
 		blob?: BlobRef & { url: string }
 	})[]
 	name: string
+	slug?: string
 	uri: AtUriString
 }

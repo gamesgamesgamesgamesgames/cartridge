@@ -6,6 +6,11 @@
       "type": "record",
       "record": {
         "type": "object",
+        "required": [
+          "name",
+          "createdAt",
+          "applicationType"
+        ],
         "properties": {
           "name": {
             "type": "string"
@@ -104,6 +109,10 @@
               "type": "string",
               "format": "at-uri"
             }
+          },
+          "externalIds": {
+            "ref": "games.gamesgamesgamesgames.defs#externalIds",
+            "type": "ref"
           },
           "publishedAt": {
             "type": "string",

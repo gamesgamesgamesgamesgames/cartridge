@@ -7,11 +7,6 @@
         "schema": {
           "type": "object",
           "properties": {
-            "slug": {
-              "type": "string",
-              "maxLength": 640,
-              "description": "URL-friendly identifier for the profile."
-            },
             "avatar": {
               "type": "blob",
               "accept": [
@@ -39,17 +34,17 @@
               "type": "string",
               "maxLength": 3000
             },
-            "descriptionFacets": {
-              "type": "array",
-              "description": "Annotations of text (mentions, URLs, hashtags, etc)",
-              "items": {
-                "ref": "app.bsky.richtext.facet",
-                "type": "ref"
-              }
-            },
             "displayName": {
               "type": "string",
               "maxLength": 640
+            },
+            "descriptionFacets": {
+              "type": "array",
+              "items": {
+                "ref": "app.bsky.richtext.facet",
+                "type": "ref"
+              },
+              "description": "Annotations of text (mentions, URLs, hashtags, etc)"
             }
           }
         },

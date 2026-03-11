@@ -16,6 +16,7 @@ export type OAuthTokens = {
 const STORAGE_KEY = 'pentaract_oauth_tokens'
 const VERIFIER_KEY = 'pentaract_pkce_verifier'
 const STATE_KEY = 'pentaract_oauth_state'
+const RETURN_URL_KEY = 'pentaract_return_url'
 
 function getConfig(): OAuthConfig {
 	return {
@@ -67,13 +68,20 @@ async function fetchUserInfo(config: OAuthConfig, accessToken: string): Promise<
 }
 
 // Public API
-export async function loginWithRedirect(handle?: string) {
+export async function loginWithRedirect(handle?: string, returnUrl?: string) {
 	const config = getConfig()
 	const { verifier, challenge } = await generatePKCE()
 	const state = generateRandomString(32)
 
 	sessionStorage.setItem(VERIFIER_KEY, verifier)
 	sessionStorage.setItem(STATE_KEY, state)
+
+	// Store the page to return to after login
+	let destination = returnUrl ?? window.location.pathname + window.location.search
+	if (destination.startsWith('/login') || destination.startsWith('/callback')) {
+		destination = '/'
+	}
+	sessionStorage.setItem(RETURN_URL_KEY, destination)
 
 	const params = new URLSearchParams({
 		response_type: 'code',
@@ -163,6 +171,12 @@ export function getAccessToken(): string | null {
 	const tokens = getStoredTokens()
 	if (!tokens || tokens.expiresAt <= Date.now()) return null
 	return tokens.accessToken
+}
+
+export function getReturnUrl(): string | null {
+	const url = sessionStorage.getItem(RETURN_URL_KEY)
+	sessionStorage.removeItem(RETURN_URL_KEY)
+	return url
 }
 
 export function logout() {

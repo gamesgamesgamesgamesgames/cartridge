@@ -1,3 +1,5 @@
+'use client'
+
 // Module imports
 import { Fragment } from 'react'
 
@@ -5,11 +7,26 @@ import { Fragment } from 'react'
 import { Card } from '@/components/ui/card'
 import { type GameRecord } from '@/typedefs/GameRecord'
 import { Header } from '@/components/Header/Header'
+import { type MediaItem } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 import { MediaType } from '@/typedefs/MediaType'
+import { useBlobUrl } from '@/hooks/use-blob-url'
 
 // Types
 type GameMediaItem = NonNullable<GameRecord['media']>[number]
 type Props = Readonly<{ gameRecord: GameRecord }>
+
+function BlobImage(props: { uri: string; mediaItem: GameMediaItem; gameName?: string }) {
+	const { uri, mediaItem, gameName } = props
+	const blobUrl = useBlobUrl(uri, mediaItem.blob as MediaItem['blob'])
+
+	return (
+		<img
+			alt={`Screenshot from ${gameName}`}
+			className={'relative h-full w-full object-contain'}
+			src={blobUrl ?? 'https://placehold.co/320x180'}
+		/>
+	)
+}
 
 export function Media(props: Props) {
 	const { gameRecord } = props
@@ -41,12 +58,12 @@ export function Media(props: Props) {
 					<Fragment key={mediaType}>
 						<Header level={4}>{mediaType}</Header>
 						<div className={'col-span-2 gap-4 grid grid-cols-3'}>
-							{mediaItems.map((mediaItem) => (
-								<img
-									key={mediaItem.blob!.url}
-									alt={`Screenshot from ${gameRecord?.name}`}
-									className={'relative h-full w-full object-contain'}
-									src={mediaItem.blob!.url ?? 'https://placehold.co/320x180'}
+							{mediaItems.map((mediaItem, index) => (
+								<BlobImage
+									key={index}
+									uri={gameRecord.uri}
+									mediaItem={mediaItem}
+									gameName={gameRecord.name}
 								/>
 							))}
 						</div>

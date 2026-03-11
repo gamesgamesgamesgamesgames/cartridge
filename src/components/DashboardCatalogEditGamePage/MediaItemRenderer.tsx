@@ -24,6 +24,7 @@ import { Input } from '@/components/ui/input'
 import { Item, ItemContent, ItemHeader } from '@/components/ui/item'
 import { LanguageSelect } from '@/components/LanguageSelect/LanguageSelect'
 import { type MediaItem } from '@/typedefs/MediaItem'
+import { useBlobUrl } from '@/hooks/use-blob-url'
 import {
 	MediaPlayer,
 	MediaPlayerVideo,
@@ -59,17 +60,19 @@ type ItemRendererProps = Readonly<{
 export function MediaItemRenderer(props: ItemRendererProps) {
 	const { mediaItem } = props
 
-	const { removeMedia, state, updateMedia } =
+	const { gameURI, removeMedia, state, updateMedia } =
 		useDashboardCatalogEditGameContext()
 
 	const imageElementRef = useRef<HTMLImageElement>(null)
 	const videoElementRef = useRef<HTMLVideoElement>(null)
 
+	const blobUrl = useBlobUrl(gameURI ?? undefined, mediaItem.blob ?? undefined)
+
 	const url = useMemo(() => {
 		if (mediaItem.file) return URL.createObjectURL(mediaItem.file)
-		if (mediaItem.blob?.url) return mediaItem.blob.url
+		if (blobUrl) return blobUrl
 		return ''
-	}, [mediaItem])
+	}, [mediaItem, blobUrl])
 
 	const mimeType = mediaItem.file?.type ?? mediaItem.blob?.mimeType ?? ''
 	const fileName = mediaItem.file?.name ?? mediaItem.title ?? 'Existing media'

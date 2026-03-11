@@ -6,6 +6,10 @@
       "type": "record",
       "record": {
         "type": "object",
+        "required": [
+          "displayName",
+          "createdAt"
+        ],
         "properties": {
           "avatar": {
             "type": "blob",
@@ -37,17 +41,17 @@
             "maxLength": 3000,
             "description": "Free-form profile description text."
           },
-          "descriptionFacets": {
-            "type": "array",
-            "description": "Annotations of text (mentions, URLs, hashtags, etc)",
-            "items": {
-              "ref": "app.bsky.richtext.facet",
-              "type": "ref"
-            }
-          },
           "displayName": {
             "type": "string",
             "maxLength": 640
+          },
+          "descriptionFacets": {
+            "type": "array",
+            "items": {
+              "ref": "app.bsky.richtext.facet",
+              "type": "ref"
+            },
+            "description": "Annotations of text (mentions, URLs, hashtags, etc)"
           }
         }
       },

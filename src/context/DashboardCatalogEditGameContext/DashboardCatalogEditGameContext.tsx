@@ -60,6 +60,7 @@ export const DashboardCatalogEditGameContext = createContext<
 		addMode: (mode: Mode) => void
 		addPlayerPerspective: (playerPerspective: PlayerPerspective) => void
 		addTheme: (theme: Theme) => void
+		gameURI: AtUriString | null
 		isEditMode: boolean
 		currentStep: null | StepperStep
 		currentStepIndex: number
@@ -100,6 +101,7 @@ export const DashboardCatalogEditGameContext = createContext<
 	addMode: () => {},
 	addPlayerPerspective: () => {},
 	addTheme: () => {},
+	gameURI: null,
 	isEditMode: false,
 	applicationType: 'game',
 	currentStep: null,
@@ -204,7 +206,7 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 	useEffect(() => {
 		if (!gameURI) return
 
-		getGame(gameURI).then((game) => {
+		getGame({ uri: gameURI }).then((game) => {
 			if (!game?.record) {
 				setState('error')
 				return
@@ -364,12 +366,21 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 				if (gameURI) {
 					// Edit mode
 					await putGame(gameURI, gameData, { shouldPublish })
-					router.push(`/game/${gameDID}/${gameRkey}`)
+					const updatedGame = await getGame({ uri: gameURI })
+					if (updatedGame?.record.slug) {
+						router.push(`/game/${updatedGame.record.slug}`)
+					} else {
+						router.push('/dashboard/catalog')
+					}
 				} else {
 					// Create mode
 					const recordURI = await createGame(gameData, { shouldPublish })
-					const { did, rkey } = parseATURI(recordURI)
-					router.push(`/game/${did}/${rkey}`)
+					const createdGame = await getGame({ uri: recordURI })
+					if (createdGame?.record.slug) {
+						router.push(`/game/${createdGame.record.slug}`)
+					} else {
+						router.push('/dashboard/catalog')
+					}
 				}
 			}
 		},
@@ -479,6 +490,7 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 
 			applicationType,
 			currentStepIndex,
+			gameURI,
 			genres,
 			media,
 			modes,
@@ -517,6 +529,7 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 		[
 			applicationType,
 			currentStepIndex,
+			gameURI,
 			genres,
 			isEditMode,
 			media,

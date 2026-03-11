@@ -18,7 +18,6 @@ type Props = Readonly<{
 	data: Record<
 		string,
 		{
-			fqid: string
 			id: string
 			name: string
 		}
@@ -43,11 +42,11 @@ export function CheckboxCardsField(props: Props) {
 					<FieldLabel key={key}>
 						<Field orientation={'horizontal'}>
 							<Checkbox
-								checked={value.has(datum.fqid)}
+								checked={value.has(datum.id)}
 								disabled={disabled}
 								id={key}
 								name={key}
-								onCheckedChange={onChange(datum.fqid)}
+								onCheckedChange={onChange(datum.id)}
 							/>
 							<FieldContent>
 								<FieldTitle>{datum.name}</FieldTitle>

@@ -12,11 +12,8 @@ export const GAME_PLAYER_PERSPECTIVES = Object.entries(PlayerPerspectiveLexicon.
 			{ description: string },
 		]
 
-		const fqid = `games.gamesgamesgamesgames.playerPerspective#${id}` as PlayerPerspective 
-
-		accumulator[fqid] = {
+		accumulator[id as PlayerPerspective] = {
 			id,
-			fqid,
 			name,
 		}
 
@@ -24,7 +21,6 @@ export const GAME_PLAYER_PERSPECTIVES = Object.entries(PlayerPerspectiveLexicon.
 	},
 	{} as Record<PlayerPerspective, {
 		id: PlayerPerspectiveLexiconIDs,
-		fqid: PlayerPerspective,
 		name: string,
 	}>,
 )

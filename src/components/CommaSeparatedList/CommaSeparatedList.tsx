@@ -1,41 +1,23 @@
 // Module imports
 import { type ReactNode, useMemo } from 'react'
 
-// Local imports
-import { Link } from '@/components/Link/Link'
-
-// Local imports
-type Props = Readonly<{
-	includeLinks?: boolean
-	items: string[]
-}>
+// Types
+type Props = Readonly<{ items: ReactNode[] }>
 
 export function CommaSeparatedList(props: Props) {
-	const { includeLinks, items } = props
+	const { items } = props
 
 	const renderedList = useMemo(
 		() =>
-			items.reduce((accumulator, item, index, array) => {
-				let result = <span>{item}</span>
-
-				if (includeLinks) {
-					result = (
-						<Link
-							key={item}
-							href={`/dashboard/catalog?mode=${item}`}>
-							{result}
-						</Link>
-					)
-				}
-
-				accumulator.push(result)
+			items.reduce<ReactNode[]>((accumulator, item, index, array) => {
+				accumulator.push(item)
 
 				if (index < array.length - 1) {
 					accumulator.push(', ')
 				}
 
 				return accumulator
-			}, [] as ReactNode[]),
+			}, []),
 		[items],
 	)
 

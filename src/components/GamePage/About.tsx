@@ -31,8 +31,8 @@ export function About(props: Props) {
 								{Boolean(gameRecord.genres) &&
 									gameRecord.genres!.map((genre) => (
 										<li key={genre}>
-											<Link href={`/genre/${GAME_GENRES[genre].id}`}>
-												{GAME_GENRES[genre].name}
+											<Link href={`/genre/${GAME_GENRES[genre]?.id ?? genre}`}>
+												{GAME_GENRES[genre]?.name ?? genre}
 											</Link>
 										</li>
 									))}
@@ -47,8 +47,8 @@ export function About(props: Props) {
 								{Boolean(gameRecord.themes) &&
 									gameRecord.themes!.map((theme) => (
 										<li key={theme}>
-											<Link href={`/theme/${GAME_THEMES[theme].id}`}>
-												{GAME_THEMES[theme].name}
+											<Link href={`/theme/${GAME_THEMES[theme]?.id ?? theme}`}>
+												{GAME_THEMES[theme]?.name ?? theme}
 											</Link>
 										</li>
 									))}
@@ -63,8 +63,8 @@ export function About(props: Props) {
 								{Boolean(gameRecord.modes) &&
 									gameRecord.modes!.map((mode) => (
 										<li key={mode}>
-											<Link href={`/mode/${GAME_MODES[mode].id}`}>
-												{GAME_MODES[mode].name}
+											<Link href={`/mode/${GAME_MODES[mode]?.id ?? mode}`}>
+												{GAME_MODES[mode]?.name ?? mode}
 											</Link>
 										</li>
 									))}
@@ -80,8 +80,8 @@ export function About(props: Props) {
 									gameRecord.playerPerspectives!.map((playerPerspective) => (
 										<li key={playerPerspective}>
 											<Link
-												href={`/playerPerspective/${GAME_PLAYER_PERSPECTIVES[playerPerspective].id}`}>
-												{GAME_PLAYER_PERSPECTIVES[playerPerspective].name}
+												href={`/playerPerspective/${GAME_PLAYER_PERSPECTIVES[playerPerspective]?.id ?? playerPerspective}`}>
+												{GAME_PLAYER_PERSPECTIVES[playerPerspective]?.name ?? playerPerspective}
 											</Link>
 										</li>
 									))}

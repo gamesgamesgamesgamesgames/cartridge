@@ -1,11 +1,12 @@
 'use client'
 
 // Module imports
-import { type ChangeEventHandler, useCallback } from 'react'
+import { type ChangeEventHandler, useCallback, useState } from 'react'
+import { useStore } from 'statery'
 
 // Local imports
+import * as API from '@/helpers/API'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Card, CardContent } from '@/components/ui/card'
 import {
 	Combobox,
 	ComboboxContent,
@@ -14,12 +15,18 @@ import {
 	ComboboxItem,
 	ComboboxList,
 } from '@/components/ui/combobox'
+import {
+	FileUpload,
+	FileUploadDropzone,
+	FileUploadTrigger,
+} from '@/components/ui/file-upload'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { RichTextComposer } from '@/components/ui/rich-text-composer'
-import { Scroller } from '@/components/ui/scroller'
 import { type Main as Facet } from '@/helpers/lexicons/app/bsky/richtext/facet.defs'
 import { useProfileSetupContext } from '@/context/ProfileSetupContext/ProfileSetupContext'
+import { store } from '@/store/store'
+import { Button } from '@/components/ui/button'
 import {
 	InputGroup,
 	InputGroupAddon,
@@ -50,13 +57,15 @@ export function ActorProfileStep() {
 		description,
 		displayName,
 		pronouns,
-		slug,
+		setAvatarBlob,
 		setDescription,
 		setDescriptionFacets,
 		setDisplayName,
 		setPronouns,
-		setSlug,
 	} = useProfileSetupContext()
+
+	const { user } = useStore(store)
+	const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
 
 	const handleDisplayNameChange = useCallback<
 		ChangeEventHandler<HTMLInputElement>
@@ -70,105 +79,116 @@ export function ActorProfileStep() {
 		[setDescription, setDescriptionFacets],
 	)
 
-	const handleSlugChange = useCallback<ChangeEventHandler<HTMLInputElement>>(
-		(event) => setSlug(event.target.value),
-		[setSlug],
+	const handleAvatarChange = useCallback(
+		async (files: File[]) => {
+			const file = files[0]
+			if (!file) return
+
+			setAvatarPreview(URL.createObjectURL(file))
+
+			try {
+				const result = await API.uploadBlob(file)
+				setAvatarBlob(result)
+			} catch (error) {
+				console.error('[pentaract] Avatar upload failed:', error)
+			}
+		},
+		[setAvatarBlob],
 	)
 
 	return (
-		<Scroller className={'h-full'}>
-			<div className={'flex flex-col gap-4'}>
-				{avatarURL && (
-					<Card>
-						<CardContent className={'flex items-center gap-4'}>
-							<Avatar className={'h-16 w-16'}>
-								<AvatarImage src={avatarURL} />
-								<AvatarFallback>
-									{displayName?.charAt(0)?.toUpperCase() ?? '?'}
-								</AvatarFallback>
-							</Avatar>
-							<div>
-								<p className={'text-sm text-muted-foreground'}>
-									{'Avatar imported from your Bluesky profile'}
-								</p>
-							</div>
-						</CardContent>
-					</Card>
-				)}
+		<div className={'flex flex-col gap-6'}>
+			<div className={'flex flex-col items-center gap-3'}>
+				<Avatar className={'h-24 w-24'}>
+					<AvatarImage src={avatarPreview ?? avatarURL} />
+					<AvatarFallback>
+						{displayName?.charAt(0)?.toUpperCase() ?? '?'}
+					</AvatarFallback>
+				</Avatar>
 
-				<Card>
-					<CardContent className={'flex flex-col gap-4'}>
-						<div className={'flex flex-col gap-2'}>
-							<Label htmlFor={'displayName'}>{'Display Name'}</Label>
-							<Input
-								id={'displayName'}
-								onChange={handleDisplayNameChange}
-								placeholder={'Your display name'}
-								value={displayName}
-							/>
-						</div>
-
-						<div className={'flex flex-col gap-2'}>
-							<Label>{'Bio'}</Label>
-							<RichTextComposer
-								className={'min-h-[100px]'}
-								onChange={handleDescriptionChange}
-								placeholder={'Tell us about yourself'}
-								value={description}
-							/>
-						</div>
-
-						<div className={'flex flex-col gap-2'}>
-							<Label>{'Pronouns'}</Label>
-							<Combobox
-								items={PRONOUN_OPTIONS}
-								itemToStringLabel={(item) => item.label}
-								onValueChange={(value) => setPronouns(value?.value ?? '')}
-								value={
-									PRONOUN_OPTIONS.find((p) => p.value === pronouns) ?? null
-								}>
-								<ComboboxInput placeholder={'Select or type your pronouns'} />
-
-								<ComboboxContent>
-									<ComboboxEmpty>{'No match found'}</ComboboxEmpty>
-
-									<ComboboxList>
-										{(item: PronounOption) => (
-											<ComboboxItem
-												key={item.value}
-												value={item}>
-												{item.label}
-											</ComboboxItem>
-										)}
-									</ComboboxList>
-								</ComboboxContent>
-							</Combobox>
-						</div>
-
-						<div className={'flex flex-col gap-2'}>
-							<Label htmlFor={'slug'}>{'Your Pentaract URL'}</Label>
-							<InputGroup>
-								<InputGroupAddon>
-									<InputGroupText>
-										{`${process.env.NEXT_PUBLIC_URL}/profile/`}
-									</InputGroupText>
-								</InputGroupAddon>
-
-								<InputGroupInput
-									className='h-auto !pl-0.5'
-									id={'slug'}
-									onChange={handleSlugChange}
-									placeholder={'your-url-friendly-name'}
-									value={slug}
-								/>
-							</InputGroup>
-							<p className={'text-xs text-muted-foreground'}>
-								{'The personalized URL for your profile on Pentaract.'}
-							</p>
-						</div>
-					</CardContent>
-				</Card>
+				<FileUpload
+					accept={'image/png, image/jpeg'}
+					maxFiles={1}
+					maxSize={10 * 1024 * 1024}
+					onValueChange={handleAvatarChange}>
+					<FileUploadTrigger asChild>
+						<Button
+							variant={'outline'}
+							size={'sm'}>
+							{'Upload Avatar'}
+						</Button>
+					</FileUploadTrigger>
+				</FileUpload>
 			</div>
-		</Scroller>
+
+			<div className={'flex flex-col gap-4'}>
+				<div className={'flex flex-col gap-2'}>
+					<Label htmlFor={'displayName'}>{'Display Name'}</Label>
+					<Input
+						id={'displayName'}
+						onChange={handleDisplayNameChange}
+						placeholder={'Your display name'}
+						value={displayName}
+					/>
+				</div>
+
+				<div className={'flex flex-col gap-2'}>
+					<Label>{'Bio'}</Label>
+					<RichTextComposer
+						className={'min-h-[100px]'}
+						onChange={handleDescriptionChange}
+						placeholder={'Tell us about yourself'}
+						value={description}
+					/>
+				</div>
+
+				<div className={'flex flex-col gap-2'}>
+					<Label>{'Pronouns'}</Label>
+					<Combobox
+						items={PRONOUN_OPTIONS}
+						itemToStringLabel={(item) => item.label}
+						onValueChange={(value) => setPronouns(value?.value ?? '')}
+						value={
+							PRONOUN_OPTIONS.find((p) => p.value === pronouns) ?? null
+						}>
+						<ComboboxInput placeholder={'Select or type your pronouns'} />
+
+						<ComboboxContent>
+							<ComboboxEmpty>{'No match found'}</ComboboxEmpty>
+
+							<ComboboxList>
+								{(item: PronounOption) => (
+									<ComboboxItem
+										key={item.value}
+										value={item}>
+										{item.label}
+									</ComboboxItem>
+								)}
+							</ComboboxList>
+						</ComboboxContent>
+					</Combobox>
+				</div>
+
+				<div className={'flex flex-col gap-2'}>
+					<Label>{'Your Pentaract URL'}</Label>
+					<InputGroup>
+						<InputGroupAddon>
+							<InputGroupText>
+								{`${process.env.NEXT_PUBLIC_URL}/profile/`}
+							</InputGroupText>
+						</InputGroupAddon>
+
+						<InputGroupInput
+							className='h-auto !pl-0.5'
+							disabled
+							value={user?.handle ?? ''}
+						/>
+					</InputGroup>
+					<p className={'text-xs text-muted-foreground'}>
+						{'Your profile URL is based on your handle.'}
+					</p>
+				</div>
+			</div>
+		</div>
 	)
 }

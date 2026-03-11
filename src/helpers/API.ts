@@ -7,12 +7,14 @@ import { type GameRecord } from '@/typedefs/GameRecord'
 import { type InputBody as ActorProfileInput } from '@/helpers/lexicons/games/gamesgamesgamesgames/actor/createProfile.defs'
 import { type InputBody as OrgProfileInput } from '@/helpers/lexicons/games/gamesgamesgamesgames/org/createProfile.defs'
 import { type MediaItem } from '@/typedefs/MediaItem'
+import { type PopfeedReview } from '@/helpers/lexicons/games/gamesgamesgamesgames/getReviews.defs'
 import { type PentaractAPICreateGameOptions } from '@/typedefs/PentaractAPICreateGameOptions'
 import { type PentaractAPICreateProfileResult } from '@/typedefs/PentaractAPICreateProfileResult'
 import { type PentaractAPIGetBlueskyProfileResult } from '@/typedefs/PentaractAPIGetBlueskyProfileResult'
 import { type PentaractAPIGetProfileResult } from '@/typedefs/PentaractAPIGetProfileResult'
 import { type PentaractAPIPutGameOptions } from '@/typedefs/PentaractAPIPutGameOptions'
 import { type PentaractAPIQueryOptions } from '@/typedefs/PentaractAPIQueryOptions'
+import { type PentaractAPISearchResult } from '@/typedefs/PentaractAPISearchResult'
 import { type PentaractAPISearchProfilesTypeaheadResult } from '@/typedefs/PentaractAPISearchProfilesTypeaheadResult'
 import { type PentaractAPIUploadBlobResult } from '@/typedefs/PentaractAPIUploadBlobResult'
 import { type UnpublishedGame } from '@/typedefs/UnpublishedGame'
@@ -53,11 +55,13 @@ function serializeGameBody(gameDetails: UnpublishedGame) {
 	const body: Record<string, unknown> = {}
 
 	if (gameDetails.summary) body.summary = gameDetails.summary
-	if (gameDetails.applicationType) body.applicationType = gameDetails.applicationType
+	if (gameDetails.applicationType)
+		body.applicationType = gameDetails.applicationType
 	if (gameDetails.genres?.length) body.genres = gameDetails.genres
 	if (gameDetails.modes?.length) body.modes = gameDetails.modes
 	if (gameDetails.themes?.length) body.themes = gameDetails.themes
-	if (gameDetails.playerPerspectives?.length) body.playerPerspectives = gameDetails.playerPerspectives
+	if (gameDetails.playerPerspectives?.length)
+		body.playerPerspectives = gameDetails.playerPerspectives
 	if (gameDetails.parent) body.parent = gameDetails.parent
 
 	if (gameDetails.releases?.length) {
@@ -104,11 +108,14 @@ export async function createGame(
 		shouldPublish: options.shouldPublish ?? false,
 	}
 
-	const response = await queryAPI('/xrpc/games.gamesgamesgamesgames.createGame', {
-		isAuthenticated: true,
-		method: 'POST',
-		body: JSON.stringify(body),
-	})
+	const response = await queryAPI(
+		'/xrpc/games.gamesgamesgamesgames.createGame',
+		{
+			isAuthenticated: true,
+			method: 'POST',
+			body: JSON.stringify(body),
+		},
+	)
 
 	if (!response.ok) {
 		const errorBody = await response.text()
@@ -122,15 +129,27 @@ export async function createGame(
 export async function listGames(
 	limit = 20,
 	cursor?: string,
+	sort?: string,
+	sortDirection?: 'asc' | 'desc',
+	did?: string,
 ): Promise<{ cursor?: string; games: GameRecord[] }> {
 	const params = new URLSearchParams({ limit: String(limit) })
 	if (cursor) {
 		params.set('cursor', cursor)
 	}
+	if (sort) {
+		params.set('sort', sort)
+	}
+	if (sortDirection) {
+		params.set('sortDirection', sortDirection)
+	}
+	if (did) {
+		params.set('did', did)
+	}
 
 	const response = await queryAPI(
 		`/xrpc/games.gamesgamesgamesgames.listGames?${params}`,
-		{ isAuthenticated: true },
+		{ isAuthenticated: !did },
 	)
 
 	if (!response.ok) {
@@ -141,9 +160,12 @@ export async function listGames(
 	return response.json()
 }
 
-export async function getGame(uri: string): Promise<GameRecord | undefined> {
+export async function getGame(query: { uri: string } | { slug: string }): Promise<GameRecord | undefined> {
+	const params = 'slug' in query
+		? `slug=${encodeURIComponent(query.slug)}`
+		: `uri=${encodeURIComponent(query.uri)}`
 	const resp = await queryAPI(
-		`/xrpc/games.gamesgamesgamesgames.getGame?uri=${encodeURIComponent(uri)}`,
+		`/xrpc/games.gamesgamesgamesgames.getGame?${params}`,
 	)
 
 	if (!resp.ok) {
@@ -154,8 +176,46 @@ export async function getGame(uri: string): Promise<GameRecord | undefined> {
 	return data.game as GameRecord
 }
 
+export async function getReviews(
+	uri: string,
+	limit = 20,
+): Promise<{ reviews: PopfeedReview[]; cursor?: string }> {
+	const params = new URLSearchParams({
+		uri,
+		limit: String(limit),
+	})
+
+	const resp = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.getReviews?${params}`,
+	)
+
+	if (!resp.ok) {
+		return { reviews: [] }
+	}
+
+	return resp.json()
+}
+
 export async function getProfile(): Promise<PentaractAPIGetProfileResult> {
-	const response = await queryAPI('/xrpc/games.gamesgamesgamesgames.getProfile', { isAuthenticated: true })
+	const response = await queryAPI(
+		'/xrpc/games.gamesgamesgamesgames.getProfile',
+		{ isAuthenticated: true },
+	)
+
+	if (!response.ok) {
+		return { profile: null, profileType: null }
+	}
+
+	return response.json()
+}
+
+export async function getProfileByHandle(
+	handle: string,
+): Promise<PentaractAPIGetProfileResult> {
+	const params = new URLSearchParams({ handle })
+	const response = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.getProfile?${params}`,
+	)
 
 	if (!response.ok) {
 		return { profile: null, profileType: null }
@@ -165,10 +225,43 @@ export async function getProfile(): Promise<PentaractAPIGetProfileResult> {
 }
 
 export async function getBlueskyProfile(): Promise<PentaractAPIGetBlueskyProfileResult | null> {
-	const response = await queryAPI('/xrpc/app.bsky.actor.getProfile', { isAuthenticated: true })
+	const response = await queryAPI('/xrpc/app.bsky.actor.getProfile', {
+		isAuthenticated: true,
+	})
 
 	if (!response.ok) {
 		return null
+	}
+
+	return response.json()
+}
+
+export async function search(
+	q: string,
+	options: { limit?: number; types?: string[]; applicationTypes?: string[]; cursor?: string } = {},
+): Promise<PentaractAPISearchResult> {
+	const params = new URLSearchParams({ q })
+	if (options.limit) {
+		params.set('limit', String(options.limit))
+	}
+	if (options.types?.length) {
+		for (const type of options.types) {
+			params.append('types', type)
+		}
+	}
+	if (options.applicationTypes?.length) {
+		params.set('applicationTypes', options.applicationTypes.join(','))
+	}
+	if (options.cursor) {
+		params.set('cursor', options.cursor)
+	}
+
+	const response = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.search?${params}`,
+	)
+
+	if (!response.ok) {
+		return { results: [] }
 	}
 
 	return response.json()
@@ -190,31 +283,45 @@ export async function searchProfilesTypeahead(
 	return response.json()
 }
 
-export async function createActorProfile(profile: ActorProfileInput): Promise<PentaractAPICreateProfileResult> {
-	const response = await queryAPI('/xrpc/games.gamesgamesgamesgames.actor.createProfile', {
-		isAuthenticated: true,
-		method: 'POST',
-		body: JSON.stringify(profile),
-	})
+export async function createActorProfile(
+	profile: ActorProfileInput,
+): Promise<PentaractAPICreateProfileResult> {
+	const response = await queryAPI(
+		'/xrpc/games.gamesgamesgamesgames.actor.createProfile',
+		{
+			isAuthenticated: true,
+			method: 'POST',
+			body: JSON.stringify(profile),
+		},
+	)
 
 	if (!response.ok) {
 		const errorBody = await response.text()
-		throw new Error(`createActorProfile failed (${response.status}): ${errorBody}`)
+		throw new Error(
+			`createActorProfile failed (${response.status}): ${errorBody}`,
+		)
 	}
 
 	return response.json()
 }
 
-export async function createOrgProfile(profile: OrgProfileInput): Promise<PentaractAPICreateProfileResult> {
-	const response = await queryAPI('/xrpc/games.gamesgamesgamesgames.org.createProfile', {
-		isAuthenticated: true,
-		method: 'POST',
-		body: JSON.stringify(profile),
-	})
+export async function createOrgProfile(
+	profile: OrgProfileInput,
+): Promise<PentaractAPICreateProfileResult> {
+	const response = await queryAPI(
+		'/xrpc/games.gamesgamesgamesgames.org.createProfile',
+		{
+			isAuthenticated: true,
+			method: 'POST',
+			body: JSON.stringify(profile),
+		},
+	)
 
 	if (!response.ok) {
 		const errorBody = await response.text()
-		throw new Error(`createOrgProfile failed (${response.status}): ${errorBody}`)
+		throw new Error(
+			`createOrgProfile failed (${response.status}): ${errorBody}`,
+		)
 	}
 
 	return response.json()
@@ -248,12 +355,51 @@ export async function putGame(
 	return data.uri as AtUriString
 }
 
+export async function toggleLike(
+	subject: string,
+): Promise<{ uri?: string; cid?: string; action: 'liked' | 'unliked' }> {
+	const response = await queryAPI(
+		'/xrpc/games.gamesgamesgamesgames.graph.toggleLike',
+		{
+			isAuthenticated: true,
+			method: 'POST',
+			body: JSON.stringify({ subject }),
+		},
+	)
+
+	if (!response.ok) {
+		const errorBody = await response.text()
+		throw new Error(`toggleLike failed (${response.status}): ${errorBody}`)
+	}
+
+	return response.json()
+}
+
+export async function getLikes(
+	uri: string,
+): Promise<{ count: number; liked: boolean }> {
+	const params = new URLSearchParams({ uri })
+	const resp = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.graph.getLikes?${params}`,
+	)
+
+	if (!resp.ok) {
+		return { count: 0, liked: false }
+	}
+
+	return resp.json()
+}
+
 export async function resolveHandle(_handle: string): Promise<DID | null> {
-	console.warn('[pentaract] API.resolveHandle is stubbed — HappyView data API not yet available')
+	console.warn(
+		'[pentaract] API.resolveHandle is stubbed — HappyView data API not yet available',
+	)
 	return null
 }
 
-export async function uploadBlob(file: File): Promise<PentaractAPIUploadBlobResult> {
+export async function uploadBlob(
+	file: File,
+): Promise<PentaractAPIUploadBlobResult> {
 	const response = await queryAPI('/xrpc/com.atproto.repo.uploadBlob', {
 		isAuthenticated: true,
 		method: 'POST',

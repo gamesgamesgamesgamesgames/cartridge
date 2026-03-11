@@ -12,11 +12,8 @@ export const GAME_GENRES = Object.entries(GenreLexicon.defs).reduce(
 			{ description: string },
 		]
 
-		const fqid = `games.gamesgamesgamesgames.genre#${id}` as Genre
-
-		accumulator[fqid] = {
+		accumulator[id as Genre] = {
 			id,
-			fqid,
 			name,
 		}
 
@@ -26,7 +23,6 @@ export const GAME_GENRES = Object.entries(GenreLexicon.defs).reduce(
 		Genre,
 		{
 			id: GenreLexiconIDs
-			fqid: Genre
 			name: string
 		}
 	>,

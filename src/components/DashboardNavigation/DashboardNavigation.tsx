@@ -4,7 +4,6 @@
 import {
 	faBook,
 	faChartPie,
-	faDiceD20,
 	faGamepad,
 	faPeopleGroup,
 	faStar,
@@ -40,12 +39,10 @@ export function DashboardNavigation() {
 						<SidebarMenuButton
 							asChild
 							className={'data-[slot=sidebar-menu-button]:!p-1.5'}>
-							<Link href='#'>
-								<FontAwesomeIcon
-									icon={faDiceD20}
-									size={'2x'}
-								/>
-								<span className={'text-base font-semibold'}>{'Pentaract'}</span>
+							<Link href='/'>
+								<span className={'font-[family-name:var(--font-cartridge)] text-2xl font-bold'}>
+									{'Cartridge'}
+								</span>
 							</Link>
 						</SidebarMenuButton>
 					</SidebarMenuItem>

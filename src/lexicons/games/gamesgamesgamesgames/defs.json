@@ -58,7 +58,13 @@
       "type": "object",
       "properties": {
         "platform": {
-          "type": "string"
+          "type": "string",
+          "description": "Free-text platform name, used when no platform record exists."
+        },
+        "platformUri": {
+          "type": "string",
+          "format": "at-uri",
+          "description": "AT URI of a platform record."
         },
         "releaseDates": {
           "type": "array",
@@ -96,8 +102,28 @@
             "reddit",
             "facebook",
             "wikipedia",
+            "bluesky",
+            "xbox",
+            "playstation",
+            "nintendo",
+            "meta",
             "other"
           ]
+        }
+      }
+    },
+    "itchIoId": {
+      "type": "object",
+      "required": [
+        "developer",
+        "game"
+      ],
+      "properties": {
+        "game": {
+          "type": "string"
+        },
+        "developer": {
+          "type": "string"
         }
       }
     },
@@ -229,6 +255,45 @@
         }
       }
     },
+    "externalIds": {
+      "type": "object",
+      "properties": {
+        "gog": {
+          "type": "string"
+        },
+        "igdb": {
+          "type": "string"
+        },
+        "xbox": {
+          "type": "string"
+        },
+        "steam": {
+          "type": "string"
+        },
+        "itchIo": {
+          "ref": "games.gamesgamesgamesgames.defs#itchIoId",
+          "type": "ref"
+        },
+        "epicGames": {
+          "type": "string"
+        },
+        "googlePlay": {
+          "type": "string"
+        },
+        "playStation": {
+          "type": "string"
+        },
+        "humbleBundle": {
+          "type": "string"
+        },
+        "appleAppStore": {
+          "type": "string"
+        },
+        "nintendoEshop": {
+          "type": "string"
+        }
+      }
+    },
     "releaseDate": {
       "type": "object",
       "properties": {
@@ -315,6 +380,9 @@
           "format": "at-uri"
         },
         "name": {
+          "type": "string"
+        },
+        "slug": {
           "type": "string"
         },
         "media": {
@@ -410,6 +478,10 @@
             "type": "string",
             "format": "at-uri"
           }
+        },
+        "externalIds": {
+          "ref": "games.gamesgamesgamesgames.defs#externalIds",
+          "type": "ref"
         },
         "publishedAt": {
           "type": "string",
@@ -517,6 +589,9 @@
           "format": "at-uri"
         },
         "name": {
+          "type": "string"
+        },
+        "slug": {
           "type": "string"
         },
         "media": {
@@ -641,6 +716,25 @@
         "operatingSystem"
       ]
     },
+    "engineSummaryView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "name"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        }
+      }
+    },
     "playerPerspective": {
       "type": "string",
       "knownValues": [
@@ -670,9 +764,6 @@
           "type": "string",
           "format": "at-uri"
         },
-        "slug": {
-          "type": "string"
-        },
         "avatar": {
           "type": "blob",
           "accept": [
@@ -694,6 +785,32 @@
         }
       }
     },
+    "platformSummaryView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "name"
+      ],
+      "properties": {
+        "uri": {
+          "type": "string",
+          "format": "at-uri"
+        },
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "category": {
+          "ref": "games.gamesgamesgamesgames.defs#platformCategory",
+          "type": "ref"
+        },
+        "abbreviation": {
+          "type": "string"
+        }
+      }
+    },
     "orgProfileDetailView": {
       "type": "object",
       "required": [
@@ -708,9 +825,6 @@
         "uri": {
           "type": "string",
           "format": "at-uri"
-        },
-        "slug": {
-          "type": "string"
         },
         "media": {
           "type": "array",
@@ -763,16 +877,43 @@
           "type": "string",
           "maxLength": 3000
         },
+        "displayName": {
+          "type": "string",
+          "maxLength": 640
+        },
         "descriptionFacets": {
           "type": "array",
           "items": {
             "ref": "app.bsky.richtext.facet",
             "type": "ref"
           }
-        },
-        "displayName": {
+        }
+      }
+    },
+    "collectionSummaryView": {
+      "type": "object",
+      "required": [
+        "uri",
+        "name"
+      ],
+      "properties": {
+        "uri": {
           "type": "string",
-          "maxLength": 640
+          "format": "at-uri"
+        },
+        "name": {
+          "type": "string"
+        },
+        "slug": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string",
+          "knownValues": [
+            "franchise",
+            "series",
+            "curated"
+          ]
         }
       }
     },
@@ -790,9 +931,6 @@
         "uri": {
           "type": "string",
           "format": "at-uri"
-        },
-        "slug": {
-          "type": "string"
         },
         "avatar": {
           "type": "blob",
@@ -823,9 +961,6 @@
           "type": "string",
           "format": "at-uri"
         },
-        "slug": {
-          "type": "string"
-        },
         "avatar": {
           "type": "blob",
           "accept": [
@@ -853,16 +988,16 @@
           "type": "string",
           "maxLength": 3000
         },
+        "displayName": {
+          "type": "string",
+          "maxLength": 640
+        },
         "descriptionFacets": {
           "type": "array",
           "items": {
             "ref": "app.bsky.richtext.facet",
             "type": "ref"
           }
-        },
-        "displayName": {
-          "type": "string",
-          "maxLength": 640
         }
       }
     },
@@ -880,9 +1015,6 @@
         "uri": {
           "type": "string",
           "format": "at-uri"
-        },
-        "slug": {
-          "type": "string"
         },
         "avatar": {
           "type": "blob",

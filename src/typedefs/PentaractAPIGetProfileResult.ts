@@ -1,7 +1,8 @@
-import { type Main as ActorProfile } from '@/helpers/lexicons/games/gamesgamesgamesgames/actor/profile.defs'
-import { type Main as OrgProfile } from '@/helpers/lexicons/games/gamesgamesgamesgames/org/profile.defs'
+import { type ActorProfileDetailView } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
+import { type OrgProfileDetailView } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 
 export type PentaractAPIGetProfileResult = {
-	profile: ActorProfile | OrgProfile | null
+	profile: ActorProfileDetailView | OrgProfileDetailView | null
 	profileType: 'actor' | 'org' | null
+	handle?: string
 }

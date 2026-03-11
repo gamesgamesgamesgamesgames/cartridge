@@ -12,6 +12,7 @@ import {
 	EmptyTitle,
 } from '@/components/ui/empty'
 import { Spinner } from '@/components/ui/spinner'
+import { getReturnUrl } from '@/helpers/oauth'
 import { login } from '@/store/actions/login'
 import { store } from '@/store/store'
 
@@ -23,7 +24,7 @@ export function CallbackPage() {
 			login().then(() => {
 				const { profileType } = store.state
 				if (profileType) {
-					router.replace('/dashboard')
+					router.replace(getReturnUrl() ?? '/')
 				} else {
 					router.replace('/profile-setup')
 				}

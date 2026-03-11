@@ -105,7 +105,7 @@ export function DashboardCatalog() {
 									<Button
 										asChild
 										size={'icon'}>
-										<Link href={`/game/${did}/${rkey}`}>
+										<Link href={`/game/${game.record.slug}`}>
 											<FontAwesomeIcon icon={faEye} />
 										</Link>
 									</Button>

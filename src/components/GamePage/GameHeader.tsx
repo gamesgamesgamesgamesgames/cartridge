@@ -66,7 +66,7 @@ export function GameHeader(props: Props) {
 								<Badge
 									key={genre}
 									variant={'outline'}>
-									{GAME_GENRES[genre].name}
+									{GAME_GENRES[genre]?.name ?? genre}
 								</Badge>
 							))}
 					</div>

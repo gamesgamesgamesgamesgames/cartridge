@@ -12,11 +12,8 @@ export const GAME_THEMES = Object.entries(ThemeLexicon.defs).reduce(
 			{ description: string },
 		]
 
-		const fqid = `games.gamesgamesgamesgames.theme#${id}` as Theme 
-
-		accumulator[fqid] = {
+		accumulator[id as Theme] = {
 			id,
-			fqid,
 			name,
 		}
 
@@ -24,7 +21,6 @@ export const GAME_THEMES = Object.entries(ThemeLexicon.defs).reduce(
 	},
 	{} as Record<Theme, {
 		id: ThemeLexiconIDs,
-		fqid: Theme,
 		name: string,
 	}>,
 )

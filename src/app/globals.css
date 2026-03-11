@@ -5,12 +5,8 @@
 
 html,
 body {
-  height: 100vh;
   margin: 0;
-  max-height: 100vh;
-  max-width: 100vw;
   min-height: 100vh;
-  overflow: hidden;
   padding: 0;
 }
 
@@ -34,6 +30,7 @@ body {
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
+  --color-deep-navy: var(--deep-navy);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
@@ -61,73 +58,256 @@ body {
 
 :root {
   --radius: 0.625rem;
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.646 0.222 41.116);
-  --chart-2: oklch(0.6 0.118 184.704);
-  --chart-3: oklch(0.398 0.07 227.392);
-  --chart-4: oklch(0.828 0.189 84.429);
-  --chart-5: oklch(0.769 0.188 70.08);
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* Light mode — inverted navy tint */
+  --background: oklch(0.985 0.005 266);
+  --foreground: oklch(0.184 0.030 266);
+  --card: oklch(0.975 0.008 266);
+  --card-foreground: oklch(0.184 0.030 266);
+  --popover: oklch(0.975 0.008 266);
+  --popover-foreground: oklch(0.184 0.030 266);
+  /* Amber — primary actions */
+  --primary: oklch(0.859 0.145 82.6);
+  --primary-foreground: oklch(0.184 0.030 266);
+  /* Light navy — secondary actions */
+  --secondary: oklch(0.935 0.020 266);
+  --secondary-foreground: oklch(0.184 0.030 266);
+  /* Muted containers */
+  --muted: oklch(0.955 0.012 266);
+  --muted-foreground: oklch(0.500 0.030 266);
+  /* Hover/highlight */
+  --accent: oklch(0.945 0.015 266);
+  --accent-foreground: oklch(0.184 0.030 266);
+  /* Crimson — destructive */
+  --destructive: oklch(0.616 0.210 19.3);
+  /* Deep Navy */
+  --deep-navy: oklch(0.254 0.070 266.5);
+  /* Navy-tinted chrome */
+  --border: oklch(0.900 0.018 266);
+  --input: oklch(0.900 0.018 266);
+  /* Amber — focus rings */
+  --ring: oklch(0.859 0.145 82.6);
+  /* Charts — Amber, Coral, Hot Pink, Jade, Crimson */
+  --chart-1: oklch(0.859 0.145 82.6);
+  --chart-2: oklch(0.723 0.173 30.9);
+  --chart-3: oklch(0.684 0.248 349.8);
+  --chart-4: oklch(0.693 0.157 155.1);
+  --chart-5: oklch(0.616 0.210 19.3);
+  /* Sidebar — light navy surface */
+  --sidebar: oklch(0.965 0.010 266);
+  --sidebar-foreground: oklch(0.184 0.030 266);
+  --sidebar-primary: oklch(0.859 0.145 82.6);
+  --sidebar-primary-foreground: oklch(0.184 0.030 266);
+  --sidebar-accent: oklch(0.859 0.145 82.6);
+  --sidebar-accent-foreground: oklch(0.184 0.030 266);
+  --sidebar-border: oklch(0.900 0.018 266);
+  --sidebar-ring: oklch(0.859 0.145 82.6);
 }
 
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.488 0.243 264.376);
-  --chart-2: oklch(0.696 0.17 162.48);
-  --chart-3: oklch(0.769 0.188 70.08);
-  --chart-4: oklch(0.627 0.265 303.9);
-  --chart-5: oklch(0.645 0.246 16.439);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  /* Void — primary background */
+  --background: oklch(0.184 0.030 266);
+  /* Primary Text */
+  --foreground: oklch(0.962 0.005 286);
+  /* Deep Navy — cards, elevated surfaces */
+  --card: oklch(0.254 0.070 266.5);
+  --card-foreground: oklch(0.962 0.005 286);
+  --popover: oklch(0.254 0.070 266.5);
+  --popover-foreground: oklch(0.962 0.005 286);
+  /* Amber — primary actions */
+  --primary: oklch(0.859 0.145 82.6);
+  --primary-foreground: oklch(0.184 0.030 266);
+  /* Deep Navy — secondary actions */
+  --secondary: oklch(0.254 0.070 266.5);
+  --secondary-foreground: oklch(0.962 0.005 286);
+  /* Muted containers */
+  --muted: oklch(0.220 0.040 266);
+  /* Secondary Text */
+  --muted-foreground: oklch(0.635 0.036 285.3);
+  /* Navy Mid — hover/highlight */
+  --accent: oklch(0.328 0.101 267.3);
+  --accent-foreground: oklch(0.962 0.005 286);
+  /* Crimson — destructive */
+  --destructive: oklch(0.616 0.210 19.3);
+  /* Deep Navy */
+  --deep-navy: oklch(0.254 0.070 266.5);
+  /* Navy Mid — borders */
+  --border: oklch(0.328 0.101 267.3);
+  --input: oklch(0.328 0.101 267.3);
+  /* Amber — focus rings */
+  --ring: oklch(0.859 0.145 82.6);
+  /* Charts — Amber, Coral, Hot Pink, Jade, Crimson */
+  --chart-1: oklch(0.859 0.145 82.6);
+  --chart-2: oklch(0.723 0.173 30.9);
+  --chart-3: oklch(0.684 0.248 349.8);
+  --chart-4: oklch(0.693 0.157 155.1);
+  --chart-5: oklch(0.616 0.210 19.3);
+  /* Deep Navy — sidebar */
+  --sidebar: oklch(0.254 0.070 266.5);
+  --sidebar-foreground: oklch(0.962 0.005 286);
+  /* Amber — active indicators */
+  --sidebar-primary: oklch(0.859 0.145 82.6);
+  --sidebar-primary-foreground: oklch(0.184 0.030 266);
+  --sidebar-accent: oklch(0.859 0.145 82.6);
+  --sidebar-accent-foreground: oklch(0.184 0.030 266);
+  --sidebar-border: oklch(0.328 0.101 267.3);
+  --sidebar-ring: oklch(0.859 0.145 82.6);
 
   --main-height: calc(100vh - (var(--spacing) * 4));
+}
+
+/* Shared search bar morph timing */
+::view-transition-group(.search-bar-morph) {
+  animation-duration: 300ms;
+  animation-timing-function: ease-in-out;
+}
+
+/* Results fade in */
+::view-transition-new(.search-results-fade-in) {
+  animation: search-results-enter 400ms ease-out;
+}
+
+::view-transition-old(.search-results-fade-in) {
+  animation: search-results-exit 200ms ease-in;
+}
+
+@keyframes search-results-enter {
+  from { opacity: 0; transform: translateY(8px); }
+}
+
+@keyframes search-results-exit {
+  to { opacity: 0; }
+}
+
+/* Search result position animation */
+::view-transition-group(.search-result-move) {
+  animation-duration: 300ms;
+  animation-timing-function: ease-in-out;
+}
+
+::view-transition-group(.search-result-enter-0),
+::view-transition-group(.search-result-enter-1),
+::view-transition-group(.search-result-enter-2),
+::view-transition-group(.search-result-enter-3),
+::view-transition-group(.search-result-enter-4),
+::view-transition-group(.search-result-enter-5),
+::view-transition-group(.search-result-enter-6),
+::view-transition-group(.search-result-enter-7),
+::view-transition-group(.search-result-enter-8),
+::view-transition-group(.search-result-enter-9),
+::view-transition-group(.search-result-enter-10),
+::view-transition-group(.search-result-enter-11),
+::view-transition-group(.search-result-enter-12),
+::view-transition-group(.search-result-enter-13),
+::view-transition-group(.search-result-enter-14),
+::view-transition-group(.search-result-enter-15),
+::view-transition-group(.search-result-enter-16),
+::view-transition-group(.search-result-enter-17),
+::view-transition-group(.search-result-enter-18),
+::view-transition-group(.search-result-enter-19) {
+  overflow: visible;
+}
+
+::view-transition-new(.search-result-enter-0)  { animation: search-result-slide-in 300ms ease-out     0ms both; }
+::view-transition-new(.search-result-enter-1)  { animation: search-result-slide-in 300ms ease-out   100ms both; }
+::view-transition-new(.search-result-enter-2)  { animation: search-result-slide-in 300ms ease-out   200ms both; }
+::view-transition-new(.search-result-enter-3)  { animation: search-result-slide-in 300ms ease-out   300ms both; }
+::view-transition-new(.search-result-enter-4)  { animation: search-result-slide-in 300ms ease-out   400ms both; }
+::view-transition-new(.search-result-enter-5)  { animation: search-result-slide-in 300ms ease-out   500ms both; }
+::view-transition-new(.search-result-enter-6)  { animation: search-result-slide-in 300ms ease-out   600ms both; }
+::view-transition-new(.search-result-enter-7)  { animation: search-result-slide-in 300ms ease-out   700ms both; }
+::view-transition-new(.search-result-enter-8)  { animation: search-result-slide-in 300ms ease-out   800ms both; }
+::view-transition-new(.search-result-enter-9)  { animation: search-result-slide-in 300ms ease-out   900ms both; }
+::view-transition-new(.search-result-enter-10) { animation: search-result-slide-in 300ms ease-out  1000ms both; }
+::view-transition-new(.search-result-enter-11) { animation: search-result-slide-in 300ms ease-out  1100ms both; }
+::view-transition-new(.search-result-enter-12) { animation: search-result-slide-in 300ms ease-out  1200ms both; }
+::view-transition-new(.search-result-enter-13) { animation: search-result-slide-in 300ms ease-out  1300ms both; }
+::view-transition-new(.search-result-enter-14) { animation: search-result-slide-in 300ms ease-out  1400ms both; }
+::view-transition-new(.search-result-enter-15) { animation: search-result-slide-in 300ms ease-out  1500ms both; }
+::view-transition-new(.search-result-enter-16) { animation: search-result-slide-in 300ms ease-out  1600ms both; }
+::view-transition-new(.search-result-enter-17) { animation: search-result-slide-in 300ms ease-out  1700ms both; }
+::view-transition-new(.search-result-enter-18) { animation: search-result-slide-in 300ms ease-out  1800ms both; }
+::view-transition-new(.search-result-enter-19) { animation: search-result-slide-in 300ms ease-out  1900ms both; }
+
+::view-transition-group(.search-result-exit) {
+  animation-duration: 200ms;
+  animation-timing-function: ease-in;
+}
+
+::view-transition-old(.search-result-exit) {
+  animation: search-result-fade-out 200ms ease-in forwards;
+}
+
+::view-transition-new(.search-result-exit) {
+  animation: none;
+}
+
+@keyframes search-result-slide-in {
+  from { opacity: 0; transform: translateY(16px); }
+}
+
+@keyframes search-result-fade-out {
+  to { opacity: 0; }
+}
+
+/* Game page tab slide transitions (carousel style) */
+::view-transition-group(.game-tab-slide-left),
+::view-transition-group(.game-tab-slide-right),
+::view-transition-image-pair(.game-tab-slide-left),
+::view-transition-image-pair(.game-tab-slide-right) {
+  overflow: visible;
+}
+
+::view-transition-old(.game-tab-slide-left),
+::view-transition-new(.game-tab-slide-left),
+::view-transition-old(.game-tab-slide-right),
+::view-transition-new(.game-tab-slide-right) {
+  animation-duration: 300ms;
+  animation-timing-function: ease-in-out;
+  animation-fill-mode: both;
+}
+
+::view-transition-old(.game-tab-slide-left) {
+  animation-name: game-tab-out-left;
+}
+
+::view-transition-new(.game-tab-slide-left) {
+  animation-name: game-tab-in-left;
+}
+
+::view-transition-old(.game-tab-slide-right) {
+  animation-name: game-tab-out-right;
+}
+
+::view-transition-new(.game-tab-slide-right) {
+  animation-name: game-tab-in-right;
+}
+
+@keyframes game-tab-out-left {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(-100%); }
+}
+
+@keyframes game-tab-in-left {
+  from { opacity: 0; transform: translateX(100%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes game-tab-out-right {
+  from { opacity: 1; transform: translateX(0); }
+  to { opacity: 0; transform: translateX(100%); }
+}
+
+@keyframes game-tab-in-right {
+  from { opacity: 0; transform: translateX(-100%); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation-duration: 0.01ms !important;
+  }
 }
 
 @layer base {
@@ -136,5 +316,12 @@ body {
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-readex-pro), system-ui, sans-serif;
   }
+}
+
+@keyframes spin-pause {
+  0%   { transform: rotate(0deg); }
+  50%  { transform: rotate(360deg); }
+  100% { transform: rotate(360deg); }
 }

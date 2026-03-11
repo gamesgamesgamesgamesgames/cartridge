@@ -14,6 +14,7 @@ import { GAME_GENRES } from '@/constants/GAME_GENRES'
 import { GAME_THEMES } from '@/constants/GAME_THEMES'
 import { Scroller } from '@/components/ui/scroller'
 import { useDashboardCatalogEditGameContext } from '@/context/DashboardCatalogEditGameContext/DashboardCatalogEditGameContext'
+import { Link } from '../Link/Link'
 
 export function ReviewContent() {
 	const {
@@ -45,16 +46,19 @@ export function ReviewContent() {
 				</DataListValue>
 				<DataListLabel>{'Type'}</DataListLabel>
 				<DataListValue>
-					{applicationType ? GAME_APPLICATION_TYPES[applicationType].name : ''}
+					{applicationType
+						? (GAME_APPLICATION_TYPES[applicationType]?.name ?? applicationType)
+						: ''}
 				</DataListValue>
 				<DataListLabel>{'Genres'}</DataListLabel>
 				<DataListValue>
 					{genres?.size ? (
 						<CommaSeparatedList
-							includeLinks
-							items={Array.from(genres).map(
-								(genre) => GAME_GENRES[genre]!.name,
-							)}
+							items={Array.from(genres).map((genre) => (
+								<Link href={`/theme/${GAME_GENRES[genre]?.name ?? genre}`}>
+									{GAME_GENRES[genre]?.name ?? genre}
+								</Link>
+							))}
 						/>
 					) : (
 						<span className={'italic text-muted-foreground'}>
@@ -66,10 +70,11 @@ export function ReviewContent() {
 				<DataListValue>
 					{themes?.size ? (
 						<CommaSeparatedList
-							includeLinks
-							items={Array.from(themes).map(
-								(theme) => GAME_THEMES[theme]!.name,
-							)}
+							items={Array.from(themes).map((theme) => (
+								<Link href={`/theme/${GAME_THEMES[theme]?.name ?? theme}`}>
+									{GAME_THEMES[theme]?.name ?? theme}
+								</Link>
+							))}
 						/>
 					) : (
 						<span className={'italic text-muted-foreground'}>
@@ -81,11 +86,13 @@ export function ReviewContent() {
 				<DataListValue>
 					{playerPerspectives?.size ? (
 						<CommaSeparatedList
-							includeLinks
-							items={Array.from(playerPerspectives).map(
-								(playerPerspective) =>
-									GAME_PLAYER_PERSPECTIVES[playerPerspective]!.name,
-							)}
+							items={Array.from(playerPerspectives).map((playerPerspective) => (
+								<Link
+									href={`/theme/${GAME_PLAYER_PERSPECTIVES[playerPerspective]?.name ?? playerPerspective}`}>
+									{GAME_PLAYER_PERSPECTIVES[playerPerspective]?.name ??
+										playerPerspective}
+								</Link>
+							))}
 						/>
 					) : (
 						<span className={'italic text-muted-foreground'}>
@@ -97,8 +104,11 @@ export function ReviewContent() {
 				<DataListValue>
 					{modes?.size ? (
 						<CommaSeparatedList
-							includeLinks
-							items={Array.from(modes).map((mode) => GAME_MODES[mode]!.name)}
+							items={Array.from(modes).map((mode) => (
+								<Link href={`/theme/${GAME_MODES[mode]?.id ?? mode}`}>
+									{GAME_MODES[mode]?.name ?? mode}
+								</Link>
+							))}
 						/>
 					) : (
 						<span className={'italic text-muted-foreground'}>

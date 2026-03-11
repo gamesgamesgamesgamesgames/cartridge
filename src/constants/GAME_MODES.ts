@@ -12,11 +12,8 @@ export const GAME_MODES = Object.entries(ModeLexicon.defs).reduce(
 			{ description: string },
 		]
 
-		const fqid = `games.gamesgamesgamesgames.mode#${id}` as Mode 
-
-		accumulator[fqid] = {
+		accumulator[id as Mode] = {
 			id,
-			fqid,
 			name,
 		}
 
@@ -24,7 +21,6 @@ export const GAME_MODES = Object.entries(ModeLexicon.defs).reduce(
 	},
 	{} as Record<Mode, {
 		id: ModeLexiconIDs,
-		fqid: Mode,
 		name: string,
 	}>,
 )
