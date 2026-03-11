@@ -14,7 +14,7 @@ export function AboutTab(props: Props) {
 				<SectionHeader
 					id={'about-summary'}
 					title={'Summary'}>
-					<div className={'flex flex-col gap-3 leading-7'}>
+					<div className={'prose prose-sm dark:prose-invert max-w-none text-muted-foreground'}>
 						{gameRecord.summary?.split('\n').map((p, index) => (
 							<p key={index}>{p}</p>
 						))}
@@ -26,7 +26,7 @@ export function AboutTab(props: Props) {
 				<SectionHeader
 					id={'about-storyline'}
 					title={'Storyline'}>
-					<div className={'flex flex-col gap-3 leading-7'}>
+					<div className={'prose prose-sm dark:prose-invert max-w-none text-muted-foreground'}>
 						{gameRecord.storyline?.split('\n').map((p, index) => (
 							<p key={index}>{p}</p>
 						))}
