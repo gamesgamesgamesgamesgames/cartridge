@@ -132,7 +132,7 @@ export async function ReviewsTab({ reviews }: Props) {
 							{review.title && <Header level={4}>{review.title}</Header>}
 
 							{review.text && (
-								<div className={'prose prose-sm dark:prose-invert max-w-none text-muted-foreground'}>
+								<div className={'prose prose-sm dark:prose-invert max-w-none text-foreground'}>
 									{review.text.split('\n').map((p, i) => (
 										<p key={i}>{p}</p>
 									))}

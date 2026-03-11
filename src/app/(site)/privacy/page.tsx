@@ -7,7 +7,7 @@ export default function PrivacyPolicyPage() {
 			<Header>{'Privacy Policy'}</Header>
 			<div
 				className={
-					'prose prose-sm dark:prose-invert mt-8 max-w-none text-muted-foreground prose-headings:font-[family-name:var(--font-cartridge)] prose-headings:text-foreground prose-a:text-primary prose-strong:text-foreground'
+					'prose prose-sm dark:prose-invert mt-8 max-w-none text-foreground prose-headings:font-[family-name:var(--font-cartridge)] prose-a:text-primary'
 				}>
 				<p>
 					Effective Date: <em>March 11, 2026</em>
