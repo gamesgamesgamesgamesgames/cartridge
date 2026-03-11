@@ -19,8 +19,8 @@ export function HomeSearchInput() {
 	}
 
 	return (
-		<ViewTransition name="search-bar">
-			<div className={'relative w-full'}>
+		<ViewTransition name='search-bar'>
+			<div className={'relative max-w-sm w-full md:max-w-xl md:w-xl'}>
 				<Search
 					className={
 						'absolute left-4 top-1/2 -translate-y-1/2 size-5 text-muted-foreground'
