@@ -130,26 +130,33 @@ function SearchPageContent() {
 												: 'search-result-enter-0'
 										}
 										exit={'search-result-exit'}>
-										<Link href={gameHref} className={'block'}>
+										<Link
+											href={gameHref}
+											className={'block'}>
 											<TiltCard>
 												<BoxArt gameRecord={item} />
 											</TiltCard>
 											<div className={'mt-1.5 px-0.5'}>
-												<p className={'truncate text-sm font-medium'}>
+												<div className={'truncate text-sm font-medium'}>
 													{item.name}
-												</p>
-												<p className={'truncate text-xs text-muted-foreground'}>
-													{[
-														item.firstReleaseDate
-															? Math.floor(item.firstReleaseDate / 10000)
-															: null,
-														item.applicationType
-															? (APPLICATION_TYPE_LABELS[item.applicationType] ?? item.applicationType)
-															: null,
-													]
-														.filter(Boolean)
-														.join(' · ')}
-												</p>
+												</div>
+												<div
+													className={
+														'flex justify-between truncate text-xs text-muted-foreground'
+													}>
+													{typeof item.firstReleaseDate !== 'undefined' && (
+														<span>
+															{Math.floor(item.firstReleaseDate / 10000)}
+														</span>
+													)}
+
+													{typeof item.applicationType !== 'undefined' && (
+														<span className={'ml-auto'}>
+															{APPLICATION_TYPE_LABELS[item.applicationType] ??
+																item.applicationType}
+														</span>
+													)}
+												</div>
 											</div>
 										</Link>
 									</ViewTransition>
@@ -161,7 +168,9 @@ function SearchPageContent() {
 
 						{isLoading && (
 							<div className={'mt-4 flex justify-center py-4'}>
-								<Loader2 className={'size-6 animate-spin text-muted-foreground'} />
+								<Loader2
+									className={'size-6 animate-spin text-muted-foreground'}
+								/>
 							</div>
 						)}
 					</>
