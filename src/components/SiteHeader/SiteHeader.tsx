@@ -69,13 +69,14 @@ export function SiteHeader() {
 				)}
 
 				<div className={'flex items-stretch gap-4 ml-auto'}>
-					<Link
+					{/* <Link
 						href={'/about'}
 						className={
 							'flex items-center px-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors'
 						}>
 						{'About'}
-					</Link>
+					</Link> */}
+
 					<UserMenu />
 				</div>
 			</div>
