@@ -13,6 +13,7 @@ export async function fetchPrefillData(): Promise<ProfileSourceData> {
 		if (!result.description && data.description)
 			result.description = data.description
 		if (!result.avatarURL && data.avatarURL) result.avatarURL = data.avatarURL
+		if (!result.avatarBlob && data.avatarBlob) result.avatarBlob = data.avatarBlob
 	}
 
 	return result

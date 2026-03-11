@@ -4,4 +4,9 @@ export type PentaractAPIGetBlueskyProfileResult = {
 	displayName?: string
 	description?: string
 	avatarURL?: string
+	avatar?: {
+		$link: string
+		mimeType: string
+		size?: number
+	}
 }

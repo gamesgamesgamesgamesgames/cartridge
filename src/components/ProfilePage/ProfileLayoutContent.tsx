@@ -103,16 +103,11 @@ export async function ProfileLayoutContent(props: Props) {
 						</Avatar>
 
 						<div className={'flex flex-col gap-3'}>
-							<div className={'flex items-center gap-4'}>
-								<Header
-									className={'text-5xl'}
-									level={2}>
-									{displayName}
-								</Header>
-								<Badge variant={'secondary'}>
-									{profileType === 'actor' ? 'Individual' : 'Organization'}
-								</Badge>
-							</div>
+							<Header
+								className={'text-5xl'}
+								level={2}>
+								{displayName}
+							</Header>
 
 							<span className={'text-muted-foreground'}>
 								{'@'}{handle}

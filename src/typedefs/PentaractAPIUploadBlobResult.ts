@@ -1,7 +1,5 @@
-import { type Cid } from '@atproto/lex'
-
 export type PentaractAPIUploadBlobResult = {
-	ref: Cid
+	ref: string
 	mimeType: string
 	size: number
 }

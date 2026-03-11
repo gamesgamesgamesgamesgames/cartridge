@@ -11,6 +11,13 @@ export const PROFILE_SOURCES: ProfileSource[] = [
 				displayName: profile.displayName,
 				description: profile.description,
 				avatarURL: profile.avatarURL,
+				avatarBlob: profile.avatar
+					? {
+							ref: profile.avatar.$link,
+							mimeType: profile.avatar.mimeType,
+							size: profile.avatar.size ?? 0,
+						}
+					: undefined,
 			}
 		},
 	},
