@@ -2,11 +2,11 @@
 
 // Module imports
 import { Heart } from 'lucide-react'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 // Local imports
 import * as API from '@/helpers/API'
-import { isAuthenticated, loginWithRedirect } from '@/helpers/oauth'
+import { consumePendingLike, isAuthenticated, setPendingLike } from '@/helpers/oauth'
 
 // Types
 type Props = Readonly<{
@@ -22,15 +22,9 @@ export function LikeButton(props: Props) {
 	const [count, setCount] = useState(initialCount)
 	const [pending, setPending] = useState(false)
 
-	const handleClick = useCallback(async () => {
-		if (!isAuthenticated()) {
-			loginWithRedirect()
-			return
-		}
-
+	const toggleLike = useCallback(async () => {
 		if (pending) return
 
-		// Optimistic update
 		const wasLiked = liked
 		const prevCount = count
 		setLiked(!wasLiked)
@@ -40,13 +34,39 @@ export function LikeButton(props: Props) {
 		try {
 			await API.toggleLike(gameUri)
 		} catch {
-			// Revert on failure
 			setLiked(wasLiked)
 			setCount(prevCount)
 		} finally {
 			setPending(false)
 		}
 	}, [gameUri, liked, count, pending])
+
+	const handleClick = useCallback(() => {
+		if (!isAuthenticated()) {
+			setPendingLike(gameUri)
+			const returnTo = window.location.pathname + window.location.search
+			window.location.href = `/login?returnTo=${encodeURIComponent(returnTo)}`
+			return
+		}
+
+		toggleLike()
+	}, [gameUri, toggleLike])
+
+	useEffect(() => {
+		if (!isAuthenticated()) return
+
+		// Server can't check liked status (no auth token), so fetch it client-side
+		API.getLikes(gameUri).then(({ count: freshCount, liked: freshLiked }) => {
+			setLiked(freshLiked)
+			setCount(freshCount)
+
+			// Execute pending like after we know the real state
+			const pendingUri = consumePendingLike()
+			if (pendingUri === gameUri && !freshLiked) {
+				toggleLike()
+			}
+		})
+	}, []) // eslint-disable-line react-hooks/exhaustive-deps
 
 	return (
 		<button

@@ -17,6 +17,7 @@ const STORAGE_KEY = 'pentaract_oauth_tokens'
 const VERIFIER_KEY = 'pentaract_pkce_verifier'
 const STATE_KEY = 'pentaract_oauth_state'
 const RETURN_URL_KEY = 'pentaract_return_url'
+const PENDING_LIKE_KEY = 'pentaract_pending_like'
 
 function getConfig(): OAuthConfig {
 	return {
@@ -157,7 +158,7 @@ export function isAuthenticated(): boolean {
 }
 
 export function getStoredTokens(): OAuthTokens | null {
-	if (typeof localStorage === 'undefined') return null
+	if (typeof window === 'undefined') return null
 	const raw = localStorage.getItem(STORAGE_KEY)
 	if (!raw) return null
 	try {
@@ -177,6 +178,16 @@ export function getReturnUrl(): string | null {
 	const url = sessionStorage.getItem(RETURN_URL_KEY)
 	sessionStorage.removeItem(RETURN_URL_KEY)
 	return url
+}
+
+export function setPendingLike(gameUri: string) {
+	sessionStorage.setItem(PENDING_LIKE_KEY, gameUri)
+}
+
+export function consumePendingLike(): string | null {
+	const uri = sessionStorage.getItem(PENDING_LIKE_KEY)
+	sessionStorage.removeItem(PENDING_LIKE_KEY)
+	return uri
 }
 
 export function logout() {
