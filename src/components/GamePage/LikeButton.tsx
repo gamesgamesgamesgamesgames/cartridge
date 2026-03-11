@@ -10,13 +10,14 @@ import { consumePendingLike, isAuthenticated, setPendingLike } from '@/helpers/o
 
 // Types
 type Props = Readonly<{
+	className?: string
 	gameUri: string
 	initialCount: number
 	initialLiked: boolean
 }>
 
 export function LikeButton(props: Props) {
-	const { gameUri, initialCount, initialLiked } = props
+	const { className, gameUri, initialCount, initialLiked } = props
 
 	const [liked, setLiked] = useState(initialLiked)
 	const [count, setCount] = useState(initialCount)
@@ -73,7 +74,7 @@ export function LikeButton(props: Props) {
 			type={'button'}
 			onClick={handleClick}
 			disabled={pending}
-			className={'flex items-center gap-2 transition-colors hover:text-red-400'}>
+			className={`flex items-center gap-2 transition-colors hover:text-red-400${className ? ` ${className}` : ''}`}>
 			<Heart
 				className={`size-6 transition-colors ${liked ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`}
 			/>

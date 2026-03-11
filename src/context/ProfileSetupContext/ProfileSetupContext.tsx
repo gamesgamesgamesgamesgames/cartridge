@@ -94,7 +94,7 @@ export function ProfileSetupContextProvider(props: Props) {
 			if (data.description) setDescription(data.description)
 			if (data.pronouns) setPronouns(data.pronouns)
 			if (data.avatarURL) setAvatarURL(data.avatarURL)
-			if (data.avatarBlob) setAvatarBlob(data.avatarBlob)
+			if (data.avatarBlob) setAvatarBlob(data.avatarBlob as unknown as PentaractAPIUploadBlobResult)
 		})
 	}, [])
 

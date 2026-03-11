@@ -17,7 +17,6 @@ import {
 } from '@/components/GamePage/GamePageSubnav'
 import { Header } from '@/components/Header/Header'
 import { ArtworkBackground } from '@/components/GamePage/ArtworkBackground'
-import { Badge } from '@/components/ui/badge'
 import { LikeButton } from '@/components/GamePage/LikeButton'
 import { GAME_APPLICATION_TYPES } from '@/constants/GAME_APPLICATION_TYPES'
 import { GAME_GENRES } from '@/constants/GAME_GENRES'
@@ -49,6 +48,18 @@ type Props = Readonly<
 export function GameLayoutContent(props: Props) {
 	const { basePath, children, gameRecord, likes, reviews, transitionName } =
 		props
+
+	const firstReleaseYear = (() => {
+		let earliest: string | undefined
+		for (const release of gameRecord.releases ?? []) {
+			for (const rd of release.releaseDates ?? []) {
+				if (rd.releasedAt && (!earliest || rd.releasedAt < earliest)) {
+					earliest = rd.releasedAt
+				}
+			}
+		}
+		return earliest?.slice(0, 4)
+	})()
 
 	const aboutSections: SubnavConfig['about'] = []
 	if (gameRecord.summary)
@@ -91,32 +102,41 @@ export function GameLayoutContent(props: Props) {
 				<ArtworkBackground gameRecord={gameRecord} />
 				<Container className={'relative z-10'}>
 					<div className={'flex gap-20 items-center'}>
-						<ViewTransition name={`sr-${transitionName}`}>
-							<BoxArt
-								className={'min-w-[25%] w-[25%]'}
-								gameRecord={gameRecord}
-							/>
-						</ViewTransition>
+						<div className={'min-w-[25%] w-[25%]'}>
+							<ViewTransition name={`sr-${transitionName}`}>
+								<div className={'relative'}>
+									<BoxArt
+										gameRecord={gameRecord}
+									/>
+									<LikeButton
+										className={'absolute top-2 right-2 z-10 rounded-full bg-black/40 p-1.5'}
+										gameUri={gameRecord.uri}
+										initialCount={likes.count}
+										initialLiked={likes.liked}
+									/>
+								</div>
+								<div className={'mt-1.5 px-0.5'}>
+									<div className={'flex justify-between truncate text-xs text-muted-foreground'}>
+										{firstReleaseYear && (
+											<span>{firstReleaseYear}</span>
+										)}
+										{gameRecord.applicationType && (
+											<span className={'ml-auto'}>
+												{GAME_APPLICATION_TYPES[gameRecord.applicationType]?.name ??
+													gameRecord.applicationType}
+											</span>
+										)}
+									</div>
+								</div>
+							</ViewTransition>
+						</div>
 
 						<div className={'flex flex-col gap-10'}>
-							<div className={'flex items-center gap-6'}>
-								<Header
-									className={'text-6xl'}
-									level={2}>
-									{gameRecord.name}
-								</Header>
-								{gameRecord.applicationType && (
-									<Badge variant={'secondary'}>
-										{GAME_APPLICATION_TYPES[gameRecord.applicationType]?.name ??
-											gameRecord.applicationType}
-									</Badge>
-								)}
-								<LikeButton
-									gameUri={gameRecord.uri}
-									initialCount={likes.count}
-									initialLiked={likes.liked}
-								/>
-							</div>
+							<Header
+								className={'text-6xl'}
+								level={2}>
+								{gameRecord.name}
+							</Header>
 
 							<DataList className={'gap-x-10 gap-y-6'}>
 								{Boolean(gameRecord.genres?.length) && (
