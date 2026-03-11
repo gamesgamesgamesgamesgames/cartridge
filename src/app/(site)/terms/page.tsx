@@ -1,5 +1,9 @@
+import { type Metadata } from 'next'
+
 // Local imports
 import { Header } from '@/components/Header/Header'
+
+export const metadata: Metadata = { title: 'Terms of Service' }
 
 export default function TermsOfServicePage() {
 	return (

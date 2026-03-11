@@ -53,7 +53,10 @@ const cartridge = localFont({
 })
 
 export const metadata: Metadata = {
-	title: 'Cartridge',
+	title: {
+		default: 'Cartridge',
+		template: '%s | Cartridge',
+	},
 	description: 'Every game, loaded.',
 }
 
