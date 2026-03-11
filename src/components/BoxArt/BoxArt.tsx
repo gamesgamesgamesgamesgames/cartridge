@@ -32,19 +32,25 @@ export function BoxArt(props: Props) {
 
 	const blobUrl = useBlobUrl(gameRecord?.uri, mediaItem?.blob)
 	const [imageLoaded, setImageLoaded] = useState(false)
+	const isLoading = Boolean(gameRecord && mediaItem && !imageLoaded)
 
 	return (
 		<div className={twMerge('overflow-hidden rounded-sm', className)}>
 			<Skeleton loading={!gameRecord}>
 				<AspectRatio ratio={2.25 / 3}>
-					<div className={'absolute inset-0 flex items-center justify-center bg-muted'}>
+					<div className={'absolute inset-0 flex flex-col items-center justify-center bg-muted'}>
 						{/* eslint-disable-next-line @next/next/no-img-element */}
 						<img
 							alt={''}
 							className={'size-2/3 opacity-30'}
 							src={'/images/branding/logomark.color.svg'}
-							style={{ animation: 'spin-pause 1.2s ease-in-out infinite' }}
+							style={isLoading ? { animation: 'spin-pause 1.2s ease-in-out infinite' } : undefined}
 						/>
+						{gameRecord && !mediaItem && (
+							<span className={'mt-2 text-xs text-muted-foreground'}>
+								{'No cover'}
+							</span>
+						)}
 					</div>
 
 					{blobUrl && (
