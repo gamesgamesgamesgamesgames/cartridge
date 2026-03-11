@@ -4,8 +4,8 @@ import { type AtUriString } from '@atproto/lex'
 // Local imports
 import { type DID } from '@/typedefs/DID'
 import { type GameRecord } from '@/typedefs/GameRecord'
-import { type InputBody as ActorProfileInput } from '@/helpers/lexicons/games/gamesgamesgamesgames/actor/createProfile.defs'
-import { type InputBody as OrgProfileInput } from '@/helpers/lexicons/games/gamesgamesgamesgames/org/createProfile.defs'
+import { type InputBody as ActorProfileInput } from '@/helpers/lexicons/games/gamesgamesgamesgames/actor/putProfile.defs'
+import { type InputBody as OrgProfileInput } from '@/helpers/lexicons/games/gamesgamesgamesgames/org/putProfile.defs'
 import { type MediaItem } from '@/typedefs/MediaItem'
 import { type PopfeedReview } from '@/helpers/lexicons/games/gamesgamesgamesgames/getReviews.defs'
 import { type PentaractAPICreateGameOptions } from '@/typedefs/PentaractAPICreateGameOptions'
@@ -283,11 +283,11 @@ export async function searchProfilesTypeahead(
 	return response.json()
 }
 
-export async function createActorProfile(
+export async function putActorProfile(
 	profile: ActorProfileInput,
 ): Promise<PentaractAPICreateProfileResult> {
 	const response = await queryAPI(
-		'/xrpc/games.gamesgamesgamesgames.actor.createProfile',
+		'/xrpc/games.gamesgamesgamesgames.actor.putProfile',
 		{
 			isAuthenticated: true,
 			method: 'POST',
@@ -298,18 +298,18 @@ export async function createActorProfile(
 	if (!response.ok) {
 		const errorBody = await response.text()
 		throw new Error(
-			`createActorProfile failed (${response.status}): ${errorBody}`,
+			`putActorProfile failed (${response.status}): ${errorBody}`,
 		)
 	}
 
 	return response.json()
 }
 
-export async function createOrgProfile(
+export async function putOrgProfile(
 	profile: OrgProfileInput,
 ): Promise<PentaractAPICreateProfileResult> {
 	const response = await queryAPI(
-		'/xrpc/games.gamesgamesgamesgames.org.createProfile',
+		'/xrpc/games.gamesgamesgamesgames.org.putProfile',
 		{
 			isAuthenticated: true,
 			method: 'POST',
@@ -320,7 +320,7 @@ export async function createOrgProfile(
 	if (!response.ok) {
 		const errorBody = await response.text()
 		throw new Error(
-			`createOrgProfile failed (${response.status}): ${errorBody}`,
+			`putOrgProfile failed (${response.status}): ${errorBody}`,
 		)
 	}
 

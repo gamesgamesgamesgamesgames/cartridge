@@ -122,7 +122,7 @@ export function ProfileSetupContextProvider(props: Props) {
 				}
 			}
 
-			await API.createActorProfile(profile)
+			await API.putActorProfile(profile)
 
 			store.set(() => ({ profileType: 'actor' as ProfileType }))
 			setProfileTypeCookie('actor')
