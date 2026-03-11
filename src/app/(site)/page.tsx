@@ -6,7 +6,7 @@ export default function Home() {
 	return (
 		<div
 			className={
-				'flex flex-1 flex-col items-center justify-center bg-background px-4'
+				'flex flex-grow flex-col items-center justify-center bg-background px-4 h-full'
 			}>
 			<main className={'flex flex-col gap-10 items-center w-full'}>
 				<Logo />
