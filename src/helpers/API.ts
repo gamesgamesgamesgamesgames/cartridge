@@ -238,7 +238,18 @@ export async function getBlueskyProfile(): Promise<PentaractAPIGetBlueskyProfile
 
 export async function search(
 	q: string,
-	options: { limit?: number; types?: string[]; applicationTypes?: string[]; cursor?: string } = {},
+	options: {
+		limit?: number
+		types?: string[]
+		applicationTypes?: string[]
+		sort?: string
+		genres?: string[]
+		themes?: string[]
+		modes?: string[]
+		playerPerspectives?: string[]
+		includeCancelled?: boolean
+		cursor?: string
+	} = {},
 ): Promise<PentaractAPISearchResult> {
 	const params = new URLSearchParams({ q })
 	if (options.limit) {
@@ -251,6 +262,24 @@ export async function search(
 	}
 	if (options.applicationTypes?.length) {
 		params.set('applicationTypes', options.applicationTypes.join(','))
+	}
+	if (options.sort) {
+		params.set('sort', options.sort)
+	}
+	if (options.genres?.length) {
+		params.set('genres', options.genres.join(','))
+	}
+	if (options.themes?.length) {
+		params.set('themes', options.themes.join(','))
+	}
+	if (options.modes?.length) {
+		params.set('modes', options.modes.join(','))
+	}
+	if (options.playerPerspectives?.length) {
+		params.set('playerPerspectives', options.playerPerspectives.join(','))
+	}
+	if (options.includeCancelled) {
+		params.set('includeCancelled', 'true')
 	}
 	if (options.cursor) {
 		params.set('cursor', options.cursor)

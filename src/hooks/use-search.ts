@@ -7,6 +7,12 @@ type UseSearchOptions = {
 	limit?: number
 	types?: string[]
 	applicationTypes?: string[]
+	sort?: string
+	genres?: string[]
+	themes?: string[]
+	modes?: string[]
+	playerPerspectives?: string[]
+	includeCancelled?: boolean
 	minLength?: number
 }
 
@@ -14,7 +20,7 @@ export function useSearch(
 	query: string,
 	options: UseSearchOptions = {},
 ) {
-	const { limit, types, applicationTypes, minLength = 1 } = options
+	const { limit, types, applicationTypes, sort, genres, themes, modes, playerPerspectives, includeCancelled, minLength = 1 } = options
 
 	const [results, setResults] = useState<SearchResultItem[]>([])
 	const [cursor, setCursor] = useState<string | undefined>(undefined)
@@ -36,7 +42,7 @@ export function useSearch(
 
 		setIsLoading(true)
 
-		search(query, { limit, types, applicationTypes })
+		search(query, { limit, types, applicationTypes, sort, genres, themes, modes, playerPerspectives, includeCancelled })
 			.then((result) => {
 				if (seq > lastRenderedSeqRef.current) {
 					lastRenderedSeqRef.current = seq
@@ -60,13 +66,13 @@ export function useSearch(
 					setIsLoading(false)
 				}
 			})
-	}, [query, limit, types, applicationTypes, minLength])
+	}, [query, limit, types, applicationTypes, sort, genres, themes, modes, playerPerspectives, includeCancelled, minLength])
 
 	const loadMore = () => {
 		if (!cursor || isLoading) return
 
 		setIsLoading(true)
-		search(query, { limit, types, applicationTypes, cursor })
+		search(query, { limit, types, applicationTypes, sort, genres, themes, modes, playerPerspectives, includeCancelled, cursor })
 			.then((result) => {
 				setResults((prev) => [...prev, ...result.results])
 				setCursor(result.cursor)
