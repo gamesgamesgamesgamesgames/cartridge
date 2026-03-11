@@ -39,9 +39,7 @@ export function SearchResult({ item }: Props) {
 					</div>
 					<div className={'min-w-0 flex-1'}>
 						<p className={'truncate font-medium'}>{item.displayName ?? item.did}</p>
-						{item.slug && (
-							<p className={'truncate text-sm text-muted-foreground'}>@{item.slug}</p>
-						)}
+						<p className={'truncate text-sm text-muted-foreground'}>{item.did}</p>
 					</div>
 					<span className={'shrink-0 rounded-full bg-muted px-2.5 py-0.5 text-xs text-muted-foreground'}>
 						{item.profileType === 'org' ? 'Organization' : 'Player'}

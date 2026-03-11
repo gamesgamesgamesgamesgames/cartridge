@@ -14,6 +14,24 @@ const MAX_STAGGER = 20
 const SEARCH_TYPES = ['game']
 const APPLICATION_TYPES = ['game', 'remake', 'remaster', 'standaloneExpansion']
 
+const APPLICATION_TYPE_LABELS: Record<string, string> = {
+	addon: 'Addon',
+	bundle: 'Bundle',
+	dlc: 'DLC',
+	episode: 'Episode',
+	expandedGame: 'Expanded Game',
+	expansion: 'Expansion',
+	fork: 'Fork',
+	game: 'Game',
+	mod: 'Mod',
+	port: 'Port',
+	remake: 'Remake',
+	remaster: 'Remaster',
+	season: 'Season',
+	standaloneExpansion: 'Standalone Expansion',
+	update: 'Update',
+}
+
 function SearchPageContent() {
 	const { query } = useSearchContext()
 	const prevUrisRef = useRef<Set<string>>(new Set())
@@ -112,10 +130,27 @@ function SearchPageContent() {
 												: 'search-result-enter-0'
 										}
 										exit={'search-result-exit'}>
-										<Link href={gameHref}>
+										<Link href={gameHref} className={'block'}>
 											<TiltCard>
 												<BoxArt gameRecord={item} />
 											</TiltCard>
+											<div className={'mt-1.5 px-0.5'}>
+												<p className={'truncate text-sm font-medium'}>
+													{item.name}
+												</p>
+												<p className={'truncate text-xs text-muted-foreground'}>
+													{[
+														item.firstReleaseDate
+															? Math.floor(item.firstReleaseDate / 10000)
+															: null,
+														item.applicationType
+															? (APPLICATION_TYPE_LABELS[item.applicationType] ?? item.applicationType)
+															: null,
+													]
+														.filter(Boolean)
+														.join(' · ')}
+												</p>
+											</div>
 										</Link>
 									</ViewTransition>
 								)
