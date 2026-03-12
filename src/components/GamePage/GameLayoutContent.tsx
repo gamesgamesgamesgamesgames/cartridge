@@ -1,4 +1,5 @@
 // Module imports
+import Image from 'next/image'
 import { type PropsWithChildren } from 'react'
 import { ViewTransition } from 'react'
 
@@ -30,9 +31,56 @@ import {
 	LOGO_TYPES,
 	SCREENSHOT_TYPES,
 } from '@/constants/MEDIA_CATEGORIES'
+import { type AgeRating } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 import { type GameRecord } from '@/typedefs/GameRecord'
 import { type PopfeedReview } from '@/helpers/lexicons/games/gamesgamesgamesgames/getReviews.defs'
 import Link from 'next/link'
+
+const AGE_RATING_ORG_DIRS: Record<string, string> = {
+	esrb: 'esrb',
+	pegi: 'pegi',
+	cero: 'cero',
+	usk: 'usk',
+	grac: 'grac',
+	classInd: 'class_ind',
+	acb: 'acb',
+}
+
+const AGE_RATING_ORG_LABELS: Record<string, string> = {
+	esrb: 'ESRB',
+	pegi: 'PEGI',
+	cero: 'CERO',
+	usk: 'USK',
+	grac: 'GRAC',
+	classInd: 'DJCTQ',
+	acb: 'ACB',
+}
+
+/** Maps rating string values (from IGDB) to image filename suffixes. */
+const AGE_RATING_FILE_SUFFIXES: Record<string, Record<string, string>> = {
+	pegi: { Three: '3', Seven: '7', Twelve: '12', Sixteen: '16', Eighteen: '18' },
+	esrb: { RP: 'rp', EC: 'ec', E: 'e', E10: 'e10', T: 't', M: 'm', AO: 'ao' },
+	cero: { A: 'a', B: 'b', C: 'c', D: 'd', Z: 'z' },
+	usk: { Zero: '0', Six: '6', Twelve: '12', Sixteen: '16', Eighteen: '18' },
+	grac: { All: 'all', Twelve: '12', Fifteen: '15', Nineteen: '19' },
+	classInd: {
+		L: 'l',
+		Ten: '10',
+		Twelve: '12',
+		Fourteen: '14',
+		Sixteen: '16',
+		Eighteen: '18',
+	},
+	acb: { G: 'g', PG: 'pg', M: 'm', MA15: 'ma_15', R18: 'r_18' },
+}
+
+function ageRatingImagePath(rating: AgeRating): string | null {
+	const dir = AGE_RATING_ORG_DIRS[rating.organization]
+	if (!dir) return null
+	const suffix = AGE_RATING_FILE_SUFFIXES[rating.organization]?.[rating.rating]
+	if (!suffix) return null
+	return `/images/age-ratings/${dir}/${dir}_${suffix}.png`
+}
 
 // Types
 type Props = Readonly<
@@ -90,9 +138,32 @@ export function GameLayoutContent(props: Props) {
 		mediaSections.push({ id: 'media-other', label: 'Other' })
 	}
 
+	const metaSections: SubnavConfig['meta'] = []
+	if (
+		gameRecord.externalIds &&
+		Object.entries(gameRecord.externalIds).some(
+			([key, value]) => key !== '$type' && value != null,
+		)
+	) {
+		metaSections.push({ id: 'meta-external-ids', label: 'External IDs' })
+	}
+	const websites = gameRecord.websites ?? []
+	const STORE_TYPES = new Set(['steam', 'gog', 'epicGames', 'itchIo', 'xbox', 'playstation', 'nintendo', 'meta'])
+	const SOCIAL_TYPES = new Set(['twitter', 'instagram', 'youtube', 'twitch', 'discord', 'reddit', 'facebook', 'bluesky'])
+	if (websites.some((w) => STORE_TYPES.has(w.type ?? ''))) {
+		metaSections.push({ id: 'meta-stores', label: 'Stores' })
+	}
+	if (websites.some((w) => SOCIAL_TYPES.has(w.type ?? ''))) {
+		metaSections.push({ id: 'meta-socials', label: 'Socials' })
+	}
+	if (websites.some((w) => !STORE_TYPES.has(w.type ?? '') && !SOCIAL_TYPES.has(w.type ?? ''))) {
+		metaSections.push({ id: 'meta-other-links', label: 'Other Links' })
+	}
+
 	const subnavConfig: SubnavConfig = {
 		about: aboutSections,
 		media: mediaSections,
+		meta: metaSections,
 		reviews: reviews.length > 0 ? ['Popfeed'] : [],
 	}
 
@@ -105,25 +176,26 @@ export function GameLayoutContent(props: Props) {
 						<div className={'min-w-[25%] w-[25%]'}>
 							<ViewTransition name={`sr-${transitionName}`}>
 								<div className={'relative'}>
-									<BoxArt
-										gameRecord={gameRecord}
-									/>
+									<BoxArt gameRecord={gameRecord} />
 									<LikeButton
-										className={'absolute top-2 right-2 z-10 rounded-full bg-black/40 p-1.5'}
+										className={
+											'absolute top-2 right-2 z-10 rounded-full bg-black/40 p-1.5'
+										}
 										gameUri={gameRecord.uri}
 										initialCount={likes.count}
 										initialLiked={likes.liked}
 									/>
 								</div>
 								<div className={'mt-1.5 px-0.5'}>
-									<div className={'flex justify-between truncate text-xs text-muted-foreground'}>
-										{firstReleaseYear && (
-											<span>{firstReleaseYear}</span>
-										)}
+									<div
+										className={
+											'flex justify-between truncate text-xs text-muted-foreground'
+										}>
+										{firstReleaseYear && <span>{firstReleaseYear}</span>}
 										{gameRecord.applicationType && (
 											<span className={'ml-auto'}>
-												{GAME_APPLICATION_TYPES[gameRecord.applicationType]?.name ??
-													gameRecord.applicationType}
+												{GAME_APPLICATION_TYPES[gameRecord.applicationType]
+													?.name ?? gameRecord.applicationType}
 											</span>
 										)}
 									</div>
@@ -210,6 +282,28 @@ export function GameLayoutContent(props: Props) {
 									</>
 								)}
 							</DataList>
+
+							{Boolean(gameRecord.ageRatings?.length) && (
+								<div className={'mt-10 flex items-center gap-4'}>
+									{gameRecord.ageRatings!.map((rating) => {
+										const src = ageRatingImagePath(rating)
+										if (!src) return null
+										const label =
+											AGE_RATING_ORG_LABELS[rating.organization] ??
+											rating.organization
+										return (
+											<Image
+												key={`${rating.organization}-${rating.rating}`}
+												src={src}
+												alt={`${label} ${rating.rating}`}
+												width={48}
+												height={48}
+												className={'h-12 w-auto'}
+											/>
+										)
+									})}
+								</div>
+							)}
 						</div>
 					</div>
 				</Container>
