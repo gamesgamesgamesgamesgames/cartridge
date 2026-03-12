@@ -14,4 +14,5 @@ export type SearchResultItem =
 export type PentaractAPISearchResult = {
 	cursor?: string
 	results: SearchResultItem[]
+	totalResults?: number
 }

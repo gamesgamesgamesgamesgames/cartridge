@@ -25,6 +25,7 @@ export function useSearch(
 	const { limit, types, applicationTypes, sort, genres, themes, modes, playerPerspectives, ageRatings, includeUnrated, includeCancelled, minLength = 1 } = options
 
 	const [results, setResults] = useState<SearchResultItem[]>([])
+	const [totalResults, setTotalResults] = useState<number | undefined>(undefined)
 	const [cursor, setCursor] = useState<string | undefined>(undefined)
 	const [isLoading, setIsLoading] = useState(false)
 	const seqRef = useRef(0)
@@ -35,6 +36,7 @@ export function useSearch(
 			seqRef.current++
 			lastRenderedSeqRef.current = seqRef.current
 			setResults([])
+			setTotalResults(undefined)
 			setCursor(undefined)
 			setIsLoading(false)
 			return
@@ -50,6 +52,7 @@ export function useSearch(
 					lastRenderedSeqRef.current = seq
 					startTransition(() => {
 						setResults(result.results)
+						setTotalResults(result.totalResults)
 						setCursor(result.cursor)
 					})
 				}
@@ -59,6 +62,7 @@ export function useSearch(
 					lastRenderedSeqRef.current = seq
 					startTransition(() => {
 						setResults([])
+						setTotalResults(undefined)
 						setCursor(undefined)
 					})
 				}
@@ -87,5 +91,5 @@ export function useSearch(
 			})
 	}
 
-	return { results, cursor, isLoading, loadMore }
+	return { results, totalResults, cursor, isLoading, loadMore }
 }

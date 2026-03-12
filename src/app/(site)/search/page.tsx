@@ -278,7 +278,7 @@ function SearchPageContent() {
 
 	const activeFilterCount = genres.length + themes.length + modes.length + playerPerspectives.length + ageRatings.length
 
-	const { results, cursor, isLoading, loadMore } = useSearch(query, {
+	const { results, totalResults, cursor, isLoading, loadMore } = useSearch(query, {
 		limit: 25,
 		types: SEARCH_TYPES,
 		applicationTypes,
@@ -753,6 +753,19 @@ function SearchPageContent() {
 					</p>
 				)}
 			</main>
+
+			{typeof totalResults === 'number' && gameResults.length > 0 && (
+				<div
+					className={
+						'sticky bottom-0 z-20 border-t border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60'
+					}>
+					<div className={'mx-auto max-w-6xl px-4 py-2'}>
+						<p className={'text-xs text-muted-foreground'}>
+							{totalResults.toLocaleString()} {totalResults === 1 ? 'result' : 'results'}
+						</p>
+					</div>
+				</div>
+			)}
 		</ViewTransition>
 	)
 }
