@@ -32,9 +32,9 @@ export function SiteHeader() {
 	return (
 		<header
 			className={
-				'sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur shadow-xl/30 supports-[backdrop-filter]:bg-background/60'
+				'sticky top-0 z-50 h-20 border-b border-border bg-background/95 backdrop-blur shadow-xl/30 supports-[backdrop-filter]:bg-background/60'
 			}>
-			<div className={'mx-auto flex max-w-6xl items-stretch gap-4 px-4'}>
+			<div className={'mx-auto flex h-full max-w-6xl items-stretch gap-4 px-4'}>
 				<Link
 					href={'/'}
 					className={'flex items-center shrink-0 py-3'}>

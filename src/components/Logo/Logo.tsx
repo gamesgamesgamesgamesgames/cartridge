@@ -1,7 +1,13 @@
 import Image from 'next/image'
 import { ViewTransition } from 'react'
 
-export function Logo() {
+type Props = Readonly<{
+	tagline?: string
+}>
+
+export function Logo(props: Props) {
+	const { tagline = 'Every game, loaded.' } = props
+
 	return (
 		<ViewTransition name={'wordmark'}>
 			<div className={'flex relative'}>
@@ -17,7 +23,7 @@ export function Logo() {
 				<div className={'relative'}>
 					<h1
 						className={
-							'font-[family-name:var(--font-cartridge)] text-7xl md:text-9xl leading-[1.2] pb-2'
+							'font-[family-name:var(--font-cartridge)] text-6xl md:text-9xl leading-[1.2] pb-2'
 						}
 						style={{
 							background:
@@ -31,9 +37,9 @@ export function Logo() {
 
 					<span
 						className={
-							'absolute bottom-0 left-19 text-md whitespace-nowrap md:bottom-1 md:left-55 md:text-xl'
+							'absolute bottom-0 left-16 text-sm whitespace-nowrap md:bottom-1 md:left-55 md:text-xl'
 						}>
-						{'Every game, loaded.'}
+						{tagline}
 					</span>
 				</div>
 			</div>

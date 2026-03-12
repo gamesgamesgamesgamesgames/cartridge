@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronDown, Loader2 } from 'lucide-react'
+import { ChevronDown, Loader2, SlidersHorizontal } from 'lucide-react'
 import Link from 'next/link'
 import {
 	useCallback,
@@ -13,6 +13,11 @@ import {
 
 import { BoxArt } from '@/components/BoxArt/BoxArt'
 import { Button } from '@/components/ui/button'
+import {
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
+} from '@/components/ui/collapsible'
 import { Checkbox } from '@/components/ui/checkbox'
 import {
 	DropdownMenu,
@@ -213,15 +218,17 @@ function FilterDropdown({
 	labels,
 	selected,
 	onToggle,
+	className,
 }: {
 	label: string
 	labels: Record<string, string>
 	selected: string[]
 	onToggle: (value: string) => void
+	className?: string
 }) {
 	const count = selected.length
 	return (
-		<div className={'flex items-center gap-1.5'}>
+		<div className={`grid grid-cols-subgrid col-span-2 items-center md:flex md:gap-1.5 ${className ?? ''}`}>
 			<span className={'text-xs font-medium text-muted-foreground'}>
 				{label}
 			</span>
@@ -230,7 +237,7 @@ function FilterDropdown({
 					<Button
 						variant={'outline'}
 						size={'sm'}
-						className={'h-8 gap-1'}>
+						className={'h-8 gap-1 w-full md:w-auto justify-between md:justify-center'}>
 						{count > 0 ? `${label} (${count})` : 'All'}
 						<ChevronDown className={'size-3 opacity-50'} />
 					</Button>
@@ -267,6 +274,9 @@ function SearchPageContent() {
 	const [ageRatings, setAgeRatings] = useState<string[]>([])
 	const [includeUnrated, setIncludeUnrated] = useState(false)
 	const [includeCancelled, setIncludeCancelled] = useState(false)
+	const [filtersOpen, setFiltersOpen] = useState(false)
+
+	const activeFilterCount = genres.length + themes.length + modes.length + playerPerspectives.length + ageRatings.length
 
 	const { results, cursor, isLoading, loadMore } = useSearch(query, {
 		limit: 25,
@@ -350,148 +360,312 @@ function SearchPageContent() {
 		<ViewTransition enter='search-results-fade-in'>
 			<main className={'mx-auto w-full max-w-6xl flex-1 px-4 py-6'}>
 				{query.trim() && (
-					<div
+					<Collapsible
+						open={filtersOpen}
+						onOpenChange={setFiltersOpen}
 						className={
-							'flex flex-wrap items-center gap-3 border-b border-border pb-4 mb-4'
+							'sticky top-20 z-20 -mx-4 border-b border-border bg-background px-4 pb-4 pt-4 mb-4'
 						}>
-						<div className={'flex w-full items-center gap-1.5 overflow-hidden'}>
-							<span
-								className={
-									'text-xs font-medium text-muted-foreground shrink-0'
-								}>
-								Type
-							</span>
-							<Scroller
-								orientation={'horizontal'}
-								hideScrollbar>
-								<ToggleGroup
-									type={'multiple'}
+						<div className={'flex items-center gap-3 md:hidden'}>
+							<CollapsibleTrigger asChild>
+								<Button
 									variant={'outline'}
 									size={'sm'}
-									value={applicationTypes}
-									onValueChange={(value) => {
-										if (value.length > 0) {
-											setApplicationTypes(value)
-										}
-									}}
-									className={'w-max'}>
-									{ALL_APPLICATION_TYPES.map((appType) => (
-										<ToggleGroupItem
-											key={appType}
-											value={appType}
-											className={'text-xs'}>
-											{APPLICATION_TYPE_LABELS[appType]}
-										</ToggleGroupItem>
-									))}
-								</ToggleGroup>
-							</Scroller>
+									className={'h-8 gap-1.5'}>
+									<SlidersHorizontal className={'size-3.5'} />
+									{'Filters'}
+									{activeFilterCount > 0 && (
+										<span className={'rounded-full bg-primary px-1.5 text-[10px] font-semibold text-primary-foreground'}>
+											{activeFilterCount}
+										</span>
+									)}
+									<ChevronDown className={`size-3 opacity-50 transition-transform ${filtersOpen ? 'rotate-180' : ''}`} />
+								</Button>
+							</CollapsibleTrigger>
+
+							<div className={'ml-auto flex items-center gap-3'}>
+								<span className={'text-xs font-medium text-muted-foreground'}>
+									Sort
+								</span>
+								<Select
+									value={sort}
+									onValueChange={setSort}>
+									<SelectTrigger size={'sm'}>
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent>
+										{SORT_OPTIONS.map((option) => (
+											<SelectItem
+												key={option.value}
+												value={option.value}>
+												{option.label}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</div>
 						</div>
 
-						<FilterDropdown
-							label={'Genre'}
-							labels={GENRE_LABELS}
-							selected={genres}
-							onToggle={toggleArrayValue(setGenres)}
-						/>
-
-						<FilterDropdown
-							label={'Theme'}
-							labels={THEME_LABELS}
-							selected={themes}
-							onToggle={toggleArrayValue(setThemes)}
-						/>
-
-						<FilterDropdown
-							label={'Mode'}
-							labels={MODE_LABELS}
-							selected={modes}
-							onToggle={toggleArrayValue(setModes)}
-						/>
-
-						<FilterDropdown
-							label={'Perspective'}
-							labels={PERSPECTIVE_LABELS}
-							selected={playerPerspectives}
-							onToggle={toggleArrayValue(setPlayerPerspectives)}
-						/>
-
-						<div className={'flex items-center gap-1.5'}>
-							<span className={'text-xs font-medium text-muted-foreground'}>
-								Age Rating
-							</span>
-							<DropdownMenu>
-								<DropdownMenuTrigger asChild>
-									<Button
+						<div className={'hidden md:flex md:flex-wrap md:items-center md:gap-3'}>
+							<div className={'flex w-full items-center gap-1.5 overflow-hidden'}>
+								<span
+									className={
+										'text-xs font-medium text-muted-foreground shrink-0'
+									}>
+									Type
+								</span>
+								<Scroller
+									orientation={'horizontal'}
+									hideScrollbar>
+									<ToggleGroup
+										type={'multiple'}
 										variant={'outline'}
 										size={'sm'}
-										className={'h-8 gap-1'}>
-										{ageRatings.length > 0 ? `Age Rating (${ageRatings.length})` : 'All'}
-										<ChevronDown className={'size-3 opacity-50'} />
-									</Button>
-								</DropdownMenuTrigger>
-								<DropdownMenuContent align={'start'} className={'max-h-80 overflow-y-auto'}>
-									{AGE_RATING_GROUPS.map((group, index) => (
-										<DropdownMenuGroup key={group.org}>
-											{index > 0 && <DropdownMenuSeparator />}
-											<DropdownMenuLabel>{group.org}</DropdownMenuLabel>
-											{group.ratings.map((rating) => (
-												<DropdownMenuCheckboxItem
-													key={rating.value}
-													checked={ageRatings.includes(rating.value)}
-													onCheckedChange={() => toggleArrayValue(setAgeRatings)(rating.value)}
-													onSelect={(e) => e.preventDefault()}>
-													{rating.label}
-												</DropdownMenuCheckboxItem>
-											))}
-										</DropdownMenuGroup>
-									))}
-								</DropdownMenuContent>
-							</DropdownMenu>
-						</div>
+										value={applicationTypes}
+										onValueChange={(value) => {
+											if (value.length > 0) {
+												setApplicationTypes(value)
+											}
+										}}
+										className={'w-max'}>
+										{ALL_APPLICATION_TYPES.map((appType) => (
+											<ToggleGroupItem
+												key={appType}
+												value={appType}
+												className={'text-xs'}>
+												{APPLICATION_TYPE_LABELS[appType]}
+											</ToggleGroupItem>
+										))}
+									</ToggleGroup>
+								</Scroller>
+							</div>
 
-						<div className={'ml-auto flex items-center gap-3'}>
-							{ageRatings.length > 0 && (
+							<FilterDropdown
+								label={'Genre'}
+								labels={GENRE_LABELS}
+								selected={genres}
+								onToggle={toggleArrayValue(setGenres)}
+							/>
+
+							<FilterDropdown
+								label={'Theme'}
+								labels={THEME_LABELS}
+								selected={themes}
+								onToggle={toggleArrayValue(setThemes)}
+							/>
+
+							<FilterDropdown
+								label={'Mode'}
+								labels={MODE_LABELS}
+								selected={modes}
+								onToggle={toggleArrayValue(setModes)}
+							/>
+
+							<FilterDropdown
+								label={'Perspective'}
+								labels={PERSPECTIVE_LABELS}
+								selected={playerPerspectives}
+								onToggle={toggleArrayValue(setPlayerPerspectives)}
+							/>
+
+							<div className={'flex items-center gap-1.5'}>
+								<span className={'text-xs font-medium text-muted-foreground'}>
+									Age Rating
+								</span>
+								<DropdownMenu>
+									<DropdownMenuTrigger asChild>
+										<Button
+											variant={'outline'}
+											size={'sm'}
+											className={'h-8 gap-1'}>
+											{ageRatings.length > 0 ? `Age Rating (${ageRatings.length})` : 'All'}
+											<ChevronDown className={'size-3 opacity-50'} />
+										</Button>
+									</DropdownMenuTrigger>
+									<DropdownMenuContent align={'start'} className={'max-h-80 overflow-y-auto'}>
+										{AGE_RATING_GROUPS.map((group, index) => (
+											<DropdownMenuGroup key={group.org}>
+												{index > 0 && <DropdownMenuSeparator />}
+												<DropdownMenuLabel>{group.org}</DropdownMenuLabel>
+												{group.ratings.map((rating) => (
+													<DropdownMenuCheckboxItem
+														key={rating.value}
+														checked={ageRatings.includes(rating.value)}
+														onCheckedChange={() => toggleArrayValue(setAgeRatings)(rating.value)}
+														onSelect={(e) => e.preventDefault()}>
+														{rating.label}
+													</DropdownMenuCheckboxItem>
+												))}
+											</DropdownMenuGroup>
+										))}
+									</DropdownMenuContent>
+								</DropdownMenu>
+							</div>
+
+							<div className={'ml-auto flex items-center gap-3'}>
+								{ageRatings.length > 0 && (
+									<label className={'flex items-center gap-1.5 cursor-pointer'}>
+										<Checkbox
+											checked={includeUnrated}
+											onCheckedChange={(checked) => setIncludeUnrated(checked === true)}
+										/>
+										<span className={'text-xs font-medium text-muted-foreground'}>
+											Include unrated
+										</span>
+									</label>
+								)}
 								<label className={'flex items-center gap-1.5 cursor-pointer'}>
 									<Checkbox
-										checked={includeUnrated}
-										onCheckedChange={(checked) => setIncludeUnrated(checked === true)}
+										checked={includeCancelled}
+										onCheckedChange={(checked) => setIncludeCancelled(checked === true)}
 									/>
 									<span className={'text-xs font-medium text-muted-foreground'}>
-										Include unrated
+										Include cancelled
 									</span>
 								</label>
-							)}
-							<label className={'flex items-center gap-1.5 cursor-pointer'}>
-								<Checkbox
-									checked={includeCancelled}
-									onCheckedChange={(checked) => setIncludeCancelled(checked === true)}
-								/>
-								<span className={'text-xs font-medium text-muted-foreground'}>
-									Include cancelled
-								</span>
-							</label>
 
-							<span className={'text-xs font-medium text-muted-foreground'}>
-								Sort
-							</span>
-							<Select
-								value={sort}
-								onValueChange={setSort}>
-								<SelectTrigger size={'sm'}>
-									<SelectValue />
-								</SelectTrigger>
-								<SelectContent>
-									{SORT_OPTIONS.map((option) => (
-										<SelectItem
-											key={option.value}
-											value={option.value}>
-											{option.label}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
+								<span className={'text-xs font-medium text-muted-foreground'}>
+									Sort
+								</span>
+								<Select
+									value={sort}
+									onValueChange={setSort}>
+									<SelectTrigger size={'sm'}>
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent>
+										{SORT_OPTIONS.map((option) => (
+											<SelectItem
+												key={option.value}
+												value={option.value}>
+												{option.label}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+							</div>
 						</div>
-					</div>
+
+						<CollapsibleContent>
+							<div className={'grid grid-cols-[auto_1fr] gap-x-3 gap-y-3 pt-4 md:hidden'}>
+								<span
+									className={
+										'text-xs font-medium text-muted-foreground self-center'
+									}>
+									Type
+								</span>
+								<Scroller
+									orientation={'horizontal'}
+									hideScrollbar>
+									<ToggleGroup
+										type={'multiple'}
+										variant={'outline'}
+										size={'sm'}
+										value={applicationTypes}
+										onValueChange={(value) => {
+											if (value.length > 0) {
+												setApplicationTypes(value)
+											}
+										}}
+										className={'w-max'}>
+										{ALL_APPLICATION_TYPES.map((appType) => (
+											<ToggleGroupItem
+												key={appType}
+												value={appType}
+												className={'text-xs'}>
+												{APPLICATION_TYPE_LABELS[appType]}
+											</ToggleGroupItem>
+										))}
+									</ToggleGroup>
+								</Scroller>
+
+								<FilterDropdown
+									label={'Genre'}
+									labels={GENRE_LABELS}
+									selected={genres}
+									onToggle={toggleArrayValue(setGenres)}
+								/>
+
+								<FilterDropdown
+									label={'Theme'}
+									labels={THEME_LABELS}
+									selected={themes}
+									onToggle={toggleArrayValue(setThemes)}
+								/>
+
+								<FilterDropdown
+									label={'Mode'}
+									labels={MODE_LABELS}
+									selected={modes}
+									onToggle={toggleArrayValue(setModes)}
+								/>
+
+								<FilterDropdown
+									label={'Perspective'}
+									labels={PERSPECTIVE_LABELS}
+									selected={playerPerspectives}
+									onToggle={toggleArrayValue(setPlayerPerspectives)}
+								/>
+
+								<div className={'grid grid-cols-subgrid col-span-2 items-center'}>
+									<span className={'text-xs font-medium text-muted-foreground'}>
+										Age Rating
+									</span>
+									<DropdownMenu>
+										<DropdownMenuTrigger asChild>
+											<Button
+												variant={'outline'}
+												size={'sm'}
+												className={'h-8 gap-1 w-full justify-between'}>
+												{ageRatings.length > 0 ? `Age Rating (${ageRatings.length})` : 'All'}
+												<ChevronDown className={'size-3 opacity-50'} />
+											</Button>
+										</DropdownMenuTrigger>
+										<DropdownMenuContent align={'start'} className={'max-h-80 overflow-y-auto'}>
+											{AGE_RATING_GROUPS.map((group, index) => (
+												<DropdownMenuGroup key={group.org}>
+													{index > 0 && <DropdownMenuSeparator />}
+													<DropdownMenuLabel>{group.org}</DropdownMenuLabel>
+													{group.ratings.map((rating) => (
+														<DropdownMenuCheckboxItem
+															key={rating.value}
+															checked={ageRatings.includes(rating.value)}
+															onCheckedChange={() => toggleArrayValue(setAgeRatings)(rating.value)}
+															onSelect={(e) => e.preventDefault()}>
+															{rating.label}
+														</DropdownMenuCheckboxItem>
+													))}
+												</DropdownMenuGroup>
+											))}
+										</DropdownMenuContent>
+									</DropdownMenu>
+								</div>
+
+								<div className={'col-span-2 flex flex-wrap items-center gap-3'}>
+									{ageRatings.length > 0 && (
+										<label className={'flex items-center gap-1.5 cursor-pointer'}>
+											<Checkbox
+												checked={includeUnrated}
+												onCheckedChange={(checked) => setIncludeUnrated(checked === true)}
+											/>
+											<span className={'text-xs font-medium text-muted-foreground'}>
+												Include unrated
+											</span>
+										</label>
+									)}
+									<label className={'flex items-center gap-1.5 cursor-pointer'}>
+										<Checkbox
+											checked={includeCancelled}
+											onCheckedChange={(checked) => setIncludeCancelled(checked === true)}
+										/>
+										<span className={'text-xs font-medium text-muted-foreground'}>
+											Include cancelled
+										</span>
+									</label>
+								</div>
+							</div>
+						</CollapsibleContent>
+					</Collapsible>
 				)}
 
 				{isLoading && results.length === 0 && (

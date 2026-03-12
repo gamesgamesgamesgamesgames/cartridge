@@ -201,11 +201,11 @@ export function GameLayoutContent(props: Props) {
 
 	return (
 		<div className={'flex min-h-screen flex-col'}>
-			<section className={'relative overflow-hidden py-20 shadow-xl/30'}>
+			<section className={'relative overflow-hidden py-10 md:py-20 shadow-xl/30'}>
 				<ArtworkBackground gameRecord={gameRecord} />
 				<Container className={'relative z-10'}>
-					<div className={'flex gap-20 items-center'}>
-						<div className={'min-w-[25%] w-[25%]'}>
+					<div className={'flex flex-col items-center gap-6 md:flex-row md:items-center md:gap-20'}>
+						<div className={'w-[60%] md:min-w-[25%] md:w-[25%]'}>
 							<ViewTransition name={`sr-${transitionName}`}>
 								<div className={'relative'}>
 									<BoxArt gameRecord={gameRecord} />
@@ -235,14 +235,14 @@ export function GameLayoutContent(props: Props) {
 							</ViewTransition>
 						</div>
 
-						<div className={'flex flex-col gap-10'}>
+						<div className={'flex flex-col gap-6 md:gap-10'}>
 							<Header
-								className={'text-6xl'}
+								className={'text-3xl md:text-6xl text-center md:text-left'}
 								level={2}>
 								{gameRecord.name}
 							</Header>
 
-							<DataList className={'gap-x-10 gap-y-6'}>
+							<DataList className={'gap-x-6 gap-y-4 md:gap-x-10 md:gap-y-6'}>
 								{Boolean(gameRecord.genres?.length) && (
 									<>
 										<DataListLabel>{'Genres'}</DataListLabel>
@@ -316,7 +316,7 @@ export function GameLayoutContent(props: Props) {
 							</DataList>
 
 							{Boolean(gameRecord.ageRatings?.length) && (
-								<div className={'mt-10 flex items-center gap-4'}>
+								<div className={'mt-4 flex flex-wrap items-center justify-center gap-4 md:mt-10 md:justify-start'}>
 									{gameRecord.ageRatings!.map((rating) => {
 										const src = ageRatingImagePath(rating)
 										if (!src) return null
@@ -341,11 +341,11 @@ export function GameLayoutContent(props: Props) {
 				</Container>
 			</section>
 
-			<div className={'bg-secondary flex flex-grow flex-col gap-20 py-20'}>
+			<div className={'bg-secondary flex flex-grow flex-col gap-10 py-10 md:gap-20 md:py-20'}>
 				<section>
 					<Container className={'overflow-visible'}>
 						<div className={'flex gap-20'}>
-							<div className={'sticky top-20 self-start'}>
+							<div className={'sticky top-20 hidden self-start md:block'}>
 								<GamePageSubnav
 									basePath={basePath}
 									subnavConfig={subnavConfig}

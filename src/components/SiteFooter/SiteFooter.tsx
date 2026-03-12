@@ -34,7 +34,7 @@ export function SiteFooter() {
 					className={
 						'flex flex-col gap-8 md:flex-row md:items-start md:justify-between'
 					}>
-					<Link href={'/'}>
+					<Link href={'/'} className={'hidden md:block'}>
 						<Image
 							src={'/images/branding/logo.color.svg'}
 							alt={'Cartridge'}
