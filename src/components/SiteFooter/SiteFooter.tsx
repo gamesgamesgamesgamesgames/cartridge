@@ -7,12 +7,12 @@ const SOCIALS = [
 	{
 		icon: IconBrandBluesky,
 		label: 'Bluesky',
-		href: 'https://bsky.app/profile/gamesgamesgamesgames.games',
+		href: 'https://bsky.app/profile/cartridge.dev',
 	},
 	{
 		icon: IconBrandGithub,
 		label: 'GitHub',
-		href: 'https://github.com/gamesgamesgamesgames',
+		href: 'https://github.com/gamesgamesgamesgamesgames/cartridge',
 	},
 ] as const
 
@@ -21,6 +21,7 @@ const LEGAL = [
 	{ label: 'Terms of Service', href: '/terms' },
 	{ label: 'Acceptable Use', href: '/acceptable-use' },
 	{ label: 'Cookie Policy', href: '/cookies' },
+	{ label: 'Community Guidelines', href: '/community' },
 ] as const
 
 export function SiteFooter() {
