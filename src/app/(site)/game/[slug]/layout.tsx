@@ -35,9 +35,10 @@ export default async function GameLayout(props: Props) {
 	const gameRecord = await API.getGame({ slug })
 	if (!gameRecord) notFound()
 
-	const [{ reviews }, likes] = await Promise.all([
+	const [{ reviews }, likes, similarGames] = await Promise.all([
 		API.getReviews(gameRecord.uri),
 		API.getLikes(gameRecord.uri),
+		API.getSimilarGames(gameRecord.uri),
 	])
 
 	return (
@@ -46,6 +47,7 @@ export default async function GameLayout(props: Props) {
 			gameRecord={gameRecord}
 			likes={likes}
 			reviews={reviews}
+			similarGames={similarGames}
 			transitionName={slug}>
 			{children}
 		</GameLayoutContent>

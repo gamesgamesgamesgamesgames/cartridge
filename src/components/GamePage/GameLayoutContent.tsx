@@ -32,8 +32,10 @@ import {
 	SCREENSHOT_TYPES,
 } from '@/constants/MEDIA_CATEGORIES'
 import { type AgeRating } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
+import { type GameFeedGame } from '@/helpers/API'
 import { type GameRecord } from '@/typedefs/GameRecord'
 import { type PopfeedReview } from '@/helpers/lexicons/games/gamesgamesgamesgames/getReviews.defs'
+import { SimilarGames } from '@/components/GamePage/SimilarGames'
 import Link from 'next/link'
 
 const AGE_RATING_ORG_DIRS: Record<string, string> = {
@@ -89,13 +91,21 @@ type Props = Readonly<
 		gameRecord: GameRecord
 		likes: { count: number; liked: boolean }
 		reviews: PopfeedReview[]
+		similarGames: GameFeedGame[]
 		transitionName: string
 	}>
 >
 
 export function GameLayoutContent(props: Props) {
-	const { basePath, children, gameRecord, likes, reviews, transitionName } =
-		props
+	const {
+		basePath,
+		children,
+		gameRecord,
+		likes,
+		reviews,
+		similarGames,
+		transitionName,
+	} = props
 
 	const firstReleaseYear = (() => {
 		let earliest: string | undefined
@@ -148,15 +158,37 @@ export function GameLayoutContent(props: Props) {
 		metaSections.push({ id: 'meta-external-ids', label: 'External IDs' })
 	}
 	const websites = gameRecord.websites ?? []
-	const STORE_TYPES = new Set(['steam', 'gog', 'epicGames', 'itchIo', 'xbox', 'playstation', 'nintendo', 'meta'])
-	const SOCIAL_TYPES = new Set(['twitter', 'instagram', 'youtube', 'twitch', 'discord', 'reddit', 'facebook', 'bluesky'])
+	const STORE_TYPES = new Set([
+		'steam',
+		'gog',
+		'epicGames',
+		'itchIo',
+		'xbox',
+		'playstation',
+		'nintendo',
+		'meta',
+	])
+	const SOCIAL_TYPES = new Set([
+		'twitter',
+		'instagram',
+		'youtube',
+		'twitch',
+		'discord',
+		'reddit',
+		'facebook',
+		'bluesky',
+	])
 	if (websites.some((w) => STORE_TYPES.has(w.type ?? ''))) {
 		metaSections.push({ id: 'meta-stores', label: 'Stores' })
 	}
 	if (websites.some((w) => SOCIAL_TYPES.has(w.type ?? ''))) {
 		metaSections.push({ id: 'meta-socials', label: 'Socials' })
 	}
-	if (websites.some((w) => !STORE_TYPES.has(w.type ?? '') && !SOCIAL_TYPES.has(w.type ?? ''))) {
+	if (
+		websites.some(
+			(w) => !STORE_TYPES.has(w.type ?? '') && !SOCIAL_TYPES.has(w.type ?? ''),
+		)
+	) {
 		metaSections.push({ id: 'meta-other-links', label: 'Other Links' })
 	}
 
@@ -309,20 +341,24 @@ export function GameLayoutContent(props: Props) {
 				</Container>
 			</section>
 
-			<section className={'flex-1 bg-secondary py-20'}>
-				<Container className={'overflow-visible'}>
-					<div className={'flex gap-20'}>
-						<div className={'sticky top-20 self-start'}>
-							<GamePageSubnav
-								basePath={basePath}
-								subnavConfig={subnavConfig}
-							/>
-						</div>
+			<div className={'bg-secondary flex flex-grow flex-col gap-20 py-20'}>
+				<section>
+					<Container className={'overflow-visible'}>
+						<div className={'flex gap-20'}>
+							<div className={'sticky top-20 self-start'}>
+								<GamePageSubnav
+									basePath={basePath}
+									subnavConfig={subnavConfig}
+								/>
+							</div>
 
-						<div className={'flex flex-1 flex-col gap-10'}>{children}</div>
-					</div>
-				</Container>
-			</section>
+							<div className={'flex flex-1 flex-col gap-10'}>{children}</div>
+						</div>
+					</Container>
+				</section>
+
+				{similarGames.length > 0 && <SimilarGames games={similarGames} />}
+			</div>
 		</div>
 	)
 }

@@ -428,6 +428,83 @@ export async function getLikes(
 	return resp.json()
 }
 
+// ---------------------------------------------------------------------------
+// Feeds
+// ---------------------------------------------------------------------------
+
+export type GameFeedGame = {
+	uri: string
+	name: string
+	applicationType?: string
+	summary?: string
+	genres?: string[]
+	themes?: string[]
+	media?: GameRecord['media']
+	releases?: GameRecord['releases']
+	slug?: string
+	likeCount?: number
+}
+
+export type GameFeedItem = {
+	game: GameFeedGame
+	feedContext?: string
+}
+
+export async function describeFeedGenerator(): Promise<{
+	did: string
+	feeds: Array<{ uri: string }>
+}> {
+	const resp = await queryAPI(
+		'/xrpc/games.gamesgamesgamesgames.feed.describeFeedGenerator',
+	)
+
+	if (!resp.ok) {
+		return { did: '', feeds: [] }
+	}
+
+	return resp.json()
+}
+
+export async function getGameFeed(
+	feed: string,
+	options: { feedContext?: string; limit?: number; cursor?: string } = {},
+): Promise<{ feed: GameFeedItem[]; cursor?: string }> {
+	const params = new URLSearchParams({ feed })
+	if (options.feedContext) params.set('feedContext', options.feedContext)
+	if (options.limit) params.set('limit', String(options.limit))
+	if (options.cursor) params.set('cursor', options.cursor)
+
+	const resp = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.feed.getGameFeed?${params}`,
+	)
+
+	if (!resp.ok) {
+		return { feed: [] }
+	}
+
+	return resp.json()
+}
+
+export async function getSimilarGames(
+	gameUri: string,
+	limit = 10,
+): Promise<GameFeedGame[]> {
+	const desc = await describeFeedGenerator()
+	const similarFeed = desc.feeds.find((f) => f.uri.endsWith('/similar'))
+	if (!similarFeed) return []
+
+	const result = await getGameFeed(similarFeed.uri, {
+		feedContext: gameUri,
+		limit,
+	})
+
+	return result.feed.map((item) => item.game)
+}
+
+// ---------------------------------------------------------------------------
+// Misc
+// ---------------------------------------------------------------------------
+
 export async function resolveHandle(_handle: string): Promise<DID | null> {
 	console.warn(
 		'[pentaract] API.resolveHandle is stubbed — HappyView data API not yet available',
