@@ -114,7 +114,9 @@ export async function ReviewsTab({ reviews }: Props) {
 								</Link>
 
 								<Link
-									className={'text-xs text-muted-foreground hover:underline shrink-0'}
+									className={
+										'text-xs text-muted-foreground hover:underline shrink-0'
+									}
 									href={getPopfeedReviewUrl(review.uri)}
 									target={'_blank'}
 									rel={'noopener noreferrer'}>
@@ -129,10 +131,11 @@ export async function ReviewsTab({ reviews }: Props) {
 								)}
 							</div>
 
-							{review.title && <Header level={4}>{review.title}</Header>}
-
 							{review.text && (
-								<div className={'prose prose-sm dark:prose-invert max-w-none text-foreground'}>
+								<div
+									className={
+										'prose prose-sm dark:prose-invert max-w-none text-foreground'
+									}>
 									{review.text.split('\n').map((p, i) => (
 										<p key={i}>{p}</p>
 									))}
@@ -152,7 +155,9 @@ export async function ReviewsTab({ reviews }: Props) {
 							)}
 
 							<Link
-								className={'text-xs text-muted-foreground hover:underline mt-1 w-fit'}
+								className={
+									'text-xs text-muted-foreground hover:underline mt-1 w-fit'
+								}
 								href={getPopfeedReviewUrl(review.uri)}
 								target={'_blank'}
 								rel={'noopener noreferrer'}>
