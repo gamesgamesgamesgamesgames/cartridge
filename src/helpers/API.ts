@@ -247,6 +247,8 @@ export async function search(
 		themes?: string[]
 		modes?: string[]
 		playerPerspectives?: string[]
+		ageRatings?: string[]
+		includeUnrated?: boolean
 		includeCancelled?: boolean
 		cursor?: string
 	} = {},
@@ -277,6 +279,12 @@ export async function search(
 	}
 	if (options.playerPerspectives?.length) {
 		params.set('playerPerspectives', options.playerPerspectives.join(','))
+	}
+	if (options.ageRatings?.length) {
+		params.set('ageRatings', options.ageRatings.join(','))
+	}
+	if (options.includeUnrated) {
+		params.set('includeUnrated', 'true')
 	}
 	if (options.includeCancelled) {
 		params.set('includeCancelled', 'true')

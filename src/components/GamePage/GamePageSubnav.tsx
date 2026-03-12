@@ -15,6 +15,7 @@ export type SubnavItem = {
 export type SubnavConfig = {
 	about: SubnavItem[]
 	media: SubnavItem[]
+	meta: SubnavItem[]
 	reviews: string[]
 }
 
@@ -51,6 +52,11 @@ export function GamePageSubnav(props: Props) {
 				id: `reviews-${source.toLowerCase()}`,
 				label: source,
 			})),
+		},
+		{
+			label: 'Meta',
+			href: `${basePath}/meta`,
+			items: subnavConfig.meta,
 		},
 	]
 

@@ -79,9 +79,32 @@ export async function GamePage(props: Props) {
 		mediaSections.push({ id: 'media-other', label: 'Other' })
 	}
 
+	const metaSections: SubnavConfig['meta'] = []
+	if (
+		gameRecord.externalIds &&
+		Object.entries(gameRecord.externalIds).some(
+			([key, value]) => key !== '$type' && value != null,
+		)
+	) {
+		metaSections.push({ id: 'meta-external-ids', label: 'External IDs' })
+	}
+	const websites = gameRecord.websites ?? []
+	const STORE_TYPES = new Set(['steam', 'gog', 'epicGames', 'itchIo', 'xbox', 'playstation', 'nintendo', 'meta'])
+	const SOCIAL_TYPES = new Set(['twitter', 'instagram', 'youtube', 'twitch', 'discord', 'reddit', 'facebook', 'bluesky'])
+	if (websites.some((w) => STORE_TYPES.has(w.type ?? ''))) {
+		metaSections.push({ id: 'meta-stores', label: 'Stores' })
+	}
+	if (websites.some((w) => SOCIAL_TYPES.has(w.type ?? ''))) {
+		metaSections.push({ id: 'meta-socials', label: 'Socials' })
+	}
+	if (websites.some((w) => !STORE_TYPES.has(w.type ?? '') && !SOCIAL_TYPES.has(w.type ?? ''))) {
+		metaSections.push({ id: 'meta-other-links', label: 'Other Links' })
+	}
+
 	const subnavConfig: SubnavConfig = {
 		about: aboutSections,
 		media: mediaSections,
+		meta: metaSections,
 		reviews: reviews.length > 0 ? ['Popfeed'] : [],
 	}
 

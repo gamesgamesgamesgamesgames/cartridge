@@ -18,6 +18,9 @@ import {
 	DropdownMenu,
 	DropdownMenuCheckboxItem,
 	DropdownMenuContent,
+	DropdownMenuGroup,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import {
@@ -122,6 +125,81 @@ const PERSPECTIVE_LABELS: Record<string, string> = {
 	vr: 'VR',
 }
 
+const AGE_RATING_GROUPS: Array<{ org: string; ratings: Array<{ value: string; label: string }> }> = [
+	{
+		org: 'ESRB',
+		ratings: [
+			{ value: 'esrb:EC', label: 'Early Childhood' },
+			{ value: 'esrb:E', label: 'Everyone' },
+			{ value: 'esrb:E10', label: 'Everyone 10+' },
+			{ value: 'esrb:T', label: 'Teen' },
+			{ value: 'esrb:M', label: 'Mature 17+' },
+			{ value: 'esrb:AO', label: 'Adults Only' },
+			{ value: 'esrb:RP', label: 'Rating Pending' },
+		],
+	},
+	{
+		org: 'PEGI',
+		ratings: [
+			{ value: 'pegi:Three', label: '3' },
+			{ value: 'pegi:Seven', label: '7' },
+			{ value: 'pegi:Twelve', label: '12' },
+			{ value: 'pegi:Sixteen', label: '16' },
+			{ value: 'pegi:Eighteen', label: '18' },
+		],
+	},
+	{
+		org: 'CERO',
+		ratings: [
+			{ value: 'cero:A', label: 'A (All Ages)' },
+			{ value: 'cero:B', label: 'B (12+)' },
+			{ value: 'cero:C', label: 'C (15+)' },
+			{ value: 'cero:D', label: 'D (17+)' },
+			{ value: 'cero:Z', label: 'Z (18+)' },
+		],
+	},
+	{
+		org: 'USK',
+		ratings: [
+			{ value: 'usk:Zero', label: '0' },
+			{ value: 'usk:Six', label: '6' },
+			{ value: 'usk:Twelve', label: '12' },
+			{ value: 'usk:Sixteen', label: '16' },
+			{ value: 'usk:Eighteen', label: '18' },
+		],
+	},
+	{
+		org: 'GRAC',
+		ratings: [
+			{ value: 'grac:All', label: 'All' },
+			{ value: 'grac:Twelve', label: '12' },
+			{ value: 'grac:Fifteen', label: '15' },
+			{ value: 'grac:Nineteen', label: '19' },
+		],
+	},
+	{
+		org: 'ClassInd',
+		ratings: [
+			{ value: 'classInd:L', label: 'L (General)' },
+			{ value: 'classInd:Ten', label: '10' },
+			{ value: 'classInd:Twelve', label: '12' },
+			{ value: 'classInd:Fourteen', label: '14' },
+			{ value: 'classInd:Sixteen', label: '16' },
+			{ value: 'classInd:Eighteen', label: '18' },
+		],
+	},
+	{
+		org: 'ACB',
+		ratings: [
+			{ value: 'acb:G', label: 'G' },
+			{ value: 'acb:PG', label: 'PG' },
+			{ value: 'acb:M', label: 'M' },
+			{ value: 'acb:MA15', label: 'MA 15+' },
+			{ value: 'acb:R18', label: 'R 18+' },
+		],
+	},
+]
+
 const SORT_OPTIONS = [
 	{ value: 'relevance', label: 'Relevance' },
 	{ value: 'name_asc', label: 'Name A\u2013Z' },
@@ -186,6 +264,8 @@ function SearchPageContent() {
 	const [themes, setThemes] = useState<string[]>([])
 	const [modes, setModes] = useState<string[]>([])
 	const [playerPerspectives, setPlayerPerspectives] = useState<string[]>([])
+	const [ageRatings, setAgeRatings] = useState<string[]>([])
+	const [includeUnrated, setIncludeUnrated] = useState(false)
 	const [includeCancelled, setIncludeCancelled] = useState(false)
 
 	const { results, cursor, isLoading, loadMore } = useSearch(query, {
@@ -198,6 +278,8 @@ function SearchPageContent() {
 		modes: modes.length > 0 ? modes : undefined,
 		playerPerspectives:
 			playerPerspectives.length > 0 ? playerPerspectives : undefined,
+		ageRatings: ageRatings.length > 0 ? ageRatings : undefined,
+		includeUnrated: ageRatings.length > 0 && includeUnrated ? true : undefined,
 		includeCancelled: includeCancelled || undefined,
 	})
 
@@ -333,7 +415,52 @@ function SearchPageContent() {
 							onToggle={toggleArrayValue(setPlayerPerspectives)}
 						/>
 
+						<div className={'flex items-center gap-1.5'}>
+							<span className={'text-xs font-medium text-muted-foreground'}>
+								Age Rating
+							</span>
+							<DropdownMenu>
+								<DropdownMenuTrigger asChild>
+									<Button
+										variant={'outline'}
+										size={'sm'}
+										className={'h-8 gap-1'}>
+										{ageRatings.length > 0 ? `Age Rating (${ageRatings.length})` : 'All'}
+										<ChevronDown className={'size-3 opacity-50'} />
+									</Button>
+								</DropdownMenuTrigger>
+								<DropdownMenuContent align={'start'} className={'max-h-80 overflow-y-auto'}>
+									{AGE_RATING_GROUPS.map((group, index) => (
+										<DropdownMenuGroup key={group.org}>
+											{index > 0 && <DropdownMenuSeparator />}
+											<DropdownMenuLabel>{group.org}</DropdownMenuLabel>
+											{group.ratings.map((rating) => (
+												<DropdownMenuCheckboxItem
+													key={rating.value}
+													checked={ageRatings.includes(rating.value)}
+													onCheckedChange={() => toggleArrayValue(setAgeRatings)(rating.value)}
+													onSelect={(e) => e.preventDefault()}>
+													{rating.label}
+												</DropdownMenuCheckboxItem>
+											))}
+										</DropdownMenuGroup>
+									))}
+								</DropdownMenuContent>
+							</DropdownMenu>
+						</div>
+
 						<div className={'ml-auto flex items-center gap-3'}>
+							{ageRatings.length > 0 && (
+								<label className={'flex items-center gap-1.5 cursor-pointer'}>
+									<Checkbox
+										checked={includeUnrated}
+										onCheckedChange={(checked) => setIncludeUnrated(checked === true)}
+									/>
+									<span className={'text-xs font-medium text-muted-foreground'}>
+										Include unrated
+									</span>
+								</label>
+							)}
 							<label className={'flex items-center gap-1.5 cursor-pointer'}>
 								<Checkbox
 									checked={includeCancelled}
