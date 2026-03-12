@@ -6,9 +6,7 @@ import { Container } from '@/components/Container/Container'
 import { Header } from '@/components/Header/Header'
 import { TiltCard } from '@/components/TiltCard/TiltCard'
 import { Scroller } from '@/components/ui/scroller'
-import { GAME_APPLICATION_TYPES } from '@/constants/GAME_APPLICATION_TYPES'
 import { type GameFeedGame } from '@/helpers/API'
-import { type ApplicationType } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 import Link from 'next/link'
 
 // Types
@@ -16,7 +14,7 @@ type Props = Readonly<{
 	games: GameFeedGame[]
 }>
 
-function getFirstReleaseYear(game: GameFeedGame): string | undefined {
+function getFirstReleaseDate(game: GameFeedGame): string | undefined {
 	let earliest: string | undefined
 	for (const release of game.releases ?? []) {
 		for (const rd of release.releaseDates ?? []) {
@@ -25,19 +23,46 @@ function getFirstReleaseYear(game: GameFeedGame): string | undefined {
 			}
 		}
 	}
-	return earliest?.slice(0, 4)
+	return earliest
 }
 
-export function SimilarGames(props: Props) {
+function formatReleaseDate(date: string): string {
+	const match = date.match(/^(\d{4})-(\d{2})-(\d{2})/)
+	if (match) {
+		return new Date(
+			`${match[1]}-${match[2]}-${match[3]}T00:00:00`,
+		).toLocaleDateString(undefined, {
+			month: 'short',
+			day: 'numeric',
+			year: 'numeric',
+		})
+	}
+
+	const monthMatch = date.match(/^(\d{4})-(\d{2})$/)
+	if (monthMatch) {
+		return new Date(
+			`${monthMatch[1]}-${monthMatch[2]}-01T00:00:00`,
+		).toLocaleDateString(undefined, {
+			month: 'short',
+			year: 'numeric',
+		})
+	}
+
+	return date
+}
+
+export function UpcomingReleases(props: Props) {
 	const { games } = props
 
+	if (games.length === 0) return null
+
 	return (
-		<section className={'bg-secondary'}>
-			<Container>
+		<section className={'bg-secondary pb-12'}>
+			<Container className={'-mt-30'}>
 				<Header
 					className={'mb-6'}
 					level={3}>
-					{'Similar Games'}
+					{'Upcoming Releases'}
 				</Header>
 
 				<Scroller
@@ -47,7 +72,7 @@ export function SimilarGames(props: Props) {
 					scrollStep={176}
 					className={'-mx-4 flex gap-4 px-4 py-4'}>
 					{games.map((game) => {
-						const year = getFirstReleaseYear(game)
+						const releaseDate = getFirstReleaseDate(game)
 						const href = game.slug ? `/game/${game.slug}` : '#'
 
 						return (
@@ -62,19 +87,11 @@ export function SimilarGames(props: Props) {
 									<div className={'truncate text-sm font-medium'}>
 										{game.name}
 									</div>
-									<div
-										className={
-											'flex justify-between truncate text-xs text-muted-foreground'
-										}>
-										{year && <span>{year}</span>}
-										{game.applicationType && (
-											<span className={'ml-auto'}>
-												{GAME_APPLICATION_TYPES[
-													game.applicationType as ApplicationType
-												]?.name ?? game.applicationType}
-											</span>
-										)}
-									</div>
+									{releaseDate && (
+										<div className={'truncate text-xs text-muted-foreground'}>
+											{formatReleaseDate(releaseDate)}
+										</div>
+									)}
 								</div>
 							</Link>
 						)

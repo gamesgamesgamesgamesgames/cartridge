@@ -501,6 +501,24 @@ export async function getSimilarGames(
 	return result.feed.map((item) => item.game)
 }
 
+export async function getUpcomingReleases(
+	limit = 20,
+	cursor?: string,
+): Promise<{ feed: GameFeedItem[]; cursor?: string }> {
+	const params = new URLSearchParams({ limit: String(limit) })
+	if (cursor) params.set('cursor', cursor)
+
+	const resp = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.feed.getUpcomingReleasesFeed?${params}`,
+	)
+
+	if (!resp.ok) {
+		return { feed: [] }
+	}
+
+	return resp.json()
+}
+
 // ---------------------------------------------------------------------------
 // Misc
 // ---------------------------------------------------------------------------
