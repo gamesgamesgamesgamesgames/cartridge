@@ -39,6 +39,11 @@ export function ProfilePageSubnav(props: Props) {
 			items: [],
 		},
 		{
+			label: 'Likes',
+			href: `${basePath}/likes`,
+			items: [],
+		},
+		{
 			label: 'Reviews',
 			href: `${basePath}/reviews`,
 			items: subnavConfig.reviews.map((source) => ({

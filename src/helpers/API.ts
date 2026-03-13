@@ -519,6 +519,25 @@ export async function getUpcomingReleases(
 	return resp.json()
 }
 
+export async function getLikedGames(
+	did: string,
+	limit = 50,
+	cursor?: string,
+): Promise<{ feed: GameFeedItem[]; cursor?: string }> {
+	const params = new URLSearchParams({ did, limit: String(limit) })
+	if (cursor) params.set('cursor', cursor)
+
+	const resp = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.feed.getLikesFeed?${params}`,
+	)
+
+	if (!resp.ok) {
+		return { feed: [] }
+	}
+
+	return resp.json()
+}
+
 // ---------------------------------------------------------------------------
 // Misc
 // ---------------------------------------------------------------------------
