@@ -1,9 +1,9 @@
 // Module imports
-import Image from 'next/image'
 import { type PropsWithChildren } from 'react'
 import { ViewTransition } from 'react'
 
 // Local imports
+import { AgeRatingBadge } from '@/components/GamePage/AgeRatingBadge'
 import { BoxArt } from '@/components/BoxArt/BoxArt'
 import { CommaSeparatedList } from '@/components/CommaSeparatedList/CommaSeparatedList'
 import { Container } from '@/components/Container/Container'
@@ -48,16 +48,6 @@ const AGE_RATING_ORG_DIRS: Record<string, string> = {
 	acb: 'acb',
 }
 
-const AGE_RATING_ORG_LABELS: Record<string, string> = {
-	esrb: 'ESRB',
-	pegi: 'PEGI',
-	cero: 'CERO',
-	usk: 'USK',
-	grac: 'GRAC',
-	classInd: 'DJCTQ',
-	acb: 'ACB',
-}
-
 /** Maps rating string values (from IGDB) to image filename suffixes. */
 const AGE_RATING_FILE_SUFFIXES: Record<string, Record<string, string>> = {
 	pegi: { Three: '3', Seven: '7', Twelve: '12', Sixteen: '16', Eighteen: '18' },
@@ -81,7 +71,7 @@ function ageRatingImagePath(rating: AgeRating): string | null {
 	if (!dir) return null
 	const suffix = AGE_RATING_FILE_SUFFIXES[rating.organization]?.[rating.rating]
 	if (!suffix) return null
-	return `/images/age-ratings/${dir}/${dir}_${suffix}.png`
+	return `/images/age-ratings/${dir}/${dir}_${suffix}.svg`
 }
 
 // Types
@@ -320,17 +310,12 @@ export function GameLayoutContent(props: Props) {
 									{gameRecord.ageRatings!.map((rating) => {
 										const src = ageRatingImagePath(rating)
 										if (!src) return null
-										const label =
-											AGE_RATING_ORG_LABELS[rating.organization] ??
-											rating.organization
 										return (
-											<Image
+											<AgeRatingBadge
 												key={`${rating.organization}-${rating.rating}`}
+												organization={rating.organization}
+												rating={rating.rating}
 												src={src}
-												alt={`${label} ${rating.rating}`}
-												width={48}
-												height={48}
-												className={'h-12 w-auto'}
 											/>
 										)
 									})}
