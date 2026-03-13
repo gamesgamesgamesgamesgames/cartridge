@@ -53,6 +53,7 @@ const cartridge = localFont({
 })
 
 export const metadata: Metadata = {
+	metadataBase: new URL(`https://${process.env.NEXT_PUBLIC_URL ?? 'localhost:3000'}`),
 	title: {
 		default: 'Cartridge',
 		template: '%s | Cartridge',
