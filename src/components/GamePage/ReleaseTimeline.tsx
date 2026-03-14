@@ -5,9 +5,7 @@ import { format } from 'date-fns'
 import { useMemo } from 'react'
 
 // Local imports
-import { Card } from '@/components/ui/card'
-import { type GameRecord } from '@/typedefs/GameRecord'
-import { Header } from '@/components/Header/Header'
+import { type Release } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 import {
 	Timeline,
 	TimelineConnector,
@@ -48,7 +46,7 @@ const STATUSES: Record<string, string> = {
 
 // Types
 type Props = Readonly<{
-	gameRecord: GameRecord
+	releases: Release[]
 }>
 
 type TimelineEvent = {
@@ -117,17 +115,13 @@ function getSortDate(
 }
 
 export function ReleaseTimeline(props: Props) {
-	const { gameRecord } = props
+	const { releases } = props
 
 	// Flatten releases into timeline events, sort by date, then group by date
 	const dateGroups = useMemo<DateGroup[]>(() => {
 		const events: TimelineEvent[] = []
 
-		if (!gameRecord.releases) {
-			return []
-		}
-
-		for (const release of gameRecord.releases) {
+		for (const release of releases) {
 			if (!release.releaseDates) continue
 
 			for (const releaseDate of release.releaseDates) {
@@ -176,7 +170,7 @@ export function ReleaseTimeline(props: Props) {
 		}
 
 		return Array.from(groupedMap.values())
-	}, [gameRecord.releases])
+	}, [releases])
 
 	// Find the index of the most recent past release (for activeIndex)
 	const activeIndex = useMemo(() => {
@@ -204,44 +198,36 @@ export function ReleaseTimeline(props: Props) {
 	}
 
 	return (
-		<section>
-			<Card className={'p-4'}>
-				<Header level={3}>{'Timeline'}</Header>
+		<Timeline
+			activeIndex={activeIndex}
+			className={'gap-0'}>
+			{dateGroups.map((group) => (
+				<TimelineItem
+					key={group.displayDate}
+					className={'pr-10'}>
+					<TimelineDot />
+					<TimelineConnector />
+					<div className={'flex flex-col gap-4'}>
+						<TimelineTime
+							className={'whitespace-nowrap'}
+							dateTime={group.dateTime}>
+							{group.displayDate}
+						</TimelineTime>
 
-				<div className={'flex flex-col gap-4'}>
-					<Timeline
-						activeIndex={activeIndex}
-						className={'gap-0'}>
-						{dateGroups.map((group) => (
-							<TimelineItem
-								key={group.displayDate}
-								className={'pr-10'}>
-								<TimelineDot />
-								<TimelineConnector />
-								<div className={'flex flex-col gap-4'}>
-									<TimelineTime
-										className={'whitespace-nowrap'}
-										dateTime={group.dateTime}>
-										{group.displayDate}
-									</TimelineTime>
+						{group.events.map((event) => (
+							<TimelineContent key={event.id}>
+								<TimelineHeader>
+									<TimelineTitle className={'whitespace-nowrap'}>
+										{event.platform}
+									</TimelineTitle>
+								</TimelineHeader>
 
-									{group.events.map((event) => (
-										<TimelineContent key={event.id}>
-											<TimelineHeader>
-												<TimelineTitle className={'whitespace-nowrap'}>
-													{event.platform}
-												</TimelineTitle>
-											</TimelineHeader>
-
-											<TimelineDescription>{`${event.status} - ${event.region}`}</TimelineDescription>
-										</TimelineContent>
-									))}
-								</div>
-							</TimelineItem>
+								<TimelineDescription>{`${event.status} - ${event.region}`}</TimelineDescription>
+							</TimelineContent>
 						))}
-					</Timeline>
-				</div>
-			</Card>
-		</section>
+					</div>
+				</TimelineItem>
+			))}
+		</Timeline>
 	)
 }

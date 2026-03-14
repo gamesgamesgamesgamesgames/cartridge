@@ -1,42 +1,46 @@
 // Module imports
-import { type PropsWithChildren } from 'react'
 import { ViewTransition } from 'react'
 
 // Local imports
+import { AboutTab } from '@/components/GamePage/AboutTab'
 import { AgeRatingBadge } from '@/components/GamePage/AgeRatingBadge'
 import { BoxArt } from '@/components/BoxArt/BoxArt'
+import { CollectionsTab } from '@/components/GamePage/CollectionsTab'
 import { CommaSeparatedList } from '@/components/CommaSeparatedList/CommaSeparatedList'
 import { Container } from '@/components/Container/Container'
+import { CreditsTab } from '@/components/GamePage/CreditsTab'
 import {
 	DataList,
 	DataListLabel,
 	DataListValue,
 } from '@/components/DataList/DataList'
-import {
-	GamePageSubnav,
-	type SubnavConfig,
-} from '@/components/GamePage/GamePageSubnav'
+import { GameTabPanel } from '@/components/GamePage/GameTabPanel'
+import { GameTabs } from '@/components/GamePage/GameTabs'
 import { Header } from '@/components/Header/Header'
 import { ArtworkBackground } from '@/components/GamePage/ArtworkBackground'
 import { LikeButton } from '@/components/GamePage/LikeButton'
+import { MediaTab } from '@/components/GamePage/MediaTab'
+import { MetaTab } from '@/components/GamePage/MetaTab'
+import { ReviewsTab } from '@/components/GamePage/ReviewsTab'
 import { GAME_APPLICATION_TYPES } from '@/constants/GAME_APPLICATION_TYPES'
 import { GAME_GENRES } from '@/constants/GAME_GENRES'
 import { GAME_MODES } from '@/constants/GAME_MODES'
 import { GAME_PLAYER_PERSPECTIVES } from '@/constants/GAME_PLAYER_PERSPECTIVES'
 import { GAME_THEMES } from '@/constants/GAME_THEMES'
 import {
-	ALL_CATEGORIZED_TYPES,
-	ARTWORK_TYPES,
-	COVER_TYPES,
-	LOGO_TYPES,
-	SCREENSHOT_TYPES,
-} from '@/constants/MEDIA_CATEGORIES'
-import { type AgeRating } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
+	type AgeRating,
+	type CollectionSummaryView,
+} from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 import { type GameFeedGame } from '@/helpers/API'
 import { type GameRecord } from '@/typedefs/GameRecord'
 import { type PopfeedReview } from '@/helpers/lexicons/games/gamesgamesgamesgames/getReviews.defs'
 import { SimilarGames } from '@/components/GamePage/SimilarGames'
 import Link from 'next/link'
+
+type CollectionWithGames = {
+	collection: CollectionSummaryView
+	games: GameFeedGame[]
+}
 
 const AGE_RATING_ORG_DIRS: Record<string, string> = {
 	esrb: 'esrb',
@@ -75,23 +79,26 @@ function ageRatingImagePath(rating: AgeRating): string | null {
 }
 
 // Types
-type Props = Readonly<
-	PropsWithChildren<{
-		basePath: string
-		gameRecord: GameRecord
-		likes: { count: number; liked: boolean }
-		reviews: PopfeedReview[]
-		similarGames: GameFeedGame[]
-		transitionName: string
-	}>
->
+type Props = Readonly<{
+	basePath: string
+	franchises?: CollectionSummaryView[]
+	gameRecord: GameRecord
+	likes: { count: number; liked: boolean }
+	nonFranchiseCollections?: CollectionWithGames[]
+	parentGame?: { name: string; slug: string } | null
+	reviews: PopfeedReview[]
+	similarGames: GameFeedGame[]
+	transitionName: string
+}>
 
 export function GameLayoutContent(props: Props) {
 	const {
 		basePath,
-		children,
+		franchises,
 		gameRecord,
 		likes,
+		nonFranchiseCollections,
+		parentGame,
 		reviews,
 		similarGames,
 		transitionName,
@@ -109,85 +116,30 @@ export function GameLayoutContent(props: Props) {
 		return earliest?.slice(0, 4)
 	})()
 
-	const aboutSections: SubnavConfig['about'] = []
-	if (gameRecord.summary)
-		aboutSections.push({ id: 'about-summary', label: 'Summary' })
-	if (gameRecord.storyline)
-		aboutSections.push({ id: 'about-storyline', label: 'Storyline' })
+	const visibleTabs: { id: string; label: string }[] = [
+		{ id: 'about', label: 'About' },
+	]
 
-	const mediaItems = gameRecord.media ?? []
-	const mediaSections: SubnavConfig['media'] = []
-	if (mediaItems.some((i) => SCREENSHOT_TYPES.includes(i.mediaType as never))) {
-		mediaSections.push({ id: 'media-screenshots', label: 'Screenshots' })
-	}
-	if (gameRecord.videos?.length) {
-		mediaSections.push({ id: 'media-trailers', label: 'Trailers' })
-	}
-	if (mediaItems.some((i) => ARTWORK_TYPES.includes(i.mediaType as never))) {
-		mediaSections.push({ id: 'media-artwork', label: 'Artwork' })
-	}
-	if (mediaItems.some((i) => COVER_TYPES.includes(i.mediaType as never))) {
-		mediaSections.push({ id: 'media-covers', label: 'Covers' })
-	}
-	if (mediaItems.some((i) => LOGO_TYPES.includes(i.mediaType as never))) {
-		mediaSections.push({ id: 'media-logos', label: 'Logos' })
-	}
-	if (
-		mediaItems.some((i) => !ALL_CATEGORIZED_TYPES.has(i.mediaType as never))
-	) {
-		mediaSections.push({ id: 'media-other', label: 'Other' })
+	// Check for media content
+	const hasMedia = Boolean(gameRecord.media?.length) || Boolean(gameRecord.videos?.length)
+	if (hasMedia) visibleTabs.push({ id: 'media', label: 'Media' })
+
+	// Check for credits
+	const hasCredits = Boolean(gameRecord.orgCredits?.length) || Boolean(gameRecord.actorCredits?.length)
+	if (hasCredits) visibleTabs.push({ id: 'credits', label: 'Credits' })
+
+	// Check for reviews
+	if (reviews.length > 0) visibleTabs.push({ id: 'reviews', label: 'Reviews' })
+
+	// Check for collections
+	if (nonFranchiseCollections && nonFranchiseCollections.length > 0) {
+		visibleTabs.push({ id: 'collections', label: 'Collections' })
 	}
 
-	const metaSections: SubnavConfig['meta'] = []
-	if (
-		gameRecord.externalIds &&
-		Object.entries(gameRecord.externalIds).some(
-			([key, value]) => key !== '$type' && value != null,
-		)
-	) {
-		metaSections.push({ id: 'meta-external-ids', label: 'External IDs' })
-	}
-	const websites = gameRecord.websites ?? []
-	const STORE_TYPES = new Set([
-		'steam',
-		'gog',
-		'epicGames',
-		'itchIo',
-		'xbox',
-		'playstation',
-		'nintendo',
-		'meta',
-	])
-	const SOCIAL_TYPES = new Set([
-		'twitter',
-		'instagram',
-		'youtube',
-		'twitch',
-		'discord',
-		'reddit',
-		'facebook',
-		'bluesky',
-	])
-	if (websites.some((w) => STORE_TYPES.has(w.type ?? ''))) {
-		metaSections.push({ id: 'meta-stores', label: 'Stores' })
-	}
-	if (websites.some((w) => SOCIAL_TYPES.has(w.type ?? ''))) {
-		metaSections.push({ id: 'meta-socials', label: 'Socials' })
-	}
-	if (
-		websites.some(
-			(w) => !STORE_TYPES.has(w.type ?? '') && !SOCIAL_TYPES.has(w.type ?? ''),
-		)
-	) {
-		metaSections.push({ id: 'meta-other-links', label: 'Other Links' })
-	}
-
-	const subnavConfig: SubnavConfig = {
-		about: aboutSections,
-		media: mediaSections,
-		meta: metaSections,
-		reviews: reviews.length > 0 ? ['Popfeed'] : [],
-	}
+	// Check for meta content
+	const hasExternalIds = gameRecord.externalIds && Object.entries(gameRecord.externalIds).some(([k, v]) => k !== '$type' && v != null)
+	const hasMeta = hasExternalIds || Boolean(gameRecord.websites?.length) || Boolean(gameRecord.languageSupports?.length) || Boolean(gameRecord.multiplayerModes?.length)
+	if (hasMeta) visibleTabs.push({ id: 'meta', label: 'Meta' })
 
 	return (
 		<div className={'flex min-h-screen flex-col'}>
@@ -328,17 +280,49 @@ export function GameLayoutContent(props: Props) {
 
 			<div className={'bg-secondary flex flex-grow flex-col gap-10 py-10 md:gap-20 md:py-20'}>
 				<section>
-					<Container className={'overflow-visible'}>
-						<div className={'flex gap-20'}>
-							<div className={'sticky top-20 hidden self-start md:block'}>
-								<GamePageSubnav
-									basePath={basePath}
-									subnavConfig={subnavConfig}
+					<Container>
+						<GameTabs tabs={visibleTabs}>
+							<GameTabPanel tab="about">
+								<AboutTab
+									gameRecord={gameRecord}
+									parentGame={parentGame}
+									franchises={franchises}
 								/>
-							</div>
+							</GameTabPanel>
 
-							<div className={'flex flex-1 flex-col gap-10'}>{children}</div>
-						</div>
+							{hasMedia && (
+								<GameTabPanel tab="media">
+									<MediaTab gameRecord={gameRecord} />
+								</GameTabPanel>
+							)}
+
+							{hasCredits && (
+								<GameTabPanel tab="credits">
+									<CreditsTab
+										orgCredits={gameRecord.orgCredits}
+										actorCredits={gameRecord.actorCredits}
+									/>
+								</GameTabPanel>
+							)}
+
+							{reviews.length > 0 && (
+								<GameTabPanel tab="reviews">
+									<ReviewsTab reviews={reviews} />
+								</GameTabPanel>
+							)}
+
+							{nonFranchiseCollections && nonFranchiseCollections.length > 0 && (
+								<GameTabPanel tab="collections">
+									<CollectionsTab collections={nonFranchiseCollections} />
+								</GameTabPanel>
+							)}
+
+							{hasMeta && (
+								<GameTabPanel tab="meta">
+									<MetaTab gameRecord={gameRecord} />
+								</GameTabPanel>
+							)}
+						</GameTabs>
 					</Container>
 				</section>
 
