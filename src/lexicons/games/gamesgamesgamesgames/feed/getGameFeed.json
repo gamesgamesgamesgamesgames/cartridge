@@ -1,25 +1,27 @@
 {
 	"$type": "com.atproto.lexicon.schema",
 	"lexicon": 1,
-	"id": "games.gamesgamesgamesgames.searchProfilesTypeahead",
+	"id": "games.gamesgamesgamesgames.feed.getGameFeed",
 	"defs": {
 		"main": {
 			"type": "query",
-			"description": "Search for actor and org profiles by display name. Intended for typeahead/autocomplete.",
+			"description": "Get a hydrated game feed. Implemented by App View.",
 			"parameters": {
 				"type": "params",
-				"required": ["q"],
+				"required": ["feed"],
 				"properties": {
-					"q": {
+					"feed": {
 						"type": "string",
-						"minLength": 1,
-						"maxLength": 100
+						"format": "at-uri"
 					},
 					"limit": {
 						"type": "integer",
 						"minimum": 1,
-						"maximum": 25,
-						"default": 10
+						"maximum": 100,
+						"default": 50
+					},
+					"cursor": {
+						"type": "string"
 					}
 				}
 			},
@@ -27,18 +29,20 @@
 				"encoding": "application/json",
 				"schema": {
 					"type": "object",
-					"required": ["profiles"],
+					"required": ["feed"],
 					"properties": {
-						"profiles": {
+						"cursor": { "type": "string" },
+						"feed": {
 							"type": "array",
 							"items": {
 								"type": "ref",
-								"ref": "games.gamesgamesgamesgames.defs#profileSummaryView"
+								"ref": "games.gamesgamesgamesgames.defs#gameFeedViewItem"
 							}
 						}
 					}
 				}
-			}
+			},
+			"errors": [{ "name": "UnknownFeed" }]
 		}
 	}
 }

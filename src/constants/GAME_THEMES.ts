@@ -1,26 +1,31 @@
 // Local imports
 import { Theme } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
-import ThemeLexicon from '@/lexicons/games/gamesgamesgamesgames/theme.json'
 
-// Types
-type ThemeLexiconIDs = keyof typeof ThemeLexicon.defs
+const THEME_LABELS: Record<string, string> = {
+	'4x': '4X',
+	action: 'Action',
+	business: 'Business',
+	comedy: 'Comedy',
+	drama: 'Drama',
+	educational: 'Educational',
+	erotic: 'Erotic',
+	fantasy: 'Fantasy',
+	historical: 'Historical',
+	horror: 'Horror',
+	kids: 'Kids',
+	mystery: 'Mystery',
+	nonfiction: 'Non-Fiction',
+	openWorld: 'Open World',
+	party: 'Party',
+	romance: 'Romance',
+	sandbox: 'Sandbox',
+	scifi: 'Sci-Fi',
+	stealth: 'Stealth',
+	survival: 'Survival',
+	thriller: 'Thriller',
+	warfare: 'Warfare',
+}
 
-export const GAME_THEMES = Object.entries(ThemeLexicon.defs).reduce(
-	(accumulator, kv) => {
-		const [id, { description: name }] = kv as [
-			ThemeLexiconIDs,
-			{ description: string },
-		]
-
-		accumulator[id as Theme] = {
-			id,
-			name,
-		}
-
-		return accumulator
-	},
-	{} as Record<Theme, {
-		id: ThemeLexiconIDs,
-		name: string,
-	}>,
-)
+export const GAME_THEMES = Object.fromEntries(
+	Object.entries(THEME_LABELS).map(([id, name]) => [id, { id, name }]),
+) as Record<Theme, { id: string; name: string }>

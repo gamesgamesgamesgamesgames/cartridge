@@ -59,6 +59,40 @@
 							]
 						}
 					},
+					"sort": {
+						"type": "string",
+						"knownValues": ["name_asc", "name_desc", "published_asc", "published_desc"]
+					},
+					"genres": {
+						"type": "array",
+						"items": { "type": "string" }
+					},
+					"themes": {
+						"type": "array",
+						"items": { "type": "string" }
+					},
+					"modes": {
+						"type": "array",
+						"items": { "type": "string" }
+					},
+					"playerPerspectives": {
+						"type": "array",
+						"items": { "type": "string" }
+					},
+					"ageRatings": {
+						"type": "array",
+						"description": "Filter game results by age rating in 'organization:rating' format (e.g. esrb:M, pegi:Eighteen).",
+						"items": { "type": "string" }
+					},
+					"includeUnrated": {
+						"type": "boolean",
+						"description": "When age rating filters are active, also include games with no age ratings.",
+						"default": false
+					},
+					"includeCancelled": {
+						"type": "boolean",
+						"default": false
+					},
 					"cursor": {
 						"type": "string"
 					}
@@ -71,6 +105,10 @@
 					"required": ["results"],
 					"properties": {
 						"cursor": { "type": "string" },
+						"totalResults": {
+							"type": "integer",
+							"description": "Total number of results matching the query above the relevance threshold."
+						},
 						"results": {
 							"type": "array",
 							"items": {

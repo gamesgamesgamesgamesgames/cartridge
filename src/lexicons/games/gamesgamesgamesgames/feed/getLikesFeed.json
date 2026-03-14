@@ -1,25 +1,27 @@
 {
 	"$type": "com.atproto.lexicon.schema",
 	"lexicon": 1,
-	"id": "games.gamesgamesgamesgames.searchProfilesTypeahead",
+	"id": "games.gamesgamesgamesgames.feed.getLikesFeed",
 	"defs": {
 		"main": {
 			"type": "query",
-			"description": "Search for actor and org profiles by display name. Intended for typeahead/autocomplete.",
+			"description": "Get a user's liked games, ordered by most recently liked.",
 			"parameters": {
 				"type": "params",
-				"required": ["q"],
+				"required": ["did"],
 				"properties": {
-					"q": {
+					"did": {
 						"type": "string",
-						"minLength": 1,
-						"maxLength": 100
+						"description": "The DID of the user whose likes to retrieve."
 					},
 					"limit": {
 						"type": "integer",
 						"minimum": 1,
-						"maximum": 25,
-						"default": 10
+						"maximum": 100,
+						"default": 50
+					},
+					"cursor": {
+						"type": "string"
 					}
 				}
 			},
@@ -27,14 +29,17 @@
 				"encoding": "application/json",
 				"schema": {
 					"type": "object",
-					"required": ["profiles"],
+					"required": ["feed"],
 					"properties": {
-						"profiles": {
+						"feed": {
 							"type": "array",
 							"items": {
 								"type": "ref",
-								"ref": "games.gamesgamesgamesgames.defs#profileSummaryView"
+								"ref": "games.gamesgamesgamesgames.defs#gameFeedViewItem"
 							}
+						},
+						"cursor": {
+							"type": "string"
 						}
 					}
 				}

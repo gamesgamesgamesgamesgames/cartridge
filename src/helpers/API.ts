@@ -4,8 +4,8 @@ import { type AtUriString } from '@atproto/lex'
 // Local imports
 import { type DID } from '@/typedefs/DID'
 import { type GameRecord } from '@/typedefs/GameRecord'
-import { type InputBody as ActorProfileInput } from '@/helpers/lexicons/games/gamesgamesgamesgames/actor/putProfile.defs'
-import { type InputBody as OrgProfileInput } from '@/helpers/lexicons/games/gamesgamesgamesgames/org/putProfile.defs'
+import { type $InputBody as ActorProfileInput } from '@/helpers/lexicons/games/gamesgamesgamesgames/actor/putProfile.defs'
+import { type $InputBody as OrgProfileInput } from '@/helpers/lexicons/games/gamesgamesgamesgames/org/putProfile.defs'
 import { type MediaItem } from '@/typedefs/MediaItem'
 import { type PopfeedReview } from '@/helpers/lexicons/games/gamesgamesgamesgames/getReviews.defs'
 import { type PentaractAPICreateGameOptions } from '@/typedefs/PentaractAPICreateGameOptions'
@@ -160,10 +160,33 @@ export async function listGames(
 	return response.json()
 }
 
-export async function getGame(query: { uri: string } | { slug: string }): Promise<GameRecord | undefined> {
-	const params = 'slug' in query
-		? `slug=${encodeURIComponent(query.slug)}`
-		: `uri=${encodeURIComponent(query.uri)}`
+export type GetGameQuery = (
+	| { uri: string }
+	| { slug: string }
+	| { igdbId: string }
+	| { steamId: string }
+	| { gogId: string }
+	| { epicGamesId: string }
+	| { humbleBundleId: string }
+	| { playStationId: string }
+	| { xboxId: string }
+	| { nintendoEshopId: string }
+	| { appleAppStoreId: string }
+	| { googlePlayId: string }
+) & {
+	includeOrgCredits?: boolean
+	includeActorCredits?: boolean
+}
+
+export async function getGame(query: GetGameQuery): Promise<GameRecord | undefined> {
+	const params = new URLSearchParams()
+	for (const [key, value] of Object.entries(query)) {
+		if (typeof value === 'boolean') {
+			if (value) params.set(key, 'true')
+		} else {
+			params.set(key, value)
+		}
+	}
 	const resp = await queryAPI(
 		`/xrpc/games.gamesgamesgamesgames.getGame?${params}`,
 	)
@@ -489,16 +512,21 @@ export async function getSimilarGames(
 	gameUri: string,
 	limit = 10,
 ): Promise<GameFeedGame[]> {
-	const desc = await describeFeedGenerator()
-	const similarFeed = desc.feeds.find((f) => f.uri.endsWith('/similar'))
-	if (!similarFeed) return []
-
-	const result = await getGameFeed(similarFeed.uri, {
-		feedContext: gameUri,
-		limit,
+	const params = new URLSearchParams({
+		uri: gameUri,
+		limit: String(limit),
 	})
 
-	return result.feed.map((item) => item.game)
+	const resp = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.feed.getSimilarGamesFeed?${params}`,
+	)
+
+	if (!resp.ok) {
+		return []
+	}
+
+	const data = await resp.json()
+	return (data.feed ?? []).map((item: GameFeedItem) => item.game)
 }
 
 export async function getUpcomingReleases(

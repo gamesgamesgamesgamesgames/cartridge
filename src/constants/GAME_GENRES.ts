@@ -1,29 +1,19 @@
 // Local imports
 import { Genre } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
-import GenreLexicon from '@/lexicons/games/gamesgamesgamesgames/genre.json'
 
-// Types
-type GenreLexiconIDs = keyof typeof GenreLexicon.defs
+const GENRE_LABELS: Record<string, string> = {
+	fighting: 'Fighting',
+	music: 'Music',
+	platform: 'Platform',
+	pointAndClick: 'Point and Click',
+	puzzle: 'Puzzle',
+	racing: 'Racing',
+	rpg: 'RPG',
+	rts: 'RTS',
+	shooter: 'Shooter',
+	simulator: 'Simulator',
+}
 
-export const GAME_GENRES = Object.entries(GenreLexicon.defs).reduce(
-	(accumulator, kv) => {
-		const [id, { description: name }] = kv as [
-			GenreLexiconIDs,
-			{ description: string },
-		]
-
-		accumulator[id as Genre] = {
-			id,
-			name,
-		}
-
-		return accumulator
-	},
-	{} as Record<
-		Genre,
-		{
-			id: GenreLexiconIDs
-			name: string
-		}
-	>,
-)
+export const GAME_GENRES = Object.fromEntries(
+	Object.entries(GENRE_LABELS).map(([id, name]) => [id, { id, name }]),
+) as Record<Genre, { id: string; name: string }>

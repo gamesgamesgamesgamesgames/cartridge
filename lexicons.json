@@ -2,17 +2,42 @@
   "version": 1,
   "lexicons": [
     "app.bsky.actor.profile",
-    "games.gamesgamesgamesgames.actor.createProfile",
+    "games.gamesgamesgamesgames.actor.credit",
     "games.gamesgamesgamesgames.actor.getProfile",
     "games.gamesgamesgamesgames.actor.profile",
+    "games.gamesgamesgamesgames.actor.putProfile",
+    "games.gamesgamesgamesgames.collection",
+    "games.gamesgamesgamesgames.createGame",
     "games.gamesgamesgamesgames.defs",
+    "games.gamesgamesgamesgames.engine",
+    "games.gamesgamesgamesgames.feed.describeFeedGenerator",
+    "games.gamesgamesgamesgames.feed.generator",
+    "games.gamesgamesgamesgames.feed.getFeedSkeleton",
+    "games.gamesgamesgamesgames.feed.getGameFeed",
+    "games.gamesgamesgamesgames.feed.getLikesFeed",
+    "games.gamesgamesgamesgames.feed.getSimilarGamesFeed",
+    "games.gamesgamesgamesgames.feed.getUpcomingReleasesFeed",
     "games.gamesgamesgamesgames.game",
+    "games.gamesgamesgamesgames.getGame",
     "games.gamesgamesgamesgames.getProfile",
     "games.gamesgamesgamesgames.getReviews",
-    "games.gamesgamesgamesgames.org.createProfile",
+    "games.gamesgamesgamesgames.graph.getLikes",
+    "games.gamesgamesgamesgames.graph.like",
+    "games.gamesgamesgamesgames.graph.toggleLike",
+    "games.gamesgamesgamesgames.listGames",
+    "games.gamesgamesgamesgames.org.credit",
     "games.gamesgamesgamesgames.org.getProfile",
     "games.gamesgamesgamesgames.org.profile",
-    "games.gamesgamesgamesgames.searchProfilesTypeahead"
+    "games.gamesgamesgamesgames.org.putProfile",
+    "games.gamesgamesgamesgames.platform",
+    "games.gamesgamesgamesgames.platformFamily",
+    "games.gamesgamesgamesgames.putGame",
+    "games.gamesgamesgamesgames.richtext.facet",
+    "games.gamesgamesgamesgames.search",
+    "games.gamesgamesgamesgames.searchProfilesTypeahead",
+    "games.gamesgamesgamesgames.searchSlugs",
+    "social.popfeed.feed.review",
+    "social.popfeed.richtext.facet"
   ],
   "resolutions": {
     "app.bsky.actor.profile": {
@@ -26,10 +51,6 @@
     "com.atproto.repo.strongRef": {
       "uri": "at://did:plc:6msi3pj7krzih5qxqtryxlzw/com.atproto.lexicon.schema/com.atproto.repo.strongRef",
       "cid": "bafyreifrkdbnkvfjujntdaeigolnrjj3srrs53tfixjhmacclps72qlov4"
-    },
-    "games.gamesgamesgamesgames.actor.createProfile": {
-      "uri": "at://did:web:gamesgamesgamesgames.games/com.atproto.lexicon.schema/games.gamesgamesgamesgames.actor.createProfile",
-      "cid": "bafyreihrtskuv2xfd3hrynb5r3ayqlqdkinturxdmyvrgfjhctyuyluxm4"
     },
     "games.gamesgamesgamesgames.actor.getProfile": {
       "uri": "at://did:web:gamesgamesgamesgames.games/com.atproto.lexicon.schema/games.gamesgamesgamesgames.actor.getProfile",
@@ -50,10 +71,6 @@
     "games.gamesgamesgamesgames.getProfile": {
       "uri": "at://did:web:gamesgamesgamesgames.games/com.atproto.lexicon.schema/games.gamesgamesgamesgames.getProfile",
       "cid": "bafyreihaffjdit5bbdo5efncuqyrnohvw7nw43n4c7mv4kyedim4zqzzwi"
-    },
-    "games.gamesgamesgamesgames.org.createProfile": {
-      "uri": "at://did:web:gamesgamesgamesgames.games/com.atproto.lexicon.schema/games.gamesgamesgamesgames.org.createProfile",
-      "cid": "bafyreibubaw3c2zdtxud7xba32x4hpiapiip3gqyrdmsonlzvbqz66ii3y"
     },
     "games.gamesgamesgamesgames.org.getProfile": {
       "uri": "at://did:web:gamesgamesgamesgames.games/com.atproto.lexicon.schema/games.gamesgamesgamesgames.org.getProfile",

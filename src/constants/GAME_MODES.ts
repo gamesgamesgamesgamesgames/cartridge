@@ -1,26 +1,15 @@
 // Local imports
 import { Mode } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
-import ModeLexicon from '@/lexicons/games/gamesgamesgamesgames/mode.json'
 
-// Types
-type ModeLexiconIDs = keyof typeof ModeLexicon.defs
+const MODE_LABELS: Record<string, string> = {
+	battleRoyale: 'Battle Royale',
+	cooperative: 'Cooperative',
+	mmo: 'MMO',
+	multiplayer: 'Multiplayer',
+	singlePlayer: 'Single Player',
+	splitScreen: 'Split Screen',
+}
 
-export const GAME_MODES = Object.entries(ModeLexicon.defs).reduce(
-	(accumulator, kv) => {
-		const [id, { description: name }] = kv as [
-			ModeLexiconIDs,
-			{ description: string },
-		]
-
-		accumulator[id as Mode] = {
-			id,
-			name,
-		}
-
-		return accumulator
-	},
-	{} as Record<Mode, {
-		id: ModeLexiconIDs,
-		name: string,
-	}>,
-)
+export const GAME_MODES = Object.fromEntries(
+	Object.entries(MODE_LABELS).map(([id, name]) => [id, { id, name }]),
+) as Record<Mode, { id: string; name: string }>
