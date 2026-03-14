@@ -529,6 +529,57 @@ export async function getSimilarGames(
 	return (data.feed ?? []).map((item: GameFeedItem) => item.game)
 }
 
+export async function getHotGames(
+	limit = 20,
+): Promise<GameFeedGame[]> {
+	const params = new URLSearchParams({ limit: String(limit) })
+
+	const resp = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.feed.getHotGamesFeed?${params}`,
+	)
+
+	if (!resp.ok) {
+		return []
+	}
+
+	const data = await resp.json()
+	return (data.feed ?? []).map((item: GameFeedItem) => item.game)
+}
+
+export async function getRecentlyUpdatedGames(
+	limit = 20,
+): Promise<GameFeedGame[]> {
+	const params = new URLSearchParams({ limit: String(limit) })
+
+	const resp = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.feed.getRecentlyUpdatedFeed?${params}`,
+	)
+
+	if (!resp.ok) {
+		return []
+	}
+
+	const data = await resp.json()
+	return (data.feed ?? []).map((item: GameFeedItem) => item.game)
+}
+
+export async function getPersonalizedGames(
+	limit = 20,
+): Promise<GameFeedGame[]> {
+	const params = new URLSearchParams({ limit: String(limit) })
+
+	const resp = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.feed.getPersonalizedFeed?${params}`,
+	)
+
+	if (!resp.ok) {
+		return []
+	}
+
+	const data = await resp.json()
+	return (data.feed ?? []).map((item: GameFeedItem) => item.game)
+}
+
 export async function getUpcomingReleases(
 	limit = 20,
 	cursor?: string,

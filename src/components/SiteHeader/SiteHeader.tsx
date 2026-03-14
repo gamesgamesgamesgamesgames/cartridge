@@ -77,6 +77,14 @@ export function SiteHeader() {
 						{'About'}
 					</Link> */}
 
+					<Link
+						href={'/browse'}
+						className={
+							'flex items-center px-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent transition-colors'
+						}>
+						{'Browse'}
+					</Link>
+
 					<UserMenu />
 				</div>
 			</div>
