@@ -570,6 +570,7 @@ export async function getPersonalizedGames(
 
 	const resp = await queryAPI(
 		`/xrpc/games.gamesgamesgamesgames.feed.getPersonalizedFeed?${params}`,
+		{ isAuthenticated: true },
 	)
 
 	if (!resp.ok) {
