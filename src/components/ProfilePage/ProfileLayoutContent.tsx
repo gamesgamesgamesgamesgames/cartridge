@@ -12,6 +12,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { type ActorProfileDetailView } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 import { type OrgProfileDetailView } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
+import { EditProfileButton } from '@/components/ProfilePage/EditProfileButton'
 import { getBlobUrl } from '@/helpers/getBlobUrl'
 import { resolvePds } from '@/helpers/resolvePds'
 
@@ -89,7 +90,12 @@ export async function ProfileLayoutContent(props: Props) {
 		<div className={'flex min-h-screen flex-col'}>
 			<section className={'relative overflow-hidden py-20 shadow-xl/30'}>
 				<Container className={'relative z-10'}>
-					<div className={'flex gap-10 items-center'}>
+					<div className={'relative'}>
+						<div className={'absolute top-0 right-0'}>
+							<EditProfileButton profileDid={did} />
+						</div>
+
+						<div className={'flex gap-10 items-center'}>
 						<Avatar className={'size-32'}>
 							{avatarUrl && (
 								<AvatarImage
@@ -140,6 +146,7 @@ export async function ProfileLayoutContent(props: Props) {
 							)}
 						</div>
 					</div>
+				</div>
 				</Container>
 			</section>
 
