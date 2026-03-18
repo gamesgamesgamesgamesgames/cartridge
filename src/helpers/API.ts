@@ -8,6 +8,9 @@ import { type $InputBody as ActorProfileInput } from '@/helpers/lexicons/games/g
 import { type $InputBody as OrgProfileInput } from '@/helpers/lexicons/games/gamesgamesgamesgames/org/putProfile.defs'
 import { type MediaItem } from '@/typedefs/MediaItem'
 import { type PopfeedReview } from '@/helpers/lexicons/games/gamesgamesgamesgames/getReviews.defs'
+import { type ClaimView, type ReviewView } from '@/helpers/lexicons/games/gamesgamesgamesgames/getClaim.defs'
+import { type GameSummaryView } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
+import { type MigrationResult } from '@/helpers/lexicons/games/gamesgamesgamesgames/migrateClaim.defs'
 import { type PentaractAPICreateGameOptions } from '@/typedefs/PentaractAPICreateGameOptions'
 import { type PentaractAPICreateProfileResult } from '@/typedefs/PentaractAPICreateProfileResult'
 import { type PentaractAPIGetBlueskyProfileResult } from '@/typedefs/PentaractAPIGetBlueskyProfileResult'
@@ -653,4 +656,138 @@ export async function uploadBlob(
 		mimeType: data.blob.mimeType,
 		size: data.blob.size,
 	}
+}
+
+// ---------------------------------------------------------------------------
+// Claims
+// ---------------------------------------------------------------------------
+
+export type { ClaimView, ReviewView, GameSummaryView, MigrationResult }
+
+export async function createClaim(input: {
+	type: 'game' | 'org'
+	games?: string[]
+	org?: string
+	message?: string
+	contact: string
+}): Promise<string> {
+	const response = await queryAPI(
+		'/xrpc/games.gamesgamesgamesgames.createClaim',
+		{
+			isAuthenticated: true,
+			method: 'POST',
+			body: JSON.stringify(input),
+		},
+	)
+
+	if (!response.ok) {
+		const errorBody = await response.text()
+		throw new Error(`createClaim failed (${response.status}): ${errorBody}`)
+	}
+
+	const data = await response.json()
+	return data.uri as string
+}
+
+export async function reviewClaim(input: {
+	claim: { uri: string; cid: string }
+	status: 'approved' | 'denied'
+	approvedGames?: string[]
+	reason?: string
+}): Promise<string> {
+	const response = await queryAPI(
+		'/xrpc/games.gamesgamesgamesgames.reviewClaim',
+		{
+			isAuthenticated: true,
+			method: 'POST',
+			body: JSON.stringify(input),
+		},
+	)
+
+	if (!response.ok) {
+		const errorBody = await response.text()
+		throw new Error(`reviewClaim failed (${response.status}): ${errorBody}`)
+	}
+
+	const data = await response.json()
+	return data.uri as string
+}
+
+export async function migrateClaim(input: {
+	claim: string
+	claimReview: string
+}): Promise<MigrationResult[]> {
+	const response = await queryAPI(
+		'/xrpc/games.gamesgamesgamesgames.migrateClaim',
+		{
+			isAuthenticated: true,
+			method: 'POST',
+			body: JSON.stringify(input),
+		},
+	)
+
+	if (!response.ok) {
+		const errorBody = await response.text()
+		throw new Error(`migrateClaim failed (${response.status}): ${errorBody}`)
+	}
+
+	const data = await response.json()
+	return data.results as MigrationResult[]
+}
+
+export async function getClaim(uri: string): Promise<ClaimView | null> {
+	const params = new URLSearchParams({ uri })
+	const response = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.getClaim?${params}`,
+		{ isAuthenticated: true },
+	)
+
+	if (!response.ok) {
+		return null
+	}
+
+	const data = await response.json()
+	return data.claim as ClaimView
+}
+
+export async function listClaims(options?: {
+	status?: 'pending' | 'approved' | 'denied'
+	limit?: number
+	cursor?: string
+}): Promise<{ claims: ClaimView[]; cursor?: string }> {
+	const params = new URLSearchParams()
+	if (options?.status) params.set('status', options.status)
+	if (options?.limit) params.set('limit', String(options.limit))
+	if (options?.cursor) params.set('cursor', options.cursor)
+
+	const response = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.listClaims?${params}`,
+		{ isAuthenticated: true },
+	)
+
+	if (!response.ok) {
+		return { claims: [] }
+	}
+
+	return response.json()
+}
+
+export async function listOrgGames(
+	org: string,
+	options?: { limit?: number; cursor?: string },
+): Promise<{ games: GameSummaryView[]; cursor?: string }> {
+	const params = new URLSearchParams({ org })
+	if (options?.limit) params.set('limit', String(options.limit))
+	if (options?.cursor) params.set('cursor', options.cursor)
+
+	const response = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.listOrgGames?${params}`,
+		{ isAuthenticated: true },
+	)
+
+	if (!response.ok) {
+		return { games: [] }
+	}
+
+	return response.json()
 }

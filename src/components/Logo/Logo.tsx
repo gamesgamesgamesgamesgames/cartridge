@@ -6,7 +6,7 @@ type Props = Readonly<{
 }>
 
 export function Logo(props: Props) {
-	const { tagline = 'Every game, loaded.' } = props
+	const { tagline = 'Find your next favorite game.' } = props
 
 	return (
 		<ViewTransition name={'wordmark'}>
@@ -37,7 +37,7 @@ export function Logo(props: Props) {
 
 					<span
 						className={
-							'absolute bottom-0 left-16 text-sm whitespace-nowrap md:bottom-1 md:left-55 md:text-xl'
+							'absolute bottom-0 right-[25%] text-xs whitespace-nowrap md:bottom-1 md:text-xl'
 						}>
 						{tagline}
 					</span>

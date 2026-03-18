@@ -149,17 +149,7 @@ export function GameLayoutContent(props: Props) {
 					<div className={'flex flex-col items-center gap-6 md:flex-row md:items-center md:gap-20'}>
 						<div className={'w-[60%] md:min-w-[25%] md:w-[25%]'}>
 							<ViewTransition name={`sr-${transitionName}`}>
-								<div className={'relative'}>
-									<BoxArt gameRecord={gameRecord} />
-									<LikeButton
-										className={
-											'absolute top-2 right-2 z-10 rounded-full bg-black/40 p-1.5'
-										}
-										gameUri={gameRecord.uri}
-										initialCount={likes.count}
-										initialLiked={likes.liked}
-									/>
-								</div>
+								<BoxArt gameRecord={gameRecord} />
 								<div className={'mt-1.5 px-0.5'}>
 									<div
 										className={
@@ -175,6 +165,13 @@ export function GameLayoutContent(props: Props) {
 									</div>
 								</div>
 							</ViewTransition>
+							<div className={'mt-3 flex items-center justify-start gap-4'}>
+								<LikeButton
+									gameUri={gameRecord.uri}
+									initialCount={likes.count}
+									initialLiked={likes.liked}
+								/>
+							</div>
 						</div>
 
 						<div className={'flex flex-col gap-6 md:gap-10'}>

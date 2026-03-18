@@ -4,15 +4,20 @@
 import {
 	faBook,
 	faChartPie,
+	faClipboardList,
 	faGamepad,
+	faGavel,
 	faPeopleGroup,
 	faStar,
 	faStore,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Link from 'next/link'
+import { useStore } from 'statery'
 
 // Local imports
+import { isAdmin } from '@/helpers/admin'
+import { store } from '@/store/store'
 import { DashboardNavigationUserMenu } from '@/components/DashboardNavigationUserMenu/DashboardNavigationUserMenu'
 import {
 	Sidebar,
@@ -29,6 +34,8 @@ import {
 } from '@/components/ui/sidebar'
 
 export function DashboardNavigation() {
+	const { user } = useStore(store)
+
 	return (
 		<Sidebar
 			collapsible={'offcanvas'}
@@ -139,8 +146,32 @@ export function DashboardNavigation() {
 							</SidebarMenuButton>
 							<SidebarMenuBadge>{'Soon!'}</SidebarMenuBadge>
 						</SidebarMenuItem>
+						<SidebarMenuItem>
+							<SidebarMenuButton asChild>
+								<Link href={'/claim/list'}>
+									<FontAwesomeIcon icon={faClipboardList} />
+									<span>{'My Claims'}</span>
+								</Link>
+							</SidebarMenuButton>
+						</SidebarMenuItem>
 					</SidebarGroupContent>
 				</SidebarGroup>
+
+				{isAdmin(user?.did) && (
+					<SidebarGroup>
+						<SidebarGroupLabel>{'Admin'}</SidebarGroupLabel>
+						<SidebarGroupContent>
+							<SidebarMenuItem>
+								<SidebarMenuButton asChild>
+									<Link href={'/admin/claims'}>
+										<FontAwesomeIcon icon={faGavel} />
+										<span>{'Claims'}</span>
+									</Link>
+								</SidebarMenuButton>
+							</SidebarMenuItem>
+						</SidebarGroupContent>
+					</SidebarGroup>
+				)}
 			</SidebarContent>
 
 			<SidebarFooter>
