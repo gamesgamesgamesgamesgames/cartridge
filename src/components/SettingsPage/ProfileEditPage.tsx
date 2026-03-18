@@ -8,7 +8,7 @@ import { ProfileEditFooter } from '@/components/SettingsPage/ProfileEditFooter'
 export function ProfileEditPage() {
 	return (
 		<ProfileEditContextProvider>
-			<div className={'flex flex-col gap-8 max-w-lg'}>
+			<div className={'flex flex-col gap-8'}>
 				<ProfileEditForm />
 				<ProfileEditFooter />
 			</div>

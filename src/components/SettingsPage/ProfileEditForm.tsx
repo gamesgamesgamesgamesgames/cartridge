@@ -46,15 +46,15 @@ const PRONOUN_OPTIONS: PronounOption[] = [
 
 function FormSkeleton() {
 	return (
-		<div className={'flex flex-col gap-6'}>
-			<div className={'flex flex-col items-center gap-3'}>
-				<Skeleton className={'h-24 w-24 rounded-full'} />
+		<div className={'grid grid-cols-1 gap-10 md:grid-cols-[280px_1fr]'}>
+			<div className={'flex flex-col items-center gap-4'}>
+				<Skeleton className={'h-32 w-32 rounded-full'} />
 				<Skeleton className={'h-8 w-28'} />
+				<Skeleton className={'h-10 w-full'} />
+				<Skeleton className={'h-10 w-full'} />
 			</div>
 			<div className={'flex flex-col gap-4'}>
-				<Skeleton className={'h-10 w-full'} />
-				<Skeleton className={'h-24 w-full'} />
-				<Skeleton className={'h-10 w-full'} />
+				<Skeleton className={'h-32 w-full'} />
 				<Skeleton className={'h-10 w-full'} />
 			</div>
 		</div>
@@ -111,31 +111,31 @@ export function ProfileEditForm() {
 	if (isLoading) return <FormSkeleton />
 
 	return (
-		<div className={'flex flex-col gap-6'}>
-			<div className={'flex flex-col items-center gap-3'}>
-				<Avatar className={'h-24 w-24'}>
-					<AvatarImage src={avatarPreview ?? avatarURL} />
-					<AvatarFallback>
-						{displayName?.charAt(0)?.toUpperCase() ?? '?'}
-					</AvatarFallback>
-				</Avatar>
+		<div className={'grid grid-cols-1 gap-10 md:grid-cols-[280px_1fr]'}>
+			<div className={'flex flex-col gap-6'}>
+				<div className={'flex flex-col items-center gap-3'}>
+					<Avatar className={'size-32'}>
+						<AvatarImage src={avatarPreview ?? avatarURL} />
+						<AvatarFallback className={'text-4xl'}>
+							{displayName?.charAt(0)?.toUpperCase() ?? '?'}
+						</AvatarFallback>
+					</Avatar>
 
-				<FileUpload
-					accept={'image/png, image/jpeg'}
-					maxFiles={1}
-					maxSize={10 * 1024 * 1024}
-					onValueChange={handleAvatarChange}>
-					<FileUploadTrigger asChild>
-						<Button
-							variant={'outline'}
-							size={'sm'}>
-							{'Upload Avatar'}
-						</Button>
-					</FileUploadTrigger>
-				</FileUpload>
-			</div>
+					<FileUpload
+						accept={'image/png, image/jpeg'}
+						maxFiles={1}
+						maxSize={10 * 1024 * 1024}
+						onValueChange={handleAvatarChange}>
+						<FileUploadTrigger asChild>
+							<Button
+								variant={'outline'}
+								size={'sm'}>
+								{'Upload Avatar'}
+							</Button>
+						</FileUploadTrigger>
+					</FileUpload>
+				</div>
 
-			<div className={'flex flex-col gap-4'}>
 				<div className={'flex flex-col gap-2'}>
 					<Label htmlFor={'displayName'}>{'Display Name'}</Label>
 					<Input
@@ -143,16 +143,6 @@ export function ProfileEditForm() {
 						onChange={handleDisplayNameChange}
 						placeholder={'Your display name'}
 						value={displayName}
-					/>
-				</div>
-
-				<div className={'flex flex-col gap-2'}>
-					<Label>{'Bio'}</Label>
-					<RichTextComposer
-						className={'min-h-[100px]'}
-						onChange={handleDescriptionChange}
-						placeholder={'Tell us about yourself'}
-						value={description}
 					/>
 				</div>
 
@@ -181,6 +171,18 @@ export function ProfileEditForm() {
 							</ComboboxList>
 						</ComboboxContent>
 					</Combobox>
+				</div>
+			</div>
+
+			<div className={'flex flex-col gap-6'}>
+				<div className={'flex flex-col gap-2'}>
+					<Label>{'Bio'}</Label>
+					<RichTextComposer
+						className={'min-h-[160px]'}
+						onChange={handleDescriptionChange}
+						placeholder={'Tell us about yourself'}
+						value={description}
+					/>
 				</div>
 
 				<div className={'flex flex-col gap-2'}>
