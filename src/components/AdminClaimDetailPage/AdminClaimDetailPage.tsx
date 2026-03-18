@@ -38,9 +38,9 @@ export function AdminClaimDetailPage() {
 
 	const breadcrumbs = useMemo(
 		() => [
-			{ label: 'Admin', url: '/admin' },
-			{ label: 'Claims', url: '/admin/claims' },
-			{ label: 'Review Claim', url: `/admin/claims/${did}/${rkey}` },
+			{ label: 'Admin', url: '/dashboard/admin' },
+			{ label: 'Claims', url: '/dashboard/admin/claims' },
+			{ label: 'Review Claim', url: `/dashboard/admin/claims/${did}/${rkey}` },
 		],
 		[did, rkey],
 	)
@@ -99,7 +99,7 @@ export function AdminClaimDetailPage() {
 				approvedGames: Array.from(selectedGameUris),
 				...(reason.trim() ? { reason: reason.trim() } : {}),
 			})
-			router.push('/admin/claims')
+			router.push('/dashboard/admin/claims')
 		} catch (error) {
 			setSubmitError(
 				error instanceof Error ? error.message : 'An unexpected error occurred.',
@@ -119,7 +119,7 @@ export function AdminClaimDetailPage() {
 				status: 'denied',
 				...(reason.trim() ? { reason: reason.trim() } : {}),
 			})
-			router.push('/admin/claims')
+			router.push('/dashboard/admin/claims')
 		} catch (error) {
 			setSubmitError(
 				error instanceof Error ? error.message : 'An unexpected error occurred.',

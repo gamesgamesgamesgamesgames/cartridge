@@ -190,7 +190,21 @@ export function consumePendingLike(): string | null {
 	return uri
 }
 
-export function logout() {
+export async function logout() {
+	const tokens = getStoredTokens()
+	if (tokens?.accessToken) {
+		const config = getConfig()
+		// Best-effort revocation — don't block logout if it fails
+		await fetch(`${config.aipUrl}/oauth/revoke`, {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+			body: new URLSearchParams({
+				token: tokens.accessToken,
+				client_id: config.clientId,
+			}),
+		}).catch(() => {})
+	}
+
 	localStorage.removeItem(STORAGE_KEY)
 	window.location.href = '/login'
 }

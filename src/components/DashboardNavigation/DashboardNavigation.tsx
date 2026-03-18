@@ -148,7 +148,7 @@ export function DashboardNavigation() {
 						</SidebarMenuItem>
 						<SidebarMenuItem>
 							<SidebarMenuButton asChild>
-								<Link href={'/claim/list'}>
+								<Link href={'/dashboard/claims'}>
 									<FontAwesomeIcon icon={faClipboardList} />
 									<span>{'My Claims'}</span>
 								</Link>
@@ -163,7 +163,7 @@ export function DashboardNavigation() {
 						<SidebarGroupContent>
 							<SidebarMenuItem>
 								<SidebarMenuButton asChild>
-									<Link href={'/admin/claims'}>
+									<Link href={'/dashboard/admin/claims'}>
 										<FontAwesomeIcon icon={faGavel} />
 										<span>{'Claims'}</span>
 									</Link>

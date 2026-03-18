@@ -12,7 +12,7 @@ import { Button } from '@/components/ui/button'
 import { Container } from '@/components/Container/Container'
 import { DashboardHeader } from '@/components/DashboardHeader/DashboardHeader'
 import { Spinner } from '@/components/ui/spinner'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { UnderlineTabs } from '@/components/UnderlineTabs/UnderlineTabs'
 import { isAdmin } from '@/helpers/admin'
 import { parseATURI } from '@/helpers/parseATURI'
 import { store } from '@/store/store'
@@ -35,8 +35,8 @@ export function AdminClaimsPage() {
 
 	const breadcrumbs = useMemo(
 		() => [
-			{ label: 'Admin', url: '/admin' },
-			{ label: 'Claims', url: '/admin/claims' },
+			{ label: 'Admin', url: '/dashboard/admin' },
+			{ label: 'Claims', url: '/dashboard/admin/claims' },
 		],
 		[],
 	)
@@ -102,7 +102,7 @@ export function AdminClaimsPage() {
 	const handleClaimClick = useCallback(
 		(uri: AtUriString) => {
 			const { did, rkey } = parseATURI(uri)
-			router.push(`/admin/claims/${did}/${rkey}`)
+			router.push(`/dashboard/admin/claims/${did}/${rkey}`)
 		},
 		[router],
 	)
@@ -183,16 +183,16 @@ export function AdminClaimsPage() {
 						</p>
 					</div>
 
-					<Tabs
+					<UnderlineTabs
+						tabs={[
+							{ id: 'all', label: 'All' },
+							{ id: 'pending', label: 'Pending' },
+							{ id: 'approved', label: 'Approved' },
+							{ id: 'denied', label: 'Denied' },
+						]}
 						value={statusFilter}
-						onValueChange={handleFilterChange}>
-						<TabsList>
-							<TabsTrigger value={'all'}>{'All'}</TabsTrigger>
-							<TabsTrigger value={'pending'}>{'Pending'}</TabsTrigger>
-							<TabsTrigger value={'approved'}>{'Approved'}</TabsTrigger>
-							<TabsTrigger value={'denied'}>{'Denied'}</TabsTrigger>
-						</TabsList>
-					</Tabs>
+						onValueChange={handleFilterChange}
+					/>
 
 					{claimsList}
 

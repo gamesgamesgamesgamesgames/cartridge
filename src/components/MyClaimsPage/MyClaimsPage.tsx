@@ -3,7 +3,7 @@
 // Module imports
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useStore } from 'statery'
 
 // Local imports
@@ -12,6 +12,7 @@ import { type ClaimView } from '@/helpers/API'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Container } from '@/components/Container/Container'
+import { DashboardHeader } from '@/components/DashboardHeader/DashboardHeader'
 import { Spinner } from '@/components/ui/spinner'
 import { store } from '@/store/store'
 
@@ -53,6 +54,11 @@ export function MyClaimsPage() {
 	const [claims, setClaims] = useState<ClaimView[]>([])
 	const [isLoading, setIsLoading] = useState(true)
 	const [loadError, setLoadError] = useState<string | null>(null)
+
+	const breadcrumbs = useMemo(
+		() => [{ label: 'My Claims', url: '/dashboard/claims' }],
+		[],
+	)
 
 	useEffect(() => {
 		if (!user) return
@@ -101,29 +107,41 @@ export function MyClaimsPage() {
 
 	if (!user) {
 		return (
-			<Container>
-				<div className={'flex flex-col gap-4 max-w-2xl'}>
-					<h1 className={'text-2xl font-bold'}>{'My Claims'}</h1>
-					<p className={'text-muted-foreground'}>
-						{'You must be signed in to view your claims.'}
-					</p>
-				</div>
-			</Container>
+			<>
+				<DashboardHeader breadcrumbs={breadcrumbs} />
+				<Container>
+					<div className={'flex flex-col gap-4 '}>
+						<h1 className={'text-2xl font-bold'}>{'My Claims'}</h1>
+						<p className={'text-muted-foreground'}>
+							{'You must be signed in to view your claims.'}
+						</p>
+					</div>
+				</Container>
+			</>
 		)
 	}
 
 	return (
-		<Container>
-			<div className={'flex flex-col gap-6 max-w-2xl'}>
-				<div className={'flex items-center justify-between gap-4'}>
-					<h1 className={'text-2xl font-bold'}>{'My Claims'}</h1>
-
+		<>
+			<DashboardHeader
+				breadcrumbs={breadcrumbs}
+				controls={
 					<Button
 						asChild
-						variant={'default'}>
-						<Link href={'/claim'}>{'New Claim'}</Link>
+						size={'sm'}>
+						<Link href={'/dashboard/claim'}>{'New Claim'}</Link>
 					</Button>
-				</div>
+				}
+			/>
+
+			<Container>
+				<div className={'flex flex-col gap-6 '}>
+					<div className={'flex flex-col gap-2'}>
+						<h1 className={'text-2xl font-bold'}>{'My Claims'}</h1>
+						<p className={'text-muted-foreground text-sm'}>
+							{'Track the status of your ownership claims.'}
+						</p>
+					</div>
 
 				{isLoading && (
 					<div className={'flex items-center justify-center py-16'}>
@@ -146,7 +164,7 @@ export function MyClaimsPage() {
 						<Button
 							asChild
 							variant={'outline'}>
-							<Link href={'/claim'}>{'Submit Your First Claim'}</Link>
+							<Link href={'/dashboard/claim'}>{'Submit Your First Claim'}</Link>
 						</Button>
 					</div>
 				)}
@@ -194,7 +212,8 @@ export function MyClaimsPage() {
 						})}
 					</div>
 				)}
-			</div>
-		</Container>
+				</div>
+			</Container>
+		</>
 	)
 }
