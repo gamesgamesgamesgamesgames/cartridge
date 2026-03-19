@@ -21,7 +21,6 @@ import { type PentaractAPISearchResult } from '@/typedefs/PentaractAPISearchResu
 import { type PentaractAPISearchProfilesTypeaheadResult } from '@/typedefs/PentaractAPISearchProfilesTypeaheadResult'
 import { type PentaractAPIUploadBlobResult } from '@/typedefs/PentaractAPIUploadBlobResult'
 import { type UnpublishedGame } from '@/typedefs/UnpublishedGame'
-import { getAccessToken } from '@/helpers/oauth'
 
 // Constants
 const API_URL = process.env.NEXT_PUBLIC_HAPPYVIEW_URL!
@@ -37,16 +36,10 @@ async function queryAPI(path: string, options: PentaractAPIQueryOptions = {}) {
 		...(fetchOptions.headers as Record<string, string>),
 	}
 
-	if (isAuthenticated) {
-		const token = getAccessToken()
-		if (token) {
-			headers['Authorization'] = `Bearer ${token}`
-		}
-	}
-
 	return fetch(`${API_URL}${path}`, {
 		...fetchOptions,
 		headers,
+		credentials: isAuthenticated ? 'include' : 'same-origin',
 	})
 }
 

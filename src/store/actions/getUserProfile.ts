@@ -3,9 +3,9 @@ import * as API from '@/helpers/API'
 import { store } from '@/store/store'
 
 export async function getUserProfile() {
-	const { authTokens } = store.state
+	const { authDid } = store.state
 
-	if (!authTokens) {
+	if (!authDid) {
 		throw new Error('Cannot get user profile before logging in.')
 	}
 
@@ -18,7 +18,7 @@ export async function getUserProfile() {
 	store.set(() => ({
 		profileType: profileType as 'actor' | 'org' | null,
 		user: {
-			did: authTokens.sub,
+			did: authDid,
 			handle: blueskyProfile?.handle,
 			displayName: profile?.displayName ?? blueskyProfile?.displayName,
 			description: profile?.description ?? blueskyProfile?.description,

@@ -20,8 +20,8 @@ export function CallbackPage() {
 	const router = useRouter()
 
 	useEffect(() => {
-		if (window.location.search.includes('code=')) {
-			login().then(() => {
+		login()
+			.then(() => {
 				const { profileType } = store.state
 				if (profileType) {
 					router.replace(getReturnUrl() ?? '/')
@@ -29,7 +29,9 @@ export function CallbackPage() {
 					router.replace('/profile-setup')
 				}
 			})
-		}
+			.catch(() => {
+				router.replace('/login')
+			})
 	}, [router])
 
 	return (

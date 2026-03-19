@@ -1,8 +1,7 @@
 // Local imports
-import { getStoredTokens } from '@/helpers/oauth'
+import { getMe } from '@/helpers/oauth'
 import { setProfileTypeCookie } from '@/helpers/setProfileTypeCookie'
 import { getUserProfile } from '@/store/actions/getUserProfile'
-import { syncAuthCookie } from '@/store/actions/login'
 import { store } from '@/store/store'
 import { subscribe } from '@/store/subscribe'
 
@@ -11,15 +10,12 @@ export async function initialize() {
 		return
 	}
 
-	const tokens = getStoredTokens()
+	const me = await getMe()
 
-	if (tokens) {
-		store.set(() => ({ authTokens: tokens }))
-	}
+	if (me) {
+		// Store the DID from HappyView session
+		store.set(() => ({ authDid: me.did }))
 
-	const isAuthed = syncAuthCookie()
-
-	if (isAuthed) {
 		await getUserProfile()
 
 		const { profileType } = store.state
