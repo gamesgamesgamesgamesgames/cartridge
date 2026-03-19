@@ -30,7 +30,7 @@ export async function loginWithRedirect(handle?: string, returnUrl?: string) {
 		params.set('handle', handle)
 	}
 
-	const response = await fetch(`${API_URL}/login?${params}`, {
+	const response = await fetch(`${API_URL}/auth/login?${params}`, {
 		credentials: 'include',
 	})
 
@@ -44,7 +44,7 @@ export async function loginWithRedirect(handle?: string, returnUrl?: string) {
 
 export async function getMe(): Promise<MeResponse | null> {
 	try {
-		const response = await fetch(`${API_URL}/me`, {
+		const response = await fetch(`${API_URL}/auth/me`, {
 			credentials: 'include',
 		})
 
@@ -79,7 +79,7 @@ export function consumePendingLike(): string | null {
 }
 
 export async function logout() {
-	await fetch(`${API_URL}/logout`, {
+	await fetch(`${API_URL}/auth/logout`, {
 		method: 'POST',
 		credentials: 'include',
 	}).catch(() => {})
