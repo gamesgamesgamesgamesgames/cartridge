@@ -190,7 +190,7 @@ export function GameLayoutContent(props: Props) {
 												items={gameRecord.genres!.map((genre) => (
 													<Link
 														key={genre}
-														href={`/theme/${GAME_GENRES[genre]?.id ?? genre}`}>
+														href={`/search?genres=${genre}`}>
 														{GAME_GENRES[genre]?.name ?? genre}
 													</Link>
 												))}
@@ -207,7 +207,7 @@ export function GameLayoutContent(props: Props) {
 												items={gameRecord.themes!.map((theme) => (
 													<Link
 														key={theme}
-														href={`/theme/${GAME_THEMES[theme]?.id ?? theme}`}>
+														href={`/search?themes=${theme}`}>
 														{GAME_THEMES[theme]?.name ?? theme}
 													</Link>
 												))}
@@ -225,7 +225,7 @@ export function GameLayoutContent(props: Props) {
 													(perspective) => (
 														<Link
 															key={perspective}
-															href={`/player-perspective/${GAME_PLAYER_PERSPECTIVES[perspective]?.id ?? perspective}`}>
+															href={`/search?playerPerspectives=${perspective}`}>
 															{GAME_PLAYER_PERSPECTIVES[perspective]?.name ??
 																perspective}
 														</Link>
@@ -244,7 +244,7 @@ export function GameLayoutContent(props: Props) {
 												items={gameRecord.modes!.map((mode) => (
 													<Link
 														key={mode}
-														href={`/mode/${GAME_MODES[mode]?.id ?? mode}`}>
+														href={`/search?modes=${mode}`}>
 														{GAME_MODES[mode]?.name ?? mode}
 													</Link>
 												))}

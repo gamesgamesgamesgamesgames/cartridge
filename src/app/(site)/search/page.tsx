@@ -2,6 +2,7 @@
 
 import { ChevronDown, Loader2, SlidersHorizontal } from 'lucide-react'
 import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
 import {
 	useCallback,
 	useEffect,
@@ -260,24 +261,40 @@ function FilterDropdown({
 
 function SearchPageContent() {
 	const { query } = useSearchContext()
+	const searchParams = useSearchParams()
 	const prevUrisRef = useRef<Set<string>>(new Set())
 	const sentinelRef = useRef<HTMLDivElement>(null)
+
+	// Parse initial filter values from URL params
+	const initialGenres = searchParams.get('genres')?.split(',').filter(Boolean) ?? []
+	const initialThemes = searchParams.get('themes')?.split(',').filter(Boolean) ?? []
+	const initialModes = searchParams.get('modes')?.split(',').filter(Boolean) ?? []
+	const initialPerspectives = searchParams.get('playerPerspectives')?.split(',').filter(Boolean) ?? []
 
 	const [applicationTypes, setApplicationTypes] = useState<string[]>(
 		DEFAULT_APPLICATION_TYPES,
 	)
 	const [sort, setSort] = useState('relevance')
-	const [genres, setGenres] = useState<string[]>([])
-	const [themes, setThemes] = useState<string[]>([])
-	const [modes, setModes] = useState<string[]>([])
-	const [playerPerspectives, setPlayerPerspectives] = useState<string[]>([])
+	const [genres, setGenres] = useState<string[]>(initialGenres)
+	const [themes, setThemes] = useState<string[]>(initialThemes)
+	const [modes, setModes] = useState<string[]>(initialModes)
+	const [playerPerspectives, setPlayerPerspectives] = useState<string[]>(initialPerspectives)
 	const [ageRatings, setAgeRatings] = useState<string[]>([])
 	const [includeUnrated, setIncludeUnrated] = useState(false)
 	const [includeCancelled, setIncludeCancelled] = useState(false)
 	const [filtersOpen, setFiltersOpen] = useState(false)
 
+	// Sync URL params to state when they change (e.g., navigating from one filter link to another)
+	useEffect(() => {
+		setGenres(initialGenres)
+		setThemes(initialThemes)
+		setModes(initialModes)
+		setPlayerPerspectives(initialPerspectives)
+	}, [searchParams]) // eslint-disable-line react-hooks/exhaustive-deps
+
 	const activeFilterCount = genres.length + themes.length + modes.length + playerPerspectives.length + ageRatings.length
 
+	const hasFilters = activeFilterCount > 0
 	const { results, totalResults, cursor, isLoading, loadMore } = useSearch(query, {
 		limit: 25,
 		types: SEARCH_TYPES,
@@ -291,6 +308,7 @@ function SearchPageContent() {
 		ageRatings: ageRatings.length > 0 ? ageRatings : undefined,
 		includeUnrated: ageRatings.length > 0 && includeUnrated ? true : undefined,
 		includeCancelled: includeCancelled || undefined,
+		minLength: hasFilters ? 0 : 1,
 	})
 
 	function toggleArrayValue(
@@ -359,7 +377,7 @@ function SearchPageContent() {
 	return (
 		<ViewTransition enter='search-results-fade-in'>
 			<main className={'mx-auto w-full max-w-6xl flex-1 px-4 py-6'}>
-				{query.trim() && (
+				{(query.trim() || hasFilters) && (
 					<Collapsible
 						open={filtersOpen}
 						onOpenChange={setFiltersOpen}
@@ -674,9 +692,9 @@ function SearchPageContent() {
 					</div>
 				)}
 
-				{!isLoading && query.trim() && gameResults.length === 0 && (
+				{!isLoading && (query.trim() || hasFilters) && gameResults.length === 0 && (
 					<p className={'py-12 text-center text-muted-foreground'}>
-						No results found for &ldquo;{query}&rdquo;
+						{query.trim() ? `No results found for "${query}"` : 'No results found'}
 					</p>
 				)}
 
@@ -747,7 +765,7 @@ function SearchPageContent() {
 					</>
 				)}
 
-				{!query.trim() && (
+				{!query.trim() && !hasFilters && (
 					<p className={'py-12 text-center text-muted-foreground'}>
 						Start typing to search
 					</p>
