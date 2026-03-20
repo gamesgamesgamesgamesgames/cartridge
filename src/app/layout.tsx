@@ -12,6 +12,7 @@ import { type PropsWithChildren } from 'react'
 import '@radix-ui/themes/styles.css'
 
 // Local imports
+import { StoreInitializer } from '@/components/StoreInitializer/StoreInitializer'
 import { ThemeProvider } from '@/context/ThemeProvider/ThemeProvider'
 
 import './fonts.css'
@@ -80,6 +81,7 @@ export default function RootLayoutWrapper(props: Props) {
 					defaultTheme={'system'}
 					enableSystem
 					disableTransitionOnChange>
+					<StoreInitializer />
 					{children}
 				</ThemeProvider>
 			</body>
