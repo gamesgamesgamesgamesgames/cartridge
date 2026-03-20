@@ -61,7 +61,7 @@ export function SiteHeader() {
 								onChange={handleChange}
 								autoFocus={isSearchPage}
 								className={
-									'w-full rounded-lg border border-input bg-background py-2 pl-10 pr-4 text-sm placeholder:text-muted-foreground shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
+									'w-full rounded-lg border border-input bg-background py-2 pl-10 pr-4 text-base sm:text-sm placeholder:text-muted-foreground shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring'
 								}
 							/>
 						</div>
