@@ -3,12 +3,12 @@ import { type Metadata } from 'next'
 // Local imports
 import { Header } from '@/components/Header/Header'
 
-export const metadata: Metadata = { title: 'Cookie Policy' }
+export const metadata: Metadata = { title: 'Community Guidelines' }
 
 export default function CookiePolicyPage() {
 	return (
 		<div className={'mx-auto w-full max-w-4xl px-4 py-24'}>
-			<Header>{'Cookie Policy'}</Header>
+			<Header>{'Community Guidelines'}</Header>
 			<div
 				className={
 					'prose prose-sm dark:prose-invert mt-8 max-w-none text-foreground prose-headings:font-[family-name:var(--font-cartridge)] prose-a:text-primary'
