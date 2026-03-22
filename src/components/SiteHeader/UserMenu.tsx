@@ -1,7 +1,7 @@
 'use client'
 
 // Module imports
-import { ChevronDown, LogOut, Monitor, Moon, Sun, User } from 'lucide-react'
+import { ChevronDown, LogOut, Monitor, Moon, Settings, Sun, User } from 'lucide-react'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
 import { usePathname, useSearchParams } from 'next/navigation'
@@ -106,6 +106,12 @@ export function UserMenu() {
 							<Link href={`/profile/${user.handle ?? user.did}`}>
 								<User className={'size-4'} />
 								{'View Profile'}
+							</Link>
+						</DropdownMenuItem>
+						<DropdownMenuItem asChild>
+							<Link href={'/settings/accounts'}>
+								<Settings className={'size-4'} />
+								{'Account Settings'}
 							</Link>
 						</DropdownMenuItem>
 						<DropdownMenuSeparator />
