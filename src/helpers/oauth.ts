@@ -84,5 +84,5 @@ export async function logout() {
 		credentials: 'include',
 	}).catch(() => {})
 
-	window.location.href = '/login'
+	window.location.href = '/'
 }
