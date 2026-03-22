@@ -7,6 +7,7 @@ import { usePathname } from 'next/navigation'
 // Constants
 const SETTINGS_TABS = [
 	{ label: 'Profile', href: '/settings/profile' },
+	{ label: 'Accounts', href: '/settings/accounts' },
 ] as const
 
 export function SettingsNav() {

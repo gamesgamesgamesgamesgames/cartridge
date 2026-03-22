@@ -8,7 +8,7 @@ import { type PropsWithChildren, useEffect, useState } from 'react'
 import { Container } from '@/components/Container/Container'
 import { Header } from '@/components/Header/Header'
 import { SettingsNav } from '@/components/SettingsPage/SettingsNav'
-import { isAuthenticated } from '@/helpers/oauth'
+import { getMe, isAuthenticated } from '@/helpers/oauth'
 
 type Props = Readonly<PropsWithChildren>
 
@@ -18,11 +18,21 @@ export default function SettingsLayout(props: Props) {
 	const [isAuthed, setIsAuthed] = useState(false)
 
 	useEffect(() => {
-		if (!isAuthenticated()) {
-			router.replace('/login?returnUrl=/settings/profile')
+		// Check synchronous store first (fast path for in-app navigation)
+		if (isAuthenticated()) {
+			setIsAuthed(true)
 			return
 		}
-		setIsAuthed(true)
+
+		// Fall back to async check (handles cold page loads like OAuth redirects
+		// where the store hasn't been initialized yet)
+		getMe().then((me) => {
+			if (me) {
+				setIsAuthed(true)
+			} else {
+				router.replace('/login?returnUrl=/settings/profile')
+			}
+		})
 	}, [router])
 
 	if (!isAuthed) return null

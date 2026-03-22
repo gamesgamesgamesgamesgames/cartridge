@@ -21,6 +21,13 @@ import { type PentaractAPISearchResult } from '@/typedefs/PentaractAPISearchResu
 import { type PentaractAPISearchProfilesTypeaheadResult } from '@/typedefs/PentaractAPISearchProfilesTypeaheadResult'
 import { type PentaractAPIUploadBlobResult } from '@/typedefs/PentaractAPIUploadBlobResult'
 import { type UnpublishedGame } from '@/typedefs/UnpublishedGame'
+import {
+	type AuthorizeResponse,
+	type ExternalProvider,
+	type LinkedAccount,
+	type SyncResponse,
+	type UnlinkResponse,
+} from '@/typedefs/ExternalAccount'
 
 // Constants
 const API_URL = process.env.NEXT_PUBLIC_HAPPYVIEW_URL!
@@ -460,6 +467,7 @@ export type GameFeedGame = {
 	themes?: string[]
 	media?: GameRecord['media']
 	releases?: GameRecord['releases']
+	firstReleaseDate?: string
 	slug?: string
 	likeCount?: number
 }
@@ -780,6 +788,86 @@ export async function listOrgGames(
 
 	if (!response.ok) {
 		return { games: [] }
+	}
+
+	return response.json()
+}
+
+// ---------------------------------------------------------------------------
+// External Auth
+// ---------------------------------------------------------------------------
+
+export async function getExternalProviders(): Promise<ExternalProvider[]> {
+	const response = await queryAPI('/external-auth/providers')
+
+	if (!response.ok) {
+		return []
+	}
+
+	return response.json()
+}
+
+export async function getLinkedAccounts(): Promise<LinkedAccount[]> {
+	const response = await queryAPI('/external-auth/accounts', {
+		isAuthenticated: true,
+	})
+
+	if (!response.ok) {
+		return []
+	}
+
+	return response.json()
+}
+
+export async function authorizeExternal(
+	pluginId: string,
+	redirectUri: string,
+): Promise<AuthorizeResponse> {
+	const params = new URLSearchParams({ redirect_uri: redirectUri })
+	const response = await queryAPI(
+		`/external-auth/${pluginId}/authorize?${params}`,
+		{ isAuthenticated: true },
+	)
+
+	if (!response.ok) {
+		const errorBody = await response.text()
+		throw new Error(
+			`authorizeExternal failed (${response.status}): ${errorBody}`,
+		)
+	}
+
+	return response.json()
+}
+
+export async function syncExternal(pluginId: string): Promise<SyncResponse> {
+	const response = await queryAPI(`/external-auth/${pluginId}/sync`, {
+		isAuthenticated: true,
+		method: 'POST',
+	})
+
+	if (!response.ok) {
+		const errorBody = await response.text()
+		throw new Error(
+			`syncExternal failed (${response.status}): ${errorBody}`,
+		)
+	}
+
+	return response.json()
+}
+
+export async function unlinkExternal(
+	pluginId: string,
+): Promise<UnlinkResponse> {
+	const response = await queryAPI(`/external-auth/${pluginId}/unlink`, {
+		isAuthenticated: true,
+		method: 'POST',
+	})
+
+	if (!response.ok) {
+		const errorBody = await response.text()
+		throw new Error(
+			`unlinkExternal failed (${response.status}): ${errorBody}`,
+		)
 	}
 
 	return response.json()

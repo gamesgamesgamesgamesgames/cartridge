@@ -2,21 +2,11 @@
 
 // Module imports
 import { format } from 'date-fns'
-import { useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 
 // Local imports
 import { type Release } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
-import {
-	Timeline,
-	TimelineConnector,
-	TimelineContent,
-	TimelineDescription,
-	TimelineDot,
-	TimelineHeader,
-	TimelineItem,
-	TimelineTime,
-	TimelineTitle,
-} from '@/components/ui/timeline'
+import { cn } from '@/lib/utils'
 
 // Constants
 const REGIONS: Record<string, string> = {
@@ -116,6 +106,8 @@ function getSortDate(
 
 export function ReleaseTimeline(props: Props) {
 	const { releases } = props
+	const scrollerRef = useRef<HTMLDivElement>(null)
+	const contentRef = useRef<HTMLDivElement>(null)
 
 	// Flatten releases into timeline events, sort by date, then group by date
 	const dateGroups = useMemo<DateGroup[]>(() => {
@@ -172,7 +164,7 @@ export function ReleaseTimeline(props: Props) {
 		return Array.from(groupedMap.values())
 	}, [releases])
 
-	// Find the index of the most recent past release (for activeIndex)
+	// Find the index of the most recent past release
 	const activeIndex = useMemo(() => {
 		const now = new Date()
 		let lastPastIndex = -1
@@ -184,7 +176,15 @@ export function ReleaseTimeline(props: Props) {
 			}
 		}
 
-		return lastPastIndex >= 0 ? lastPastIndex : undefined
+		return lastPastIndex >= 0 ? lastPastIndex : dateGroups.length - 1
+	}, [dateGroups])
+
+	// Scroll to show the most recent item on mount
+	useEffect(() => {
+		if (scrollerRef.current) {
+			// Scroll to the right to show the most recent item
+			scrollerRef.current.scrollLeft = scrollerRef.current.scrollWidth
+		}
 	}, [dateGroups])
 
 	if (dateGroups.length === 0) {
@@ -198,36 +198,94 @@ export function ReleaseTimeline(props: Props) {
 	}
 
 	return (
-		<Timeline
-			activeIndex={activeIndex}
-			className={'gap-0'}>
-			{dateGroups.map((group) => (
-				<TimelineItem
-					key={group.displayDate}
-					className={'pr-10'}>
-					<TimelineDot />
-					<TimelineConnector />
-					<div className={'flex flex-col gap-4'}>
-						<TimelineTime
-							className={'whitespace-nowrap'}
-							dateTime={group.dateTime}>
-							{group.displayDate}
-						</TimelineTime>
+		<div className={'relative w-[100vw] -ml-[calc((100vw-100%)/2)]'}>
+			{/* Scrollable container */}
+			<div
+				ref={scrollerRef}
+				className={'overflow-x-auto scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent'}>
+				{/* Content wrapper with min-width to allow centering when content is narrow */}
+				<div className={'flex min-w-full'}>
+					{/* Left spacer - fills remaining space, pushes content right */}
+					<div className={'flex-1'} />
 
-						{group.events.map((event) => (
-							<TimelineContent key={event.id}>
-								<TimelineHeader>
-									<TimelineTitle className={'whitespace-nowrap'}>
-										{event.platform}
-									</TimelineTitle>
-								</TimelineHeader>
+					{/* Timeline content - right padding matches container edge */}
+					<div
+						ref={contentRef}
+						className={'relative flex items-start py-4 pr-4 mr-[max(0px,calc((100vw-72rem)/2))]'}>
+						{/* Through line - extends from left edge of viewport to the last dot */}
+						<div
+							className={'absolute top-[calc(1rem+0.4375rem)] h-0.5 bg-border'}
+							style={{
+								left: '-100vw',
+								right: 'calc(0.4375rem)',
+							}}
+							aria-hidden="true"
+						/>
+						{/* Active portion of the line - from left edge to active dot */}
+						{activeIndex >= 0 && (
+							<div
+								className={'absolute top-[calc(1rem+0.4375rem)] h-0.5 bg-primary transition-all'}
+								style={{
+									left: '-100vw',
+									width: `calc(100vw + ${(activeIndex / Math.max(dateGroups.length - 1, 1)) * 100}% + 0.4375rem)`,
+								}}
+								aria-hidden="true"
+							/>
+						)}
 
-								<TimelineDescription>{`${event.status} - ${event.region}`}</TimelineDescription>
-							</TimelineContent>
-						))}
+						{dateGroups.map((group, index) => {
+							const isPast = group.sortDate && group.sortDate <= new Date()
+							const isActive = index === activeIndex
+							const isLast = index === dateGroups.length - 1
+
+							return (
+								<div
+									key={group.displayDate}
+									className={cn(
+										'relative flex flex-col items-center',
+										!isLast && 'pr-8 md:pr-12',
+									)}>
+									{/* Dot */}
+									<div
+										className={cn(
+											'relative z-10 size-3.5 rounded-full border-2 bg-background shrink-0',
+											isPast || isActive ? 'border-primary' : 'border-border',
+										)}
+									/>
+
+									{/* Content */}
+									<div className={'mt-3 flex flex-col items-center text-center min-w-[120px]'}>
+										<time
+											dateTime={group.dateTime}
+											className={cn(
+												'text-xs font-medium whitespace-nowrap',
+												isActive ? 'text-primary' : 'text-muted-foreground',
+											)}>
+											{group.displayDate}
+										</time>
+
+										<div className={'mt-2 flex flex-col gap-2'}>
+											{group.events.map((event) => (
+												<div
+													key={event.id}
+													className={'text-sm'}>
+													<div className={'font-semibold whitespace-nowrap'}>
+														{event.platform}
+													</div>
+													<div className={'text-muted-foreground text-xs whitespace-nowrap'}>
+														{event.status}
+														{event.region !== 'Worldwide' && ` — ${event.region}`}
+													</div>
+												</div>
+											))}
+										</div>
+									</div>
+								</div>
+							)
+						})}
 					</div>
-				</TimelineItem>
-			))}
-		</Timeline>
+				</div>
+			</div>
+		</div>
 	)
 }

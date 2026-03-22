@@ -15,6 +15,8 @@ type Props = Readonly<{
 }>
 
 function getFirstReleaseDate(game: GameFeedGame): string | undefined {
+	if (game.firstReleaseDate) return game.firstReleaseDate
+
 	let earliest: string | undefined
 	for (const release of game.releases ?? []) {
 		for (const rd of release.releaseDates ?? []) {
