@@ -56,7 +56,7 @@ export function SiteHeader() {
 							/>
 							<input
 								type={'search'}
-								placeholder={'Search games, studios, and players...'}
+								placeholder={'Search games...'}
 								value={query}
 								onChange={handleChange}
 								autoFocus={isSearchPage}

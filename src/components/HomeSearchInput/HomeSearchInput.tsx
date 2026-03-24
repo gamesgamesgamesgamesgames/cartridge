@@ -29,7 +29,7 @@ export function HomeSearchInput() {
 				<input
 					autoFocus
 					type={'search'}
-					placeholder={'Search games, studios, and players...'}
+					placeholder={'Search games...'}
 					onChange={handleChange}
 					className={
 						'w-full rounded-xl border border-input bg-background px-12 py-4 text-base placeholder:text-muted-foreground shadow-sm ring-0 ring-ring transition-[box-shadow,color] duration-500 focus-visible:outline-none focus-visible:ring-2'
