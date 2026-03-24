@@ -8,14 +8,12 @@ export const metadata = {
 }
 
 export default async function BrowsePage() {
-	const [hotGames, upcomingData, recentGames] =
+	const [hotGames, { feed: upcomingGames }, recentGames] =
 		await Promise.all([
 			API.getHotGames(20),
 			API.getUpcomingReleases(20),
 			API.getRecentlyUpdatedGames(20),
 		])
-
-	const upcomingGames = upcomingData.feed.map((item) => item.game)
 
 	return (
 		<div className={'flex flex-col gap-12 py-8'}>

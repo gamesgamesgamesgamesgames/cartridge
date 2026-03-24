@@ -13,6 +13,7 @@ import {
 } from 'react'
 
 import { BoxArt } from '@/components/BoxArt/BoxArt'
+import { SuggestedQueries } from '@/components/HomeSearchInput/SuggestedQueries'
 import { Button } from '@/components/ui/button'
 import {
 	Collapsible,
@@ -295,7 +296,7 @@ function SearchPageContent() {
 	const activeFilterCount = genres.length + themes.length + modes.length + playerPerspectives.length + ageRatings.length
 
 	const hasFilters = activeFilterCount > 0
-	const { results, totalResults, cursor, isLoading, loadMore } = useSearch(query, {
+	const { results, totalResults, cursor, isLoading, loadMore, cancelAll } = useSearch(query, {
 		limit: 25,
 		types: SEARCH_TYPES,
 		applicationTypes,
@@ -721,6 +722,7 @@ function SearchPageContent() {
 										exit={'search-result-exit'}>
 										<Link
 											href={gameHref}
+											onClick={cancelAll}
 											className={'block'}>
 											<TiltCard>
 												<BoxArt gameRecord={item} />
@@ -766,9 +768,12 @@ function SearchPageContent() {
 				)}
 
 				{!query.trim() && !hasFilters && (
-					<p className={'py-12 text-center text-muted-foreground'}>
-						Start typing to search
-					</p>
+					<div className={'flex flex-col items-center gap-4 py-12'}>
+						<p className={'text-center text-muted-foreground'}>
+							Start typing to search, or try one of these:
+						</p>
+						<SuggestedQueries />
+					</div>
 				)}
 			</main>
 

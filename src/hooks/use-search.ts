@@ -28,13 +28,22 @@ export function useSearch(
 	const [totalResults, setTotalResults] = useState<number | undefined>(undefined)
 	const [cursor, setCursor] = useState<string | undefined>(undefined)
 	const [isLoading, setIsLoading] = useState(false)
-	const seqRef = useRef(0)
-	const lastRenderedSeqRef = useRef(0)
+	const abortRef = useRef<AbortController | null>(null)
+	const loadMoreAbortRef = useRef<AbortController | null>(null)
+
+	// Cancel all in-flight search requests (primary + loadMore)
+	const cancelAll = () => {
+		abortRef.current?.abort()
+		abortRef.current = null
+		loadMoreAbortRef.current?.abort()
+		loadMoreAbortRef.current = null
+	}
 
 	useEffect(() => {
+		// Cancel any previous request
+		cancelAll()
+
 		if (query.length < minLength) {
-			seqRef.current++
-			lastRenderedSeqRef.current = seqRef.current
 			setResults([])
 			setTotalResults(undefined)
 			setCursor(undefined)
@@ -42,14 +51,14 @@ export function useSearch(
 			return
 		}
 
-		const seq = ++seqRef.current
+		const controller = new AbortController()
+		abortRef.current = controller
 
 		setIsLoading(true)
 
-		search(query, { limit, types, applicationTypes, sort, genres, themes, modes, playerPerspectives, ageRatings, includeUnrated, includeCancelled })
+		search(query, { limit, types, applicationTypes, sort, genres, themes, modes, playerPerspectives, ageRatings, includeUnrated, includeCancelled, signal: controller.signal })
 			.then((result) => {
-				if (seq > lastRenderedSeqRef.current) {
-					lastRenderedSeqRef.current = seq
+				if (!controller.signal.aborted) {
 					startTransition(() => {
 						setResults(result.results)
 						setTotalResults(result.totalResults)
@@ -57,9 +66,9 @@ export function useSearch(
 					})
 				}
 			})
-			.catch(() => {
-				if (seq > lastRenderedSeqRef.current) {
-					lastRenderedSeqRef.current = seq
+			.catch((err) => {
+				if (err instanceof DOMException && err.name === 'AbortError') return
+				if (!controller.signal.aborted) {
 					startTransition(() => {
 						setResults([])
 						setTotalResults(undefined)
@@ -68,28 +77,43 @@ export function useSearch(
 				}
 			})
 			.finally(() => {
-				if (seq >= seqRef.current) {
+				if (!controller.signal.aborted) {
 					setIsLoading(false)
 				}
 			})
+
+		return () => {
+			controller.abort()
+		}
 	}, [query, limit, types, applicationTypes, sort, genres, themes, modes, playerPerspectives, ageRatings, includeUnrated, includeCancelled, minLength])
 
 	const loadMore = () => {
 		if (!cursor || isLoading) return
 
+		// Cancel any previous loadMore request
+		loadMoreAbortRef.current?.abort()
+
+		const controller = new AbortController()
+		loadMoreAbortRef.current = controller
+
 		setIsLoading(true)
-		search(query, { limit, types, applicationTypes, sort, genres, themes, modes, playerPerspectives, ageRatings, includeUnrated, includeCancelled, cursor })
+		search(query, { limit, types, applicationTypes, sort, genres, themes, modes, playerPerspectives, ageRatings, includeUnrated, includeCancelled, cursor, signal: controller.signal })
 			.then((result) => {
-				setResults((prev) => [...prev, ...result.results])
-				setCursor(result.cursor)
+				if (!controller.signal.aborted) {
+					setResults((prev) => [...prev, ...result.results])
+					setCursor(result.cursor)
+				}
 			})
-			.catch(() => {
+			.catch((err) => {
+				if (err instanceof DOMException && err.name === 'AbortError') return
 				// keep existing results on error
 			})
 			.finally(() => {
-				setIsLoading(false)
+				if (!controller.signal.aborted) {
+					setIsLoading(false)
+				}
 			})
 	}
 
-	return { results, totalResults, cursor, isLoading, loadMore }
+	return { results, totalResults, cursor, isLoading, loadMore, cancelAll }
 }

@@ -277,6 +277,7 @@ export async function search(
 		includeUnrated?: boolean
 		includeCancelled?: boolean
 		cursor?: string
+		signal?: AbortSignal
 	} = {},
 ): Promise<PentaractAPISearchResult> {
 	const params = new URLSearchParams({ q })
@@ -321,6 +322,7 @@ export async function search(
 
 	const response = await queryAPI(
 		`/xrpc/games.gamesgamesgamesgames.search?${params}`,
+		{ signal: options.signal },
 	)
 
 	if (!response.ok) {
@@ -588,7 +590,7 @@ export async function getPersonalizedGames(
 export async function getUpcomingReleases(
 	limit = 20,
 	cursor?: string,
-): Promise<{ feed: GameFeedItem[]; cursor?: string }> {
+): Promise<{ feed: GameFeedGame[]; cursor?: string }> {
 	const params = new URLSearchParams({ limit: String(limit) })
 	if (cursor) params.set('cursor', cursor)
 
@@ -620,6 +622,55 @@ export async function getLikedGames(
 	}
 
 	return resp.json()
+}
+
+export async function getPopularGames(
+	limit: number = 20,
+): Promise<{ games: GameFeedGame[] }> {
+	const response = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.getPopularGames?limit=${limit}`,
+	)
+
+	if (!response.ok) {
+		return { games: [] }
+	}
+
+	return response.json()
+}
+
+export type PlatformStats = {
+	totalGames: number
+	totalStudios: number
+	totalReviews: number
+}
+
+export async function getStats(): Promise<PlatformStats | null> {
+	const response = await queryAPI(
+		'/xrpc/games.gamesgamesgamesgames.getStats',
+	)
+
+	if (!response.ok) {
+		return null
+	}
+
+	return response.json()
+}
+
+export type GenreCountItem = {
+	genre: string
+	count: number
+}
+
+export async function getGenreCounts(): Promise<{ genres: GenreCountItem[] }> {
+	const response = await queryAPI(
+		'/xrpc/games.gamesgamesgamesgames.getGenreCounts',
+	)
+
+	if (!response.ok) {
+		return { genres: [] }
+	}
+
+	return response.json()
 }
 
 // ---------------------------------------------------------------------------
