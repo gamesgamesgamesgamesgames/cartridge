@@ -29,13 +29,12 @@ export function useSearch(
 	const [cursor, setCursor] = useState<string | undefined>(undefined)
 	const [isLoading, setIsLoading] = useState(false)
 	const seqRef = useRef(0)
-	const controllersRef = useRef<Map<number, { controller: AbortController; query: string }>>(new Map())
+	const controllersRef = useRef<Map<number, AbortController>>(new Map())
 	const loadMoreAbortRef = useRef<AbortController | null>(null)
 
 	// Cancel all in-flight search requests (primary + loadMore)
 	const cancelAll = () => {
-		for (const [, { controller, query: q }] of controllersRef.current) {
-			console.log(`[search] cancelling query: "${q}"`)
+		for (const controller of controllersRef.current.values()) {
 			controller.abort()
 		}
 		controllersRef.current.clear()
@@ -45,10 +44,9 @@ export function useSearch(
 
 	// Cancel all requests older than the given sequence number
 	const cancelOlderThan = (seq: number) => {
-		for (const [s, { controller, query: q }] of controllersRef.current) {
+		for (const [s, controller] of controllersRef.current) {
 			if (s < seq) {
-				console.log(`[search] cancelling query: "${q}"`)
-				controller.abort()
+					controller.abort()
 				controllersRef.current.delete(s)
 			}
 		}
@@ -67,9 +65,8 @@ export function useSearch(
 
 		const seq = ++seqRef.current
 		const controller = new AbortController()
-		controllersRef.current.set(seq, { controller, query })
+		controllersRef.current.set(seq, controller)
 
-		console.log(`[search] starting query: "${query}"`)
 		setIsLoading(true)
 
 		search(query, { limit, types, applicationTypes, sort, genres, themes, modes, playerPerspectives, ageRatings, includeUnrated, includeCancelled, signal: controller.signal })
