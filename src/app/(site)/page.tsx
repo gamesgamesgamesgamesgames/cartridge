@@ -9,8 +9,7 @@ import { UpcomingReleases } from '@/components/UpcomingReleases/UpcomingReleases
 import * as API from '@/helpers/API'
 
 export default async function Home() {
-	const [{ feed: upcomingGames }, popularResult, statsResult, genreResult] = await Promise.all([
-		API.getUpcomingReleases(20),
+	const [popularResult, statsResult, genreResult] = await Promise.all([
 		API.getPopularGames(20),
 		API.getStats(),
 		API.getGenreCounts(),
@@ -31,7 +30,7 @@ export default async function Home() {
 				</main>
 			</div>
 
-			<UpcomingReleases games={upcomingGames} />
+			<UpcomingReleases />
 			<PopularRightNow games={popularResult.games} />
 			<GenrePills genreCounts={genreResult.genres} />
 			<StatsBar stats={statsResult} />

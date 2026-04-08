@@ -1,17 +1,18 @@
 'use client'
 
-// Module imports
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
-
 // Local imports
 import { BoxArt } from '@/components/BoxArt/BoxArt'
 import { Container } from '@/components/Container/Container'
 import { Header } from '@/components/Header/Header'
 import { TiltCard } from '@/components/TiltCard/TiltCard'
 import { Scroller } from '@/components/ui/scroller'
-import * as API from '@/helpers/API'
 import { type GameFeedGame } from '@/helpers/API'
+import Link from 'next/link'
+
+// Types
+type Props = Readonly<{
+	games: GameFeedGame[]
+}>
 
 function getFirstReleaseDate(game: GameFeedGame): string | undefined {
 	if (game.firstReleaseDate) return game.firstReleaseDate
@@ -52,25 +53,18 @@ function formatReleaseDate(date: string): string {
 	return date
 }
 
-export function UpcomingReleases() {
-	const [games, setGames] = useState<GameFeedGame[]>([])
-
-	useEffect(() => {
-		const now = API.getLocalNow()
-		API.getUpcomingReleases(20, undefined, now).then((result) => {
-			setGames(result.feed)
-		})
-	}, [])
+export function RecentlyReleased(props: Props) {
+	const { games } = props
 
 	if (games.length === 0) return null
 
 	return (
-		<section className={'bg-secondary pb-12'}>
-			<Container className={'-mt-30'}>
+		<section>
+			<Container>
 				<Header
 					className={'mb-6'}
 					level={3}>
-					{'Upcoming Releases'}
+					{'Recently Released'}
 				</Header>
 
 				<Scroller

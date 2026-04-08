@@ -32,6 +32,17 @@ import {
 // Constants
 const API_URL = process.env.NEXT_PUBLIC_HAPPYVIEW_URL!
 
+/**
+ * Returns the current local date as a YYYYMMDD string based on the browser's timezone.
+ */
+export function getLocalNow(): string {
+	const now = new Date()
+	const y = now.getFullYear()
+	const m = String(now.getMonth() + 1).padStart(2, '0')
+	const d = String(now.getDate()).padStart(2, '0')
+	return `${y}${m}${d}`
+}
+
 // ---------------------------------------------------------------------------
 // Core
 // ---------------------------------------------------------------------------
@@ -590,12 +601,34 @@ export async function getPersonalizedGames(
 export async function getUpcomingReleases(
 	limit = 20,
 	cursor?: string,
+	now?: string,
 ): Promise<{ feed: GameFeedGame[]; cursor?: string }> {
 	const params = new URLSearchParams({ limit: String(limit) })
 	if (cursor) params.set('cursor', cursor)
+	if (now) params.set('now', now)
 
 	const resp = await queryAPI(
 		`/xrpc/games.gamesgamesgamesgames.feed.getUpcomingReleasesFeed?${params}`,
+	)
+
+	if (!resp.ok) {
+		return { feed: [] }
+	}
+
+	return resp.json()
+}
+
+export async function getRecentlyReleased(
+	limit = 20,
+	cursor?: string,
+	now?: string,
+): Promise<{ feed: GameFeedGame[]; cursor?: string }> {
+	const params = new URLSearchParams({ limit: String(limit) })
+	if (cursor) params.set('cursor', cursor)
+	if (now) params.set('now', now)
+
+	const resp = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.feed.getRecentlyReleasedFeed?${params}`,
 	)
 
 	if (!resp.ok) {

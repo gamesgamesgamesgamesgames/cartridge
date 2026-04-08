@@ -1,38 +1,14 @@
 // Local imports
-import * as API from '@/helpers/API'
-import { FeedSection } from '@/components/BrowsePage/FeedSection'
-import { PersonalizedFeedSection } from '@/components/BrowsePage/PersonalizedFeedSection'
+import { BrowseFeedSections } from '@/components/BrowsePage/BrowseFeedSections'
 
 export const metadata = {
 	title: 'Browse Games',
 }
 
-export default async function BrowsePage() {
-	const [hotGames, { feed: upcomingGames }, recentGames] =
-		await Promise.all([
-			API.getHotGames(20),
-			API.getUpcomingReleases(20),
-			API.getRecentlyUpdatedGames(20),
-		])
-
+export default function BrowsePage() {
 	return (
 		<div className={'flex flex-col gap-12 py-8'}>
-			<PersonalizedFeedSection />
-
-			<FeedSection
-				title={'Hot This Week'}
-				games={hotGames}
-			/>
-
-			<FeedSection
-				title={'Upcoming'}
-				games={upcomingGames}
-			/>
-
-			<FeedSection
-				title={'Recently Updated'}
-				games={recentGames}
-			/>
+			<BrowseFeedSections />
 		</div>
 	)
 }
