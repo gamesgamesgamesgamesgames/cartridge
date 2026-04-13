@@ -8,12 +8,13 @@ import { type $InputBody as ActorProfileInput } from '@/helpers/lexicons/games/g
 import { type $InputBody as OrgProfileInput } from '@/helpers/lexicons/games/gamesgamesgamesgames/org/putProfile.defs'
 import { type MediaItem } from '@/typedefs/MediaItem'
 import { type PopfeedReview } from '@/helpers/lexicons/games/gamesgamesgamesgames/getReviews.defs'
-import { type ClaimView, type ReviewView } from '@/helpers/lexicons/games/gamesgamesgamesgames/getClaim.defs'
+import {
+	type ClaimView,
+	type ReviewView,
+} from '@/helpers/lexicons/games/gamesgamesgamesgames/getClaim.defs'
 import { type GameSummaryView } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 import { type MigrationResult } from '@/helpers/lexicons/games/gamesgamesgamesgames/migrateClaim.defs'
-import {
-	type ContributionView,
-} from '@/helpers/lexicons/games/gamesgamesgamesgames/getContribution.defs'
+import { type ContributionView } from '@/helpers/lexicons/games/gamesgamesgamesgames/getContribution.defs'
 import {
 	type ContributionStats,
 	type Badge,
@@ -38,7 +39,7 @@ import {
 
 // Constants
 const API_URL = process.env.NEXT_PUBLIC_HAPPYVIEW_URL!
-const CLIENT_KEY = process.env.NEXT_PUBLIC_CLIENT_KEY
+const CLIENT_KEY = process.env.NEXT_PUBLIC_HAPPYVIEW_CLIENT_KEY
 
 /**
  * Returns the current local date as a YYYYMMDD string based on the browser's timezone.
@@ -201,7 +202,9 @@ export type GetGameQuery = (
 	includeActorCredits?: boolean
 }
 
-export async function getGame(query: GetGameQuery): Promise<GameRecord | undefined> {
+export async function getGame(
+	query: GetGameQuery,
+): Promise<GameRecord | undefined> {
 	const params = new URLSearchParams()
 	for (const [key, value] of Object.entries(query)) {
 		if (typeof value === 'boolean') {
@@ -382,9 +385,7 @@ export async function putActorProfile(
 
 	if (!response.ok) {
 		const errorBody = await response.text()
-		throw new Error(
-			`putActorProfile failed (${response.status}): ${errorBody}`,
-		)
+		throw new Error(`putActorProfile failed (${response.status}): ${errorBody}`)
 	}
 
 	return response.json()
@@ -404,9 +405,7 @@ export async function putOrgProfile(
 
 	if (!response.ok) {
 		const errorBody = await response.text()
-		throw new Error(
-			`putOrgProfile failed (${response.status}): ${errorBody}`,
-		)
+		throw new Error(`putOrgProfile failed (${response.status}): ${errorBody}`)
 	}
 
 	return response.json()
@@ -555,9 +554,7 @@ export async function getSimilarGames(
 	return (data.feed ?? []).map((item: GameFeedItem) => item.game)
 }
 
-export async function getHotGames(
-	limit = 20,
-): Promise<GameFeedGame[]> {
+export async function getHotGames(limit = 20): Promise<GameFeedGame[]> {
 	const params = new URLSearchParams({ limit: String(limit) })
 
 	const resp = await queryAPI(
@@ -687,9 +684,7 @@ export type PlatformStats = {
 }
 
 export async function getStats(): Promise<PlatformStats | null> {
-	const response = await queryAPI(
-		'/xrpc/games.gamesgamesgamesgames.getStats',
-	)
+	const response = await queryAPI('/xrpc/games.gamesgamesgamesgames.getStats')
 
 	if (!response.ok) {
 		return null
@@ -1116,9 +1111,7 @@ export async function syncExternal(pluginId: string): Promise<SyncResponse> {
 
 	if (!response.ok) {
 		const errorBody = await response.text()
-		throw new Error(
-			`syncExternal failed (${response.status}): ${errorBody}`,
-		)
+		throw new Error(`syncExternal failed (${response.status}): ${errorBody}`)
 	}
 
 	return response.json()
@@ -1134,9 +1127,7 @@ export async function unlinkExternal(
 
 	if (!response.ok) {
 		const errorBody = await response.text()
-		throw new Error(
-			`unlinkExternal failed (${response.status}): ${errorBody}`,
-		)
+		throw new Error(`unlinkExternal failed (${response.status}): ${errorBody}`)
 	}
 
 	return response.json()
