@@ -3,7 +3,9 @@ import { notFound } from 'next/navigation'
 import { type PropsWithChildren } from 'react'
 
 import * as API from '@/helpers/API'
+import { OrgProfileLayoutContent } from '@/components/OrgProfilePage/OrgProfileLayoutContent'
 import { ProfileLayoutContent } from '@/components/ProfilePage/ProfileLayoutContent'
+import { type OrgProfileDetailView } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 
 type Props = Readonly<
 	PropsWithChildren<{
@@ -35,6 +37,15 @@ export default async function ProfileLayout(props: Props) {
 
 	const result = await API.getProfileByHandle(handle)
 	if (!result.profile || !result.profileType) notFound()
+
+	if (result.profileType === 'org') {
+		return (
+			<OrgProfileLayoutContent
+				handle={result.handle ?? handle}
+				profile={result.profile as OrgProfileDetailView}
+			/>
+		)
+	}
 
 	return (
 		<ProfileLayoutContent

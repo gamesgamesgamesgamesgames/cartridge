@@ -13,7 +13,7 @@ export type MeResponse = {
 }
 
 // Public API
-export async function loginWithRedirect(handle?: string, returnUrl?: string) {
+export async function loginWithRedirect(handle?: string, returnUrl?: string, scope?: string) {
 	// Store the page to return to after login
 	let destination = returnUrl ?? window.location.pathname + window.location.search
 	if (destination.startsWith('/login') || destination.startsWith('/callback')) {
@@ -26,8 +26,18 @@ export async function loginWithRedirect(handle?: string, returnUrl?: string) {
 
 	const params = new URLSearchParams()
 	params.set('redirect_uri', callbackUrl)
+
+	// Only pass client_id when the origin is publicly reachable. ATProto OAuth
+	// requires the PDS to fetch the client_id URL, which fails for localhost.
+	const isLocal = /^https?:\/\/(localhost|127\.0\.0\.1)(:|$)/.test(window.location.origin)
+	if (!isLocal) {
+		params.set('client_id', `${window.location.origin}/oauth-client-metadata.json`)
+	}
 	if (handle) {
 		params.set('handle', handle)
+	}
+	if (scope) {
+		params.set('scope', scope)
 	}
 
 	const response = await fetch(`${API_URL}/auth/login?${params}`, {

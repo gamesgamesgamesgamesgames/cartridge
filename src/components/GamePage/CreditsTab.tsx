@@ -1,3 +1,6 @@
+// Module imports
+import Link from 'next/link'
+
 // Local imports
 import {
 	type ActorCreditView,
@@ -105,25 +108,37 @@ export function CreditsTab(props: Props) {
 					id={'credits-companies'}
 					title={'Companies'}>
 					<div className={'flex flex-col gap-4'}>
-						{orgCredits.map((org) => (
-							<div
-								key={org.uri}
-								className={'flex items-center gap-3'}>
-								<span className={'font-medium'}>
-									{org.displayName ?? 'Unknown'}
-								</span>
+						{orgCredits.map((org) => {
+							const did = org.orgUri?.match(/^at:\/\/([^/]+)\//)?.[1]
 
-								<div className={'flex flex-wrap gap-1.5'}>
-									{org.roles.map((role) => (
-										<span
-											key={role}
-											className={'rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium'}>
-											{getCompanyRoleLabel(role)}
+							return (
+								<div
+									key={org.uri}
+									className={'flex items-center gap-3'}>
+									{did ? (
+										<Link
+											href={`/profile/${did}`}
+											className={'font-medium text-primary hover:underline'}>
+											{org.displayName ?? 'Unknown'}
+										</Link>
+									) : (
+										<span className={'font-medium'}>
+											{org.displayName ?? 'Unknown'}
 										</span>
-									))}
+									)}
+
+									<div className={'flex flex-wrap gap-1.5'}>
+										{org.roles.map((role) => (
+											<span
+												key={role}
+												className={'rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium'}>
+												{getCompanyRoleLabel(role)}
+											</span>
+										))}
+									</div>
 								</div>
-							</div>
-						))}
+							)
+						})}
 					</div>
 				</SectionHeader>
 			)}

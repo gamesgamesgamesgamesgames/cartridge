@@ -41,7 +41,7 @@ export function LoginPage() {
 		const formData = new FormData(event.currentTarget)
 		const handle = formData.get('handle') as string
 		const returnTo = searchParams.get('returnTo') ?? undefined
-		loginWithRedirect(handle || undefined, returnTo)
+		loginWithRedirect(handle || undefined, returnTo, 'atproto include:games.gamesgamesgamesgames.authBasic')
 	}, [searchParams])
 
 	return (

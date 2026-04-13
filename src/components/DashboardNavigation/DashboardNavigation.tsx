@@ -7,6 +7,7 @@ import {
 	faClipboardList,
 	faGamepad,
 	faGavel,
+	faHandshake,
 	faPeopleGroup,
 	faStar,
 	faStore,
@@ -154,6 +155,15 @@ export function DashboardNavigation() {
 								</Link>
 							</SidebarMenuButton>
 						</SidebarMenuItem>
+
+						<SidebarMenuItem>
+							<SidebarMenuButton asChild>
+								<Link href={'/dashboard/contributions'}>
+									<FontAwesomeIcon icon={faHandshake} />
+									<span>{'My Contributions'}</span>
+								</Link>
+							</SidebarMenuButton>
+						</SidebarMenuItem>
 					</SidebarGroupContent>
 				</SidebarGroup>
 
@@ -166,6 +176,15 @@ export function DashboardNavigation() {
 									<Link href={'/dashboard/admin/claims'}>
 										<FontAwesomeIcon icon={faGavel} />
 										<span>{'Claims'}</span>
+									</Link>
+								</SidebarMenuButton>
+							</SidebarMenuItem>
+
+							<SidebarMenuItem>
+								<SidebarMenuButton asChild>
+									<Link href={'/dashboard/admin/contributions'}>
+										<FontAwesomeIcon icon={faHandshake} />
+										<span>{'Contributions'}</span>
 									</Link>
 								</SidebarMenuButton>
 							</SidebarMenuItem>

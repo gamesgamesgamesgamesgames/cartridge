@@ -35,6 +35,7 @@ import { type GameFeedGame } from '@/helpers/API'
 import { type GameRecord } from '@/typedefs/GameRecord'
 import { type PopfeedReview } from '@/helpers/lexicons/games/gamesgamesgamesgames/getReviews.defs'
 import { SimilarGames } from '@/components/GamePage/SimilarGames'
+import { SuggestEditButton } from '@/components/GamePage/SuggestEditButton'
 import Link from 'next/link'
 
 type CollectionWithGames = {
@@ -171,6 +172,9 @@ export function GameLayoutContent(props: Props) {
 									initialCount={likes.count}
 									initialLiked={likes.liked}
 								/>
+								{gameRecord.slug && (
+									<SuggestEditButton slug={gameRecord.slug} />
+								)}
 							</div>
 						</div>
 

@@ -11,6 +11,13 @@ import { type PopfeedReview } from '@/helpers/lexicons/games/gamesgamesgamesgame
 import { type ClaimView, type ReviewView } from '@/helpers/lexicons/games/gamesgamesgamesgames/getClaim.defs'
 import { type GameSummaryView } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 import { type MigrationResult } from '@/helpers/lexicons/games/gamesgamesgamesgames/migrateClaim.defs'
+import {
+	type ContributionView,
+} from '@/helpers/lexicons/games/gamesgamesgamesgames/getContribution.defs'
+import {
+	type ContributionStats,
+	type Badge,
+} from '@/helpers/lexicons/games/gamesgamesgamesgames/getContributionStats.defs'
 import { type PentaractAPICreateGameOptions } from '@/typedefs/PentaractAPICreateGameOptions'
 import { type PentaractAPICreateProfileResult } from '@/typedefs/PentaractAPICreateProfileResult'
 import { type PentaractAPIGetBlueskyProfileResult } from '@/typedefs/PentaractAPIGetBlueskyProfileResult'
@@ -31,6 +38,7 @@ import {
 
 // Constants
 const API_URL = process.env.NEXT_PUBLIC_HAPPYVIEW_URL!
+const CLIENT_KEY = process.env.NEXT_PUBLIC_CLIENT_KEY
 
 /**
  * Returns the current local date as a YYYYMMDD string based on the browser's timezone.
@@ -51,6 +59,7 @@ async function queryAPI(path: string, options: PentaractAPIQueryOptions = {}) {
 	const { isAuthenticated = false, ...fetchOptions } = options
 	const headers: Record<string, string> = {
 		'Content-Type': 'application/json',
+		...(CLIENT_KEY ? { 'X-Client-Key': CLIENT_KEY } : {}),
 		...(fetchOptions.headers as Record<string, string>),
 	}
 
@@ -872,6 +881,182 @@ export async function listOrgGames(
 
 	if (!response.ok) {
 		return { games: [] }
+	}
+
+	return response.json()
+}
+
+export async function getOrgDevelopedFeed(
+	org: string,
+	options?: { limit?: number; cursor?: string },
+): Promise<{ feed: GameFeedItem[]; cursor?: string }> {
+	const params = new URLSearchParams({ org })
+	if (options?.limit) params.set('limit', String(options.limit))
+	if (options?.cursor) params.set('cursor', options.cursor)
+
+	const response = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.feed.getOrgDevelopedFeed?${params}`,
+	)
+
+	if (!response.ok) {
+		return { feed: [] }
+	}
+
+	return response.json()
+}
+
+export async function getOrgPublishedFeed(
+	org: string,
+	options?: { limit?: number; cursor?: string },
+): Promise<{ feed: GameFeedItem[]; cursor?: string }> {
+	const params = new URLSearchParams({ org })
+	if (options?.limit) params.set('limit', String(options.limit))
+	if (options?.cursor) params.set('cursor', options.cursor)
+
+	const response = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.feed.getOrgPublishedFeed?${params}`,
+	)
+
+	if (!response.ok) {
+		return { feed: [] }
+	}
+
+	return response.json()
+}
+
+// ---------------------------------------------------------------------------
+// Contributions
+// ---------------------------------------------------------------------------
+
+export type { ContributionView, ContributionStats, Badge }
+
+export async function createContribution(input: {
+	subject?: string
+	contributionType: 'correction' | 'addition' | 'newGame'
+	changes: Record<string, unknown>
+	message?: string
+}): Promise<string> {
+	const response = await queryAPI(
+		'/xrpc/games.gamesgamesgamesgames.createContribution',
+		{
+			isAuthenticated: true,
+			method: 'POST',
+			body: JSON.stringify(input),
+		},
+	)
+
+	if (!response.ok) {
+		const errorBody = await response.text()
+		throw new Error(
+			`createContribution failed (${response.status}): ${errorBody}`,
+		)
+	}
+
+	const data = await response.json()
+	return data.uri as string
+}
+
+export async function reviewContribution(input: {
+	contribution: { uri: string; cid: string }
+	status: 'approved' | 'denied' | 'needsRevision'
+	reason?: string
+}): Promise<string> {
+	const response = await queryAPI(
+		'/xrpc/games.gamesgamesgamesgames.reviewContribution',
+		{
+			isAuthenticated: true,
+			method: 'POST',
+			body: JSON.stringify(input),
+		},
+	)
+
+	if (!response.ok) {
+		const errorBody = await response.text()
+		throw new Error(
+			`reviewContribution failed (${response.status}): ${errorBody}`,
+		)
+	}
+
+	const data = await response.json()
+	return data.uri as string
+}
+
+export async function acceptContribution(input: {
+	patch: string
+}): Promise<string> {
+	const response = await queryAPI(
+		'/xrpc/games.gamesgamesgamesgames.acceptContribution',
+		{
+			isAuthenticated: true,
+			method: 'POST',
+			body: JSON.stringify(input),
+		},
+	)
+
+	if (!response.ok) {
+		const errorBody = await response.text()
+		throw new Error(
+			`acceptContribution failed (${response.status}): ${errorBody}`,
+		)
+	}
+
+	const data = await response.json()
+	return data.uri as string
+}
+
+export async function getContribution(
+	uri: string,
+): Promise<ContributionView | null> {
+	const params = new URLSearchParams({ uri })
+	const response = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.getContribution?${params}`,
+		{ isAuthenticated: true },
+	)
+
+	if (!response.ok) {
+		return null
+	}
+
+	const data = await response.json()
+	return data.contribution as ContributionView
+}
+
+export async function listContributions(options?: {
+	status?: 'pending' | 'approved' | 'denied' | 'needsRevision'
+	subject?: string
+	contributor?: string
+	limit?: number
+	cursor?: string
+}): Promise<{ contributions: ContributionView[]; cursor?: string }> {
+	const params = new URLSearchParams()
+	if (options?.status) params.set('status', options.status)
+	if (options?.subject) params.set('subject', options.subject)
+	if (options?.contributor) params.set('contributor', options.contributor)
+	if (options?.limit) params.set('limit', String(options.limit))
+	if (options?.cursor) params.set('cursor', options.cursor)
+
+	const response = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.listContributions?${params}`,
+		{ isAuthenticated: true },
+	)
+
+	if (!response.ok) {
+		return { contributions: [] }
+	}
+
+	return response.json()
+}
+
+export async function getContributionStats(
+	did: string,
+): Promise<{ stats: ContributionStats; badges: Badge[] } | null> {
+	const params = new URLSearchParams({ did })
+	const response = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.getContributionStats?${params}`,
+	)
+
+	if (!response.ok) {
+		return null
 	}
 
 	return response.json()
