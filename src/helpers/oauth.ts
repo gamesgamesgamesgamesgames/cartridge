@@ -3,8 +3,13 @@ import { store } from '@/store/store'
 
 // Constants
 const API_URL = process.env.NEXT_PUBLIC_HAPPYVIEW_URL!
+const CLIENT_KEY = process.env.NEXT_PUBLIC_HAPPYVIEW_CLIENT_KEY
 const RETURN_URL_KEY = 'pentaract_return_url'
 const PENDING_LIKE_KEY = 'pentaract_pending_like'
+
+const clientKeyHeader: Record<string, string> = CLIENT_KEY
+	? { 'X-Client-Key': CLIENT_KEY }
+	: {}
 
 // Types
 export type MeResponse = {
@@ -42,6 +47,7 @@ export async function loginWithRedirect(handle?: string, returnUrl?: string, sco
 
 	const response = await fetch(`${API_URL}/auth/login?${params}`, {
 		credentials: 'include',
+		headers: clientKeyHeader,
 	})
 
 	if (!response.ok) {
@@ -56,6 +62,7 @@ export async function getMe(): Promise<MeResponse | null> {
 	try {
 		const response = await fetch(`${API_URL}/auth/me`, {
 			credentials: 'include',
+			headers: clientKeyHeader,
 		})
 
 		if (!response.ok) {
@@ -92,6 +99,7 @@ export async function logout() {
 	await fetch(`${API_URL}/auth/logout`, {
 		method: 'POST',
 		credentials: 'include',
+		headers: clientKeyHeader,
 	}).catch(() => {})
 
 	window.location.href = '/'
