@@ -3,8 +3,8 @@
 // Module imports
 import { faChevronDown } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { useCallback, useState } from 'react'
-import { useSearchParams } from 'next/navigation'
+import { useCallback, useEffect, useState } from 'react'
+import { useRouter, useSearchParams } from 'next/navigation'
 
 // Local imports
 import { Button } from '@/components/ui/button'
@@ -29,11 +29,27 @@ import {
 import { Link } from '@/components/Link/Link'
 import { Spinner } from '@/components/ui/spinner'
 import { type State } from '@/typedefs/State'
-import { loginWithRedirect } from '@/helpers/oauth'
+import { getMe, isAuthenticated, loginWithRedirect } from '@/helpers/oauth'
 
 export function LoginPage() {
+	const router = useRouter()
 	const searchParams = useSearchParams()
 	const [state, setSaveState] = useState<State>('idle')
+
+	useEffect(() => {
+		const returnTo = searchParams.get('returnTo') ?? '/'
+
+		if (isAuthenticated()) {
+			router.replace(returnTo)
+			return
+		}
+
+		getMe().then((me) => {
+			if (me) {
+				router.replace(returnTo)
+			}
+		})
+	}, [router, searchParams])
 
 	const handleSubmit = useCallback((event: React.FormEvent<HTMLFormElement>) => {
 		event.preventDefault()
