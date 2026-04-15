@@ -14,5 +14,6 @@ export function GET(request: NextRequest) {
 		grant_types: ['authorization_code', 'refresh_token'],
 		scope: 'atproto include:games.gamesgamesgamesgames.authBasic',
 		application_type: 'web',
+		dpop_bound_access_tokens: true,
 	})
 }
