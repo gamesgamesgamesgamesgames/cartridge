@@ -235,6 +235,17 @@ export function MetaTab(props: Props) {
 
 	return (
 		<>
+			<SectionHeader
+				id={'meta-at-uri'}
+				title={'AT URI'}>
+				<DataList className={'gap-x-10 gap-y-4'}>
+					<DataListLabel>{'AT URI'}</DataListLabel>
+					<DataListValue>
+						<code className={'break-all'}>{gameRecord.uri}</code>
+					</DataListValue>
+				</DataList>
+			</SectionHeader>
+
 			{hasExternalIds && (
 				<SectionHeader
 					id={'meta-external-ids'}
