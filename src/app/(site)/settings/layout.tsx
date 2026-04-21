@@ -8,7 +8,7 @@ import { type PropsWithChildren, useEffect, useState } from 'react'
 import { Container } from '@/components/Container/Container'
 import { Header } from '@/components/Header/Header'
 import { SettingsNav } from '@/components/SettingsPage/SettingsNav'
-import { getMe, isAuthenticated } from '@/helpers/oauth'
+import { isAuthenticated, restoreSession } from '@/helpers/oauth'
 
 type Props = Readonly<PropsWithChildren>
 
@@ -26,8 +26,8 @@ export default function SettingsLayout(props: Props) {
 
 		// Fall back to async check (handles cold page loads like OAuth redirects
 		// where the store hasn't been initialized yet)
-		getMe().then((me) => {
-			if (me) {
+		restoreSession().then((session) => {
+			if (session) {
 				setIsAuthed(true)
 			} else {
 				router.replace('/login?returnUrl=/settings/profile')

@@ -17,6 +17,8 @@
         "@fortawesome/free-regular-svg-icons": "^7.1.0",
         "@fortawesome/free-solid-svg-icons": "^7.1.0",
         "@fortawesome/react-fontawesome": "^3.1.1",
+        "@happyview/oauth-client": "1.0.0-dev.2",
+        "@happyview/oauth-client-browser": "1.0.0-dev.2",
         "@hookform/resolvers": "^5.2.2",
         "@next/third-parties": "^16.1.6",
         "@radix-ui/react-aspect-ratio": "^1.1.8",
@@ -229,6 +231,10 @@
     "@fortawesome/free-solid-svg-icons": ["@fortawesome/free-solid-svg-icons@7.1.0", "", { "dependencies": { "@fortawesome/fontawesome-common-types": "7.1.0" } }, "sha512-Udu3K7SzAo9N013qt7qmm22/wo2hADdheXtBfxFTecp+ogsc0caQNRKEb7pkvvagUGOpG9wJC1ViH6WXs8oXIA=="],
 
     "@fortawesome/react-fontawesome": ["@fortawesome/react-fontawesome@3.1.1", "", { "peerDependencies": { "@fortawesome/fontawesome-svg-core": "~6 || ~7", "react": "^18.0.0 || ^19.0.0" } }, "sha512-EDllr9hpodc21odmUywHS1alXNiCd4E8sp5GJ5s7wYINz8vSmMiNWpALTiuYODb865YyQ/NlyiN4mbXp7HCNqg=="],
+
+    "@happyview/oauth-client": ["@happyview/oauth-client@1.0.0-dev.2", "", {}, "sha512-UeaZNTBctHVREWKU3BPOy/pvsdUtG1WG6ljD7zyhG4/DD0pRssdOo5ysyOoiQQwQvNdY18T3JqlXXarnuHX2zA=="],
+
+    "@happyview/oauth-client-browser": ["@happyview/oauth-client-browser@1.0.0-dev.2", "", { "dependencies": { "@happyview/oauth-client": "^1.0.0-dev.2" } }, "sha512-JI0VfjDykw5R07zIYtYlsUKL5KtKz45ejD39y4C4lBrxR0MiQR/77x6nrYmQ9NlCqXQhkjao+uA4pcfADQ6ByQ=="],
 
     "@hookform/resolvers": ["@hookform/resolvers@5.2.2", "", { "dependencies": { "@standard-schema/utils": "^0.3.0" }, "peerDependencies": { "react-hook-form": "^7.55.0" } }, "sha512-A/IxlMLShx3KjV/HeTcTfaMxdwy690+L/ZADoeaTltLx+CVuzkeVIPuybK3jrRfw7YZnmdKsVVHAlEPIAEUNlA=="],
 
@@ -1447,6 +1453,8 @@
     "@eslint-community/eslint-utils/eslint-visitor-keys": ["eslint-visitor-keys@3.4.3", "", {}, "sha512-wpc+LXeiyiisxPlEkUzU6svyS1frIO3Mgxj1fdy7Pm8Ygzguax2N3Fa/D/ag1WqbOprdI+uY6wMUl8/a2G+iag=="],
 
     "@eslint/eslintrc/globals": ["globals@14.0.0", "", {}, "sha512-oahGvuMGQlPw/ivIYBjVSrWAfWLBeku5tpPE2fOPLi+WHffIWbuh2tCjhyQhTBPMf5E9jDEH4FOmTYgYwbKwtQ=="],
+
+    "@happyview/oauth-client-browser/@happyview/oauth-client": ["@happyview/oauth-client@1.0.0", "", {}, "sha512-hvVeyVHJStZ/nrqolcWfy39AJuaws0axKx7b3UvXTSi2TmnTeCJOnelnHstt0L9S6P6b7xxP8ujzvcWZsOd0Ig=="],
 
     "@radix-ui/react-accordion/@radix-ui/react-context": ["@radix-ui/react-context@1.1.2", "", { "peerDependencies": { "@types/react": "*", "react": "^16.8 || ^17.0 || ^18.0 || ^19.0 || ^19.0.0-rc" }, "optionalPeers": ["@types/react"] }, "sha512-jCi/QKUM2r1Ju5a3J64TH2A5SpKAgh0LpknyqdQ4m6DCV0xJ2HG1xARRwNGPQfi1SLdLWZ1OJz6F4OMBBNiGJA=="],
 

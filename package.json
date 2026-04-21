@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --experimental-https",
+    "dev": "next dev",
     "build": "next build",
     "build-lexicons": "lex build --lexicons ./src/lexicons --out ./src/helpers/lexicons --clear",
     "update-lexicons": "lex install --lexicons ./src/lexicons --update",
@@ -24,6 +24,8 @@
     "@fortawesome/free-regular-svg-icons": "^7.1.0",
     "@fortawesome/free-solid-svg-icons": "^7.1.0",
     "@fortawesome/react-fontawesome": "^3.1.1",
+    "@happyview/oauth-client": "1.0.0-dev.2",
+    "@happyview/oauth-client-browser": "1.0.0-dev.2",
     "@hookform/resolvers": "^5.2.2",
     "@next/third-parties": "^16.1.6",
     "@radix-ui/react-aspect-ratio": "^1.1.8",

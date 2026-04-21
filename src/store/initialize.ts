@@ -1,5 +1,5 @@
 // Local imports
-import { getMe } from '@/helpers/oauth'
+import { restoreSession } from '@/helpers/oauth'
 import { setProfileTypeCookie } from '@/helpers/setProfileTypeCookie'
 import { getUserProfile } from '@/store/actions/getUserProfile'
 import { store } from '@/store/store'
@@ -10,11 +10,10 @@ export async function initialize() {
 		return
 	}
 
-	const me = await getMe()
+	const session = await restoreSession()
 
-	if (me) {
-		// Store the DID from HappyView session
-		store.set(() => ({ authDid: me.did }))
+	if (session) {
+		store.set(() => ({ authDid: session.did }))
 
 		await getUserProfile()
 

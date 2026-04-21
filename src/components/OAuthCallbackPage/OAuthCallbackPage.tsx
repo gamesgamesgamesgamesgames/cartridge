@@ -16,7 +16,7 @@ import { getReturnUrl } from '@/helpers/oauth'
 import { loginFromCallback } from '@/store/actions/login'
 import { store } from '@/store/store'
 
-export function CallbackPage() {
+export function OAuthCallbackPage() {
 	const router = useRouter()
 
 	useEffect(() => {
@@ -29,7 +29,9 @@ export function CallbackPage() {
 					router.replace('/profile-setup')
 				}
 			})
-			.catch(() => {
+			.catch((err) => {
+				console.error('[OAuthCallback] login failed:', err)
+				alert(`OAuth callback failed: ${err?.message ?? err}\n\nStack: ${err?.stack ?? 'no stack'}`)
 				router.replace('/login')
 			})
 	}, [router])

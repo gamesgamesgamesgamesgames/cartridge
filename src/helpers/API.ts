@@ -19,6 +19,7 @@ import {
 	type ContributionStats,
 	type Badge,
 } from '@/helpers/lexicons/games/gamesgamesgamesgames/getContributionStats.defs'
+import { getSession } from '@/helpers/oauth'
 import { type PentaractAPICreateGameOptions } from '@/typedefs/PentaractAPICreateGameOptions'
 import { type PentaractAPICreateProfileResult } from '@/typedefs/PentaractAPICreateProfileResult'
 import { type PentaractAPIGetBlueskyProfileResult } from '@/typedefs/PentaractAPIGetBlueskyProfileResult'
@@ -39,7 +40,6 @@ import {
 
 // Constants
 const API_URL = process.env.NEXT_PUBLIC_HAPPYVIEW_URL!
-const CLIENT_KEY = process.env.NEXT_PUBLIC_HAPPYVIEW_CLIENT_KEY
 
 /**
  * Returns the current local date as a YYYYMMDD string based on the browser's timezone.
@@ -58,16 +58,28 @@ export function getLocalNow(): string {
 
 async function queryAPI(path: string, options: PentaractAPIQueryOptions = {}) {
 	const { isAuthenticated = false, ...fetchOptions } = options
+	const url = `${API_URL}${path}`
 	const headers: Record<string, string> = {
 		'Content-Type': 'application/json',
-		...(CLIENT_KEY ? { 'X-Client-Key': CLIENT_KEY } : {}),
 		...(fetchOptions.headers as Record<string, string>),
 	}
 
-	return fetch(`${API_URL}${path}`, {
+	const session = getSession()
+
+	if (isAuthenticated && !session) {
+		throw new Error('No authenticated session')
+	}
+
+	if (session) {
+		return session.fetchHandler(url, {
+			...fetchOptions,
+			headers,
+		})
+	}
+
+	return fetch(url, {
 		...fetchOptions,
 		headers,
-		credentials: isAuthenticated ? 'include' : 'same-origin',
 	})
 }
 

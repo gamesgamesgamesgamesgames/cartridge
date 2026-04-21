@@ -29,7 +29,7 @@ import {
 import { Link } from '@/components/Link/Link'
 import { Spinner } from '@/components/ui/spinner'
 import { type State } from '@/typedefs/State'
-import { getMe, isAuthenticated, loginWithRedirect } from '@/helpers/oauth'
+import { isAuthenticated, loginWithRedirect, restoreSession } from '@/helpers/oauth'
 
 export function LoginPage() {
 	const router = useRouter()
@@ -44,8 +44,8 @@ export function LoginPage() {
 			return
 		}
 
-		getMe().then((me) => {
-			if (me) {
+		restoreSession().then((session) => {
+			if (session) {
 				router.replace(returnTo)
 			}
 		})
@@ -57,7 +57,7 @@ export function LoginPage() {
 		const formData = new FormData(event.currentTarget)
 		const handle = formData.get('handle') as string
 		const returnTo = searchParams.get('returnTo') ?? undefined
-		loginWithRedirect(handle || undefined, returnTo, 'atproto include:games.gamesgamesgamesgames.authBasic')
+		loginWithRedirect(handle || undefined, returnTo)
 	}, [searchParams])
 
 	return (

@@ -1,4 +1,13 @@
-// Local imports
-import { CallbackPage } from '@/components/CallbackPage/CallbackPage'
+import { redirect } from 'next/navigation'
 
-export default CallbackPage
+export default function Page({
+	searchParams,
+}: {
+	searchParams: Promise<Record<string, string>>
+}) {
+	// Redirect old callback URL to new OAuth callback path
+	return searchParams.then((params) => {
+		const query = new URLSearchParams(params).toString()
+		redirect(`/oauth/callback${query ? `?${query}` : ''}`)
+	})
+}
