@@ -2,6 +2,7 @@
 
 // Module imports
 import { useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 
 // Local imports
 import {
@@ -11,12 +12,15 @@ import {
 	EmptyTitle,
 } from '@/components/ui/empty'
 import { Spinner } from '@/components/ui/spinner'
+import { restoreSession } from '@/helpers/oauth'
 import { logout } from '@/store/actions/logout'
 
 export function LogoutPage() {
+	const router = useRouter()
+
 	useEffect(() => {
-		logout()
-	}, [])
+		restoreSession().then(() => logout()).then(() => router.replace('/'))
+	}, [router])
 
 	return (
 		<div
