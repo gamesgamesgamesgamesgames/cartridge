@@ -40,6 +40,7 @@ import {
 
 // Constants
 const API_URL = process.env.NEXT_PUBLIC_HAPPYVIEW_URL!
+const CLIENT_KEY = process.env.NEXT_PUBLIC_HAPPYVIEW_CLIENT_KEY!
 
 /**
  * Returns the current local date as a YYYYMMDD string based on the browser's timezone.
@@ -61,6 +62,7 @@ async function queryAPI(path: string, options: PentaractAPIQueryOptions = {}) {
 	const url = `${API_URL}${path}`
 	const headers: Record<string, string> = {
 		'Content-Type': 'application/json',
+		'x-client-key': CLIENT_KEY,
 		...(fetchOptions.headers as Record<string, string>),
 	}
 
