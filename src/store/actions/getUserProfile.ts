@@ -1,5 +1,6 @@
 // Local imports
 import * as API from '@/helpers/API'
+import { rewriteImageUrl } from '@/helpers/rewriteImageUrl'
 import { store } from '@/store/store'
 
 export async function getUserProfile() {
@@ -22,7 +23,7 @@ export async function getUserProfile() {
 			handle: blueskyProfile?.handle,
 			displayName: profile?.displayName ?? blueskyProfile?.displayName,
 			description: profile?.description ?? blueskyProfile?.description,
-			avatarURL: blueskyProfile?.avatarURL,
+			avatarURL: rewriteImageUrl(blueskyProfile?.avatarURL),
 		},
 	}))
 }

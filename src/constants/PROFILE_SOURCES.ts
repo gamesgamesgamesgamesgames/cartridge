@@ -1,4 +1,5 @@
 import * as API from '@/helpers/API'
+import { rewriteImageUrl } from '@/helpers/rewriteImageUrl'
 import { type ProfileSource } from '@/typedefs/ProfileSource'
 
 export const PROFILE_SOURCES: ProfileSource[] = [
@@ -10,7 +11,7 @@ export const PROFILE_SOURCES: ProfileSource[] = [
 			return {
 				displayName: profile.displayName,
 				description: profile.description,
-				avatarURL: profile.avatarURL,
+				avatarURL: rewriteImageUrl(profile.avatarURL),
 				avatarBlob: profile.avatar
 					? {
 							ref: profile.avatar.$link,
