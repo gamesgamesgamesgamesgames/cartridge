@@ -1,28 +1,11 @@
-// Module imports
-import Link from 'next/link'
-
-// Local imports
 import {
 	type ActorCreditView,
-	type CompanyRole,
-	type IndividualRole,
-	type OrgCreditView,
 } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
-import { SectionHeader } from './SectionHeader'
+import { Header } from '@/components/Header/Header'
 
-// Types
 type Props = Readonly<{
-	orgCredits?: OrgCreditView[]
 	actorCredits?: ActorCreditView[]
 }>
-
-// Constants
-const COMPANY_ROLE_LABELS: Record<string, string> = {
-	developer: 'Developer',
-	publisher: 'Publisher',
-	porter: 'Porter',
-	supporter: 'Supporter',
-}
 
 const INDIVIDUAL_ROLE_ORDER: string[] = [
 	'director',
@@ -58,10 +41,6 @@ const INDIVIDUAL_ROLE_LABELS: Record<string, string> = {
 	marketing: 'Marketing',
 }
 
-function getCompanyRoleLabel(role: CompanyRole): string {
-	return COMPANY_ROLE_LABELS[role] ?? role
-}
-
 function getIndividualRoleLabel(role: string): string {
 	return INDIVIDUAL_ROLE_LABELS[role] ?? role
 }
@@ -72,9 +51,8 @@ function getRoleSortIndex(role: string): number {
 }
 
 export function CreditsTab(props: Props) {
-	const { orgCredits, actorCredits } = props
+	const { actorCredits } = props
 
-	// Group actor credits by role
 	const creditsByRole = new Map<string, string[]>()
 
 	if (actorCredits) {
@@ -89,65 +67,19 @@ export function CreditsTab(props: Props) {
 		}
 	}
 
-	// Sort roles in logical order
 	const sortedRoles = [...creditsByRole.keys()].sort(
 		(a, b) => getRoleSortIndex(a) - getRoleSortIndex(b),
 	)
 
-	const hasOrgCredits = orgCredits && orgCredits.length > 0
-	const hasActorCredits = sortedRoles.length > 0
-
-	if (!hasOrgCredits && !hasActorCredits) {
-		return null
-	}
+	if (!sortedRoles.length) return null
 
 	return (
 		<>
-			{hasOrgCredits && (
-				<SectionHeader
-					id={'credits-companies'}
-					title={'Companies'}>
-					<div className={'flex flex-col gap-4'}>
-						{orgCredits.map((org) => {
-							const did = org.orgUri?.match(/^at:\/\/([^/]+)\//)?.[1]
-
-							return (
-								<div
-									key={org.uri}
-									className={'flex items-center gap-3'}>
-									{did ? (
-										<Link
-											href={`/profile/${did}`}
-											className={'font-medium text-primary hover:underline'}>
-											{org.displayName ?? 'Unknown'}
-										</Link>
-									) : (
-										<span className={'font-medium'}>
-											{org.displayName ?? 'Unknown'}
-										</span>
-									)}
-
-									<div className={'flex flex-wrap gap-1.5'}>
-										{org.roles.map((role) => (
-											<span
-												key={role}
-												className={'rounded-full bg-muted px-2.5 py-0.5 text-xs font-medium'}>
-												{getCompanyRoleLabel(role)}
-											</span>
-										))}
-									</div>
-								</div>
-							)
-						})}
-					</div>
-				</SectionHeader>
-			)}
-
 			{sortedRoles.map((role) => (
-				<SectionHeader
-					key={role}
-					id={`credits-${role}`}
-					title={getIndividualRoleLabel(role)}>
+				<div key={role}>
+					<Header className={'mb-3 text-base'} level={4}>
+						{getIndividualRoleLabel(role)}
+					</Header>
 					<div className={'flex flex-wrap gap-x-6 gap-y-1'}>
 						{creditsByRole.get(role)!.map((name, index) => (
 							<span
@@ -157,7 +89,7 @@ export function CreditsTab(props: Props) {
 							</span>
 						))}
 					</div>
-				</SectionHeader>
+				</div>
 			))}
 		</>
 	)

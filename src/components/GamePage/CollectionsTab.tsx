@@ -1,9 +1,8 @@
 // Module imports
 import Link from 'next/link'
 
-// Local imports
 import { BoxArt } from '@/components/BoxArt/BoxArt'
-import { SectionHeader } from './SectionHeader'
+import { Header } from '@/components/Header/Header'
 
 // Types
 import type { CollectionSummaryView } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
@@ -24,10 +23,8 @@ export function CollectionsTab(props: Props) {
 	return (
 		<div className={'space-y-8'}>
 			{collections.map(({ collection, games }) => (
-				<SectionHeader
-					key={collection.uri}
-					id={`collection-${collection.slug ?? collection.uri}`}
-					title={collection.name}>
+				<div key={collection.uri}>
+					<Header className={'mb-4 text-lg'} level={4}>{collection.name}</Header>
 					<div className={'grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'}>
 						{games.map((game) => (
 							<Link
@@ -43,7 +40,7 @@ export function CollectionsTab(props: Props) {
 							</Link>
 						))}
 					</div>
-				</SectionHeader>
+				</div>
 			))}
 		</div>
 	)

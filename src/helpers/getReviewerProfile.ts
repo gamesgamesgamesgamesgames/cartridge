@@ -58,6 +58,20 @@ async function fetchRecord(
 	return response.json()
 }
 
+function extractAvatar(
+	value: Record<string, unknown>,
+	pdsEndpoint: string,
+	did: string,
+): string | undefined {
+	const avatarRef = value.avatar as
+		| { ref?: { $link: string }; mimeType?: string }
+		| undefined
+	if (avatarRef?.ref?.$link) {
+		return getBlobUrl(pdsEndpoint, did, avatarRef.ref.$link)
+	}
+	return undefined
+}
+
 export async function getReviewerProfile(
 	did: string,
 ): Promise<ReviewerProfile> {
@@ -68,41 +82,28 @@ export async function getReviewerProfile(
 
 	const handle = extractHandle(didDoc)
 
-	// Try games profile first
-	const gamesProfile = await fetchRecord(
-		pdsEndpoint,
-		did,
+	const collections = [
 		'games.gamesgamesgamesgames.actor.profile',
-	)
-
-	if (gamesProfile) {
-		const value = gamesProfile.value
-		const avatarRef = value.avatar as
-			| { ref?: { $link: string }; mimeType?: string }
-			| undefined
-
-		return {
-			handle,
-			displayName: value.displayName as string | undefined,
-			avatarUrl: avatarRef?.ref?.$link
-				? getBlobUrl(pdsEndpoint, did, avatarRef.ref.$link)
-				: undefined,
-		}
-	}
-
-	// Fall back to popfeed profile
-	const popfeedProfile = await fetchRecord(
-		pdsEndpoint,
-		did,
 		'social.popfeed.actor.profile',
-	)
+		'app.bsky.actor.profile',
+	]
 
-	if (popfeedProfile) {
-		return {
-			handle,
-			displayName: popfeedProfile.value.displayName as string | undefined,
+	let displayName: string | undefined
+	let avatarUrl: string | undefined
+
+	for (const collection of collections) {
+		const record = await fetchRecord(pdsEndpoint, did, collection)
+		if (!record) continue
+
+		const value = record.value
+		if (!displayName) {
+			displayName = value.displayName as string | undefined
 		}
+		if (!avatarUrl) {
+			avatarUrl = extractAvatar(value, pdsEndpoint, did)
+		}
+		if (displayName && avatarUrl) break
 	}
 
-	return { handle }
+	return { handle, displayName, avatarUrl }
 }

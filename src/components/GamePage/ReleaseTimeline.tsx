@@ -1,14 +1,12 @@
 'use client'
 
-// Module imports
 import { format } from 'date-fns'
-import { useEffect, useMemo, useRef } from 'react'
+import { useCallback, useMemo } from 'react'
 
-// Local imports
+import { Scroller } from '@/components/ui/scroller'
 import { type Release } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 import { cn } from '@/lib/utils'
 
-// Constants
 const REGIONS: Record<string, string> = {
 	worldwide: 'Worldwide',
 	europe: 'Europe',
@@ -24,17 +22,18 @@ const REGIONS: Record<string, string> = {
 
 const STATUSES: Record<string, string> = {
 	release: 'Full Release',
+	fullrelease: 'Full Release',
 	advancedAccess: 'Advanced Access',
 	alpha: 'Alpha',
 	beta: 'Beta',
 	cancelled: 'Cancelled',
 	digitalCompatibilityRelease: 'Digital Compatibility',
 	earlyAccess: 'Early Access',
+	earlyaccess: 'Early Access',
 	nextGenOptimizationRelease: 'Next-Gen Optimization',
 	offline: 'Offline',
 }
 
-// Types
 type Props = Readonly<{
 	releases: Release[]
 }>
@@ -44,6 +43,7 @@ type TimelineEvent = {
 	platform: string
 	region: string
 	status: string
+	statusKey: string
 	dateTime: string
 	displayDate: string
 	sortDate: Date | null
@@ -56,23 +56,15 @@ type DateGroup = {
 	events: TimelineEvent[]
 }
 
-// Helper to format the display date based on format
 function formatDisplayDate(
 	releasedAt: string | undefined,
 	releasedAtFormat: string | undefined,
 ): string {
-	if (!releasedAtFormat || releasedAtFormat === 'TBD') {
-		return 'TBD'
-	}
-
-	if (!releasedAt) {
-		return 'TBD'
-	}
+	if (!releasedAtFormat || releasedAtFormat === 'TBD') return 'TBD'
+	if (!releasedAt) return 'TBD'
 
 	const date = new Date(releasedAt)
-	if (isNaN(date.getTime())) {
-		return releasedAt
-	}
+	if (isNaN(date.getTime())) return releasedAt
 
 	switch (releasedAtFormat) {
 		case 'YYYY-MM-DD':
@@ -91,25 +83,18 @@ function formatDisplayDate(
 	}
 }
 
-// Helper to get a sortable date
 function getSortDate(
 	releasedAt: string | undefined,
 	releasedAtFormat: string | undefined,
 ): Date | null {
-	if (!releasedAt || releasedAtFormat === 'TBD') {
-		return null
-	}
-
+	if (!releasedAt || releasedAtFormat === 'TBD') return null
 	const date = new Date(releasedAt)
 	return isNaN(date.getTime()) ? null : date
 }
 
 export function ReleaseTimeline(props: Props) {
 	const { releases } = props
-	const scrollerRef = useRef<HTMLDivElement>(null)
-	const contentRef = useRef<HTMLDivElement>(null)
 
-	// Flatten releases into timeline events, sort by date, then group by date
 	const dateGroups = useMemo<DateGroup[]>(() => {
 		const events: TimelineEvent[] = []
 
@@ -126,6 +111,7 @@ export function ReleaseTimeline(props: Props) {
 						releaseDate.region ??
 						'Unknown Region',
 					status: STATUSES[statusKey] ?? statusKey,
+					statusKey,
 					dateTime: releaseDate.releasedAt ?? '',
 					displayDate: formatDisplayDate(
 						releaseDate.releasedAt,
@@ -139,7 +125,6 @@ export function ReleaseTimeline(props: Props) {
 			}
 		}
 
-		// Sort by date (earliest first), with TBD items at the end
 		events.sort((a, b) => {
 			if (!a.sortDate && !b.sortDate) return 0
 			if (!a.sortDate) return 1
@@ -147,7 +132,6 @@ export function ReleaseTimeline(props: Props) {
 			return a.sortDate.getTime() - b.sortDate.getTime()
 		})
 
-		// Group events by displayDate
 		const groupedMap = new Map<string, DateGroup>()
 		for (const event of events) {
 			if (!groupedMap.has(event.displayDate)) {
@@ -164,7 +148,6 @@ export function ReleaseTimeline(props: Props) {
 		return Array.from(groupedMap.values())
 	}, [releases])
 
-	// Find the index of the most recent past release
 	const activeIndex = useMemo(() => {
 		const now = new Date()
 		let lastPastIndex = -1
@@ -179,113 +162,144 @@ export function ReleaseTimeline(props: Props) {
 		return lastPastIndex >= 0 ? lastPastIndex : dateGroups.length - 1
 	}, [dateGroups])
 
-	// Scroll to show the most recent item on mount
-	useEffect(() => {
-		if (scrollerRef.current) {
-			// Scroll to the right to show the most recent item
-			scrollerRef.current.scrollLeft = scrollerRef.current.scrollWidth
+	const activeScrollRef = useCallback((node: HTMLDivElement | null) => {
+		if (node) {
+			requestAnimationFrame(() => {
+				node.scrollIntoView({ inline: 'center', block: 'nearest' })
+			})
 		}
-	}, [dateGroups])
+	}, [])
 
 	if (dateGroups.length === 0) {
 		return (
-			<div>
-				<p className={'text-muted-foreground text-center py-8'}>
-					{'No release information available.'}
-				</p>
-			</div>
+			<p className={'text-muted-foreground text-center py-8'}>
+				{'No release information available.'}
+			</p>
 		)
 	}
 
 	return (
-		<div className={'relative w-[100vw] -ml-[calc((100vw-100%)/2)]'}>
-			{/* Scrollable container */}
-			<div
-				ref={scrollerRef}
-				className={'overflow-x-auto scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent'}>
-				{/* Content wrapper with min-width to allow centering when content is narrow */}
-				<div className={'flex min-w-full'}>
-					{/* Left spacer - fills remaining space, pushes content right */}
-					<div className={'flex-1'} />
+		<Scroller
+			orientation={'horizontal'}
+			hideScrollbar
+			withNavigation
+			scrollStep={280}
+			className={'-mx-4 flex gap-0 px-4 pb-2 pt-1'}>
+			{dateGroups.map((group, index) => {
+				const isPast = group.sortDate && group.sortDate <= new Date()
+				const isActive = index === activeIndex
+				const isFuture = !isPast && !isActive
+				const isFirst = index === 0
+				const isLast = index === dateGroups.length - 1
+				const isCancelled = group.events.every(
+					(e) => e.statusKey === 'cancelled',
+				)
 
-					{/* Timeline content - right padding matches container edge */}
+				return (
 					<div
-						ref={contentRef}
-						className={'relative flex items-start py-4 pr-4 mr-[max(0px,calc((100vw-72rem)/2))]'}>
-						{/* Through line - extends from left edge of viewport to the last dot */}
-						<div
-							className={'absolute top-[calc(1rem+0.4375rem)] h-0.5 bg-border'}
-							style={{
-								left: '-100vw',
-								right: 'calc(0.4375rem)',
-							}}
-							aria-hidden="true"
-						/>
-						{/* Active portion of the line - from left edge to active dot */}
-						{activeIndex >= 0 && (
+						key={group.displayDate}
+						ref={isActive ? activeScrollRef : undefined}
+						className={'flex shrink-0 flex-col items-center'}
+						style={{ minWidth: '156px' }}>
+						{/* Rail: left segment + dot + right segment */}
+						<div className={'flex w-full items-center'}>
 							<div
-								className={'absolute top-[calc(1rem+0.4375rem)] h-0.5 bg-primary transition-all'}
-								style={{
-									left: '-100vw',
-									width: `calc(100vw + ${(activeIndex / Math.max(dateGroups.length - 1, 1)) * 100}% + 0.4375rem)`,
-								}}
-								aria-hidden="true"
+								className={cn(
+									'h-0.5 flex-1',
+									isFirst
+										? 'bg-transparent'
+										: index <= activeIndex
+											? 'bg-primary'
+											: 'bg-border',
+								)}
 							/>
-						)}
+							<div
+								className={cn(
+									'size-3 shrink-0 rounded-full transition-all',
+									isCancelled &&
+										'border-2 border-destructive/50 bg-destructive/10',
+									!isCancelled && isPast && 'bg-primary',
+									!isCancelled &&
+										isActive &&
+										'bg-primary ring-[5px] ring-primary/15',
+									!isCancelled &&
+										isFuture &&
+										'border-2 border-border bg-background',
+								)}
+							/>
+							<div
+								className={cn(
+									'h-0.5 flex-1',
+									isLast
+										? 'bg-transparent'
+										: index < activeIndex
+											? 'bg-primary'
+											: 'bg-border',
+								)}
+							/>
+						</div>
 
-						{dateGroups.map((group, index) => {
-							const isPast = group.sortDate && group.sortDate <= new Date()
-							const isActive = index === activeIndex
-							const isLast = index === dateGroups.length - 1
+						{/* Date + event cards */}
+						<div
+							className={
+								'mt-3 flex flex-col items-center px-2'
+							}>
+							<time
+								dateTime={group.dateTime}
+								className={cn(
+									'whitespace-nowrap text-xs font-semibold',
+									isActive && 'text-primary',
+									isCancelled && 'text-muted-foreground',
+									!isActive &&
+										!isCancelled &&
+										'text-muted-foreground',
+								)}>
+								{group.displayDate}
+							</time>
 
-							return (
-								<div
-									key={group.displayDate}
-									className={cn(
-										'relative flex flex-col items-center',
-										!isLast && 'pr-8 md:pr-12',
-									)}>
-									{/* Dot */}
-									<div
-										className={cn(
-											'relative z-10 size-3.5 rounded-full border-2 bg-background shrink-0',
-											isPast || isActive ? 'border-primary' : 'border-border',
-										)}
-									/>
+							<div className={'mt-2.5 flex flex-col gap-1.5'}>
+								{group.events.map((event) => {
+									const cancelled =
+										event.statusKey === 'cancelled'
 
-									{/* Content */}
-									<div className={'mt-3 flex flex-col items-center text-center min-w-[120px]'}>
-										<time
-											dateTime={group.dateTime}
+									return (
+										<div
+											key={event.id}
 											className={cn(
-												'text-xs font-medium whitespace-nowrap',
-												isActive ? 'text-primary' : 'text-muted-foreground',
+												'min-w-[130px] rounded-lg border px-3 py-2 text-center',
+												cancelled &&
+													'border-destructive/20 bg-destructive/5',
+												!cancelled &&
+													isActive &&
+													'border-primary/30 bg-primary/5',
+												!cancelled &&
+													!isActive &&
+													'border-border bg-card',
 											)}>
-											{group.displayDate}
-										</time>
-
-										<div className={'mt-2 flex flex-col gap-2'}>
-											{group.events.map((event) => (
-												<div
-													key={event.id}
-													className={'text-sm'}>
-													<div className={'font-semibold whitespace-nowrap'}>
-														{event.platform}
-													</div>
-													<div className={'text-muted-foreground text-xs whitespace-nowrap'}>
-														{event.status}
-														{event.region !== 'Worldwide' && ` — ${event.region}`}
-													</div>
-												</div>
-											))}
+											<div
+												className={cn(
+													'whitespace-nowrap text-sm font-medium',
+													cancelled &&
+														'text-muted-foreground line-through',
+												)}>
+												{event.platform}
+											</div>
+											<div
+												className={
+													'whitespace-nowrap text-xs text-muted-foreground'
+												}>
+												{event.status}
+												{event.region !== 'Worldwide' &&
+													` · ${event.region}`}
+											</div>
 										</div>
-									</div>
-								</div>
-							)
-						})}
+									)
+								})}
+							</div>
+						</div>
 					</div>
-				</div>
-			</div>
-		</div>
+				)
+			})}
+		</Scroller>
 	)
 }
