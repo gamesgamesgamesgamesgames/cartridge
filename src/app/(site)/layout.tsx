@@ -2,6 +2,7 @@
 import { type PropsWithChildren, Suspense } from 'react'
 
 // Local imports
+import { ScrollToTop } from '@/components/ScrollToTop/ScrollToTop'
 import { SearchProvider } from '@/context/SearchContext/SearchContext'
 import { SiteFooter } from '@/components/SiteFooter/SiteFooter'
 import { SiteHeader } from '@/components/SiteHeader/SiteHeader'
@@ -15,6 +16,7 @@ export default function SiteLayout(props: Props) {
 	return (
 		<Suspense>
 			<SearchProvider>
+				<ScrollToTop />
 				<div className={'flex flex-col'}>
 					<div className={'flex flex-col justify-stretch min-h-screen'}>
 						<SiteHeader />
