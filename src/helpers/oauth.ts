@@ -6,6 +6,7 @@ import type { HappyViewSession } from '@happyview/oauth-client-browser'
 import { store } from '@/store/store'
 
 // Constants
+const PUBLIC_URL = process.env.NEXT_PUBLIC_URL!
 const INSTANCE_URL = process.env.NEXT_PUBLIC_HAPPYVIEW_URL!
 const CLIENT_KEY = process.env.NEXT_PUBLIC_HAPPYVIEW_CLIENT_KEY!
 const RETURN_URL_KEY = 'pentaract_return_url'
@@ -22,8 +23,12 @@ let _client: HappyViewBrowserClient | null = null
 
 export function getClient(): HappyViewBrowserClient {
 	if (!_client) {
+		const protocol = /^(?:localhost|127\.0\.0\.1)/giu.test(PUBLIC_URL)
+			? 'http'
+			: 'https'
 		_client = new HappyViewBrowserClient({
 			instanceUrl: INSTANCE_URL,
+			clientId: `${protocol}://${PUBLIC_URL}/oauth-client-metadata.json`,
 			clientKey: CLIENT_KEY,
 			fetch: (input, init) => window.fetch(input, init),
 			scopes: 'atproto include:games.gamesgamesgamesgames.authBasic',

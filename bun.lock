@@ -18,7 +18,7 @@
         "@fortawesome/free-solid-svg-icons": "^7.1.0",
         "@fortawesome/react-fontawesome": "^3.1.1",
         "@happyview/oauth-client": "1.0.1",
-        "@happyview/oauth-client-browser": "1.0.1",
+        "@happyview/oauth-client-browser": "1.1.0",
         "@hookform/resolvers": "^5.2.2",
         "@next/third-parties": "^16.1.6",
         "@radix-ui/react-aspect-ratio": "^1.1.8",
@@ -242,7 +242,7 @@
 
     "@happyview/oauth-client": ["@happyview/oauth-client@1.0.1", "", { "dependencies": { "@atproto/jwk": "^0.6.0", "@atproto/jwk-webcrypto": "^0.2.0" } }, "sha512-mSmpygKu9VM1mVJXHdqUHCGy08ljwDEatQ2ZMBCuhcloktaC46MgmzVjJcpmFozo6QwIJ5am/o+vzKeJZYsrpA=="],
 
-    "@happyview/oauth-client-browser": ["@happyview/oauth-client-browser@1.0.1", "", { "dependencies": { "@atproto-labs/did-resolver": "^0.2.6", "@atproto-labs/handle-resolver": "^0.3.6", "@atproto/did": "^0.3.0", "@happyview/oauth-client": "^1.0.1" } }, "sha512-yIT5jQD2gEcJ/SyoLSwGALagZFrY3yCXmmK5CmnctQ0WEAvYfp3Q6Hb9GYoLlS0DOJDc58fN8JilsoyF8ofRoQ=="],
+    "@happyview/oauth-client-browser": ["@happyview/oauth-client-browser@1.1.0", "", { "dependencies": { "@atproto-labs/did-resolver": "^0.2.6", "@atproto-labs/handle-resolver": "^0.3.6", "@atproto/did": "^0.3.0", "@happyview/oauth-client": "^1.0.1" } }, "sha512-hb7l/TgI+OFDAAGT0g562SFkusWpJVqY5Xq18dx7azBuCdXw/PFSggmvN7ySop6nhHTQ2mEjYoIltgCeSwQ6TA=="],
 
     "@hookform/resolvers": ["@hookform/resolvers@5.2.2", "", { "dependencies": { "@standard-schema/utils": "^0.3.0" }, "peerDependencies": { "react-hook-form": "^7.55.0" } }, "sha512-A/IxlMLShx3KjV/HeTcTfaMxdwy690+L/ZADoeaTltLx+CVuzkeVIPuybK3jrRfw7YZnmdKsVVHAlEPIAEUNlA=="],
 

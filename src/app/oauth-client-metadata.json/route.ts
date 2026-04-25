@@ -1,15 +1,16 @@
-import { type NextRequest } from 'next/server'
+const PUBLIC_URL = process.env.NEXT_PUBLIC_URL!
 
-const HAPPYVIEW_URL = process.env.NEXT_PUBLIC_HAPPYVIEW_URL!
-
-export function GET(request: NextRequest) {
-	const origin = request.nextUrl.origin
+export function GET() {
+	const protocol = /^(?:localhost|127\.0\.0\.1)/giu.test(PUBLIC_URL)
+		? 'http'
+		: 'https'
+	const uri = `${protocol}://${PUBLIC_URL}`
 
 	return Response.json({
-		client_id: `${origin}/oauth-client-metadata.json`,
+		client_id: `${uri}/oauth-client-metadata.json`,
 		client_name: 'Cartridge',
-		client_uri: origin,
-		redirect_uris: [`${HAPPYVIEW_URL}/auth/callback`],
+		client_uri: uri,
+		redirect_uris: [`${uri}/oauth/callback`],
 		token_endpoint_auth_method: 'none',
 		grant_types: ['authorization_code', 'refresh_token'],
 		scope: 'atproto include:games.gamesgamesgamesgames.authBasic',
