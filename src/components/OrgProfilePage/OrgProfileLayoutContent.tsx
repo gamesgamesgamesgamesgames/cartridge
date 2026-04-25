@@ -1,22 +1,33 @@
-// Local imports
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faLink } from '@fortawesome/free-solid-svg-icons'
+
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
 import { Container } from '@/components/Container/Container'
-import { GameTabPanel } from '@/components/GamePage/GameTabPanel'
-import { GameTabs } from '@/components/GamePage/GameTabs'
 import { Header } from '@/components/Header/Header'
-import { OrgCreditsFeed } from '@/components/OrgProfilePage/OrgCreditsFeed'
-import { ProfileAboutTab } from '@/components/ProfilePage/ProfileAboutTab'
+import { OrgGameSections } from '@/components/CompanyPage/OrgGameSections'
 import { EditProfileButton } from '@/components/ProfilePage/EditProfileButton'
+import {
+	detectFromUrl,
+	extractDisplayValue,
+	WEBSITE_TYPE_MAP,
+} from '@/constants/WEBSITE_TYPES'
 import { getBlobUrl } from '@/helpers/getBlobUrl'
 import { resolvePds } from '@/helpers/resolvePds'
 import { type OrgProfileDetailView } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 
-// Types
 type Props = Readonly<{
 	handle: string
 	profile: OrgProfileDetailView
 }>
+
+const STATUS_VARIANTS: Record<string, 'default' | 'secondary' | 'destructive' | 'outline'> = {
+	active: 'default',
+	inactive: 'secondary',
+	merged: 'outline',
+	acquired: 'outline',
+	defunct: 'destructive',
+}
 
 async function resolveAvatarUrl(
 	profile: OrgProfileDetailView,
@@ -49,6 +60,30 @@ async function resolveAvatarUrl(
 	}
 }
 
+function getWebsiteDisplay(url: string, type?: string) {
+	const typeConfig = type ? WEBSITE_TYPE_MAP.get(type) : undefined
+
+	if (typeConfig) {
+		return {
+			icon: typeConfig.icon,
+			label: extractDisplayValue(url, typeConfig),
+		}
+	}
+
+	const detected = detectFromUrl(url)
+	if (detected) {
+		return {
+			icon: detected.type.icon,
+			label: detected.username,
+		}
+	}
+
+	return {
+		icon: faLink,
+		label: url.replace(/^https?:\/\//, ''),
+	}
+}
+
 export async function OrgProfileLayoutContent(props: Props) {
 	const { handle, profile } = props
 
@@ -56,94 +91,103 @@ export async function OrgProfileLayoutContent(props: Props) {
 	const avatarUrl = await resolveAvatarUrl(profile, did)
 	const displayName = profile.displayName ?? handle
 
-	const tabs: { id: string; label: string }[] = [
-		{ id: 'about', label: 'About' },
-		{ id: 'developed', label: 'Developed' },
-		{ id: 'published', label: 'Published' },
-	]
+	const hasDescription = Boolean(profile.description)
+	const hasWebsites = Boolean(profile.websites?.length)
+	const hasMeta = Boolean(profile.country) || Boolean(profile.foundedAt)
 
 	return (
 		<div className={'flex min-h-screen flex-col'}>
-			<section className={'relative overflow-hidden py-10 md:py-20 shadow-xl/30'}>
+			{/* Hero */}
+			<section className={'relative overflow-hidden py-12 shadow-xl/30 md:py-20'}>
 				<Container className={'relative z-10'}>
 					<div className={'relative'}>
-						<div className={'absolute top-0 right-0'}>
+						<div className={'absolute right-0 top-0'}>
 							<EditProfileButton profileDid={did} />
 						</div>
 
-						<div className={'flex flex-col items-center gap-6 md:flex-row md:items-center md:gap-10'}>
-							<Avatar className={'size-32 md:size-40'}>
+						<div className={'flex flex-col items-center gap-8 md:flex-row md:items-start md:gap-14'}>
+							<Avatar className={'size-36 shadow-2xl ring-4 ring-border/50 md:size-44'}>
 								{avatarUrl && (
 									<AvatarImage
 										src={avatarUrl}
 										alt={displayName}
 									/>
 								)}
-								<AvatarFallback className={'text-4xl'}>
+								<AvatarFallback className={'text-5xl'}>
 									{displayName.charAt(0).toUpperCase()}
 								</AvatarFallback>
 							</Avatar>
 
-							<div className={'flex flex-col gap-3 text-center md:text-left'}>
-								<Header
-									className={'text-3xl md:text-5xl'}
-									level={2}>
-									{displayName}
-								</Header>
+							<div className={'flex flex-col gap-5 text-center md:text-left'}>
+								<div>
+									<Header
+										className={'text-3xl md:text-5xl'}
+										level={2}>
+										{displayName}
+									</Header>
+									<span className={'mt-1.5 block text-muted-foreground'}>
+										{'@'}{handle}
+									</span>
+								</div>
 
-								<span className={'text-muted-foreground'}>
-									{'@'}{handle}
-								</span>
-
-								<div className={'flex items-center justify-center gap-3 md:justify-start'}>
+								<div className={'flex flex-wrap items-center justify-center gap-3 md:justify-start'}>
 									{profile.status && (
-										<Badge variant={profile.status === 'active' ? 'default' : 'secondary'}>
+										<Badge variant={STATUS_VARIANTS[profile.status] ?? 'secondary'}>
 											{profile.status.charAt(0).toUpperCase() + profile.status.slice(1)}
 										</Badge>
-									)}
-									{profile.country && (
-										<span className={'text-sm text-muted-foreground'}>
-											{profile.country}
-										</span>
 									)}
 									{profile.foundedAt && (
 										<span className={'text-sm text-muted-foreground'}>
 											{'Founded '}{new Date(profile.foundedAt).getFullYear()}
 										</span>
 									)}
+									{profile.country && (
+										<span className={'text-sm text-muted-foreground'}>
+											{profile.country}
+										</span>
+									)}
 								</div>
+
+								{hasDescription && (
+									<div className={'prose prose-sm dark:prose-invert max-w-2xl text-foreground'}>
+										{profile.description!.split('\n').map((p, index) => (
+											<p key={index}>{p}</p>
+										))}
+									</div>
+								)}
+
+								{hasWebsites && (
+									<div className={'flex flex-wrap items-center justify-center gap-2 md:justify-start'}>
+										{profile.websites!.map((website, index) => {
+											const { icon, label } = getWebsiteDisplay(website.url, website.type)
+
+											return (
+												<a
+													key={index}
+													href={website.url}
+													target={'_blank'}
+													rel={'noopener noreferrer'}
+													className={'flex items-center gap-1.5 rounded-full border border-border bg-card/50 px-3 py-1 text-xs transition-colors hover:bg-accent'}>
+													<FontAwesomeIcon
+														icon={icon}
+														className={'size-3 text-muted-foreground'}
+														fixedWidth
+													/>
+													<span>{label}</span>
+												</a>
+											)
+										})}
+									</div>
+								)}
 							</div>
 						</div>
 					</div>
 				</Container>
 			</section>
 
-			<div className={'bg-secondary flex flex-grow flex-col gap-10 py-10 md:gap-20 md:py-20'}>
-				<section>
-					<Container>
-						<GameTabs tabs={tabs}>
-							<GameTabPanel tab="about">
-								<ProfileAboutTab profile={profile} />
-							</GameTabPanel>
-
-							<GameTabPanel tab="developed">
-								<OrgCreditsFeed
-									orgUri={profile.uri}
-									role="developer"
-									emptyMessage="No development credits found."
-								/>
-							</GameTabPanel>
-
-							<GameTabPanel tab="published">
-								<OrgCreditsFeed
-									orgUri={profile.uri}
-									role="publisher"
-									emptyMessage="No publishing credits found."
-								/>
-							</GameTabPanel>
-						</GameTabs>
-					</Container>
-				</section>
+			{/* Content */}
+			<div className={'flex flex-grow flex-col bg-secondary py-12 md:py-20'}>
+				<OrgGameSections orgUri={profile.uri} />
 			</div>
 		</div>
 	)

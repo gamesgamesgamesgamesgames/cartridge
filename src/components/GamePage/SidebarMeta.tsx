@@ -90,12 +90,12 @@ export function SidebarMeta(props: Props) {
 					<Header className={'mb-4 text-base md:text-sm'} level={5}>{'Companies'}</Header>
 					<div className={'flex flex-col gap-4'}>
 						{orgCredits.map((org) => {
-							const did = org.orgUri?.match(/^at:\/\/([^/]+)\//)?.[1]
+							const rkey = org.orgUri?.split('/').pop()
 							return (
 								<div key={org.uri} className={'flex flex-col gap-1'}>
-									{did ? (
+									{rkey ? (
 										<Link
-											href={`/profile/${did}`}
+											href={`/company/${rkey}`}
 											className={'text-sm font-medium text-primary hover:underline'}>
 											{org.displayName ?? 'Unknown'}
 										</Link>

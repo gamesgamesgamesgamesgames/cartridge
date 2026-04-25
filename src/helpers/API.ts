@@ -897,7 +897,7 @@ export async function listOrgGames(
 export async function getOrgDevelopedFeed(
 	org: string,
 	options?: { limit?: number; cursor?: string },
-): Promise<{ feed: GameFeedItem[]; cursor?: string }> {
+): Promise<{ feed: GameFeedItem[]; cursor?: string; totalCount?: number }> {
 	const params = new URLSearchParams({ org })
 	if (options?.limit) params.set('limit', String(options.limit))
 	if (options?.cursor) params.set('cursor', options.cursor)
@@ -916,7 +916,7 @@ export async function getOrgDevelopedFeed(
 export async function getOrgPublishedFeed(
 	org: string,
 	options?: { limit?: number; cursor?: string },
-): Promise<{ feed: GameFeedItem[]; cursor?: string }> {
+): Promise<{ feed: GameFeedItem[]; cursor?: string; totalCount?: number }> {
 	const params = new URLSearchParams({ org })
 	if (options?.limit) params.set('limit', String(options.limit))
 	if (options?.cursor) params.set('cursor', options.cursor)
