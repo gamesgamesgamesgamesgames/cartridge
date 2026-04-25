@@ -479,7 +479,6 @@ export async function getLikes(
 	const params = new URLSearchParams({ uri })
 	const resp = await queryAPI(
 		`/xrpc/games.gamesgamesgamesgames.graph.getLikes?${params}`,
-		{ isAuthenticated: true },
 	)
 
 	if (!resp.ok) {
