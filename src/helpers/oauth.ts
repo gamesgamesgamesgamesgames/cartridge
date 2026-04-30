@@ -23,15 +23,18 @@ let _client: HappyViewBrowserClient | null = null
 
 export function getClient(): HappyViewBrowserClient {
 	if (!_client) {
-		const protocol = /^(?:localhost|127\.0\.0\.1)/giu.test(PUBLIC_URL)
-			? 'http'
-			: 'https'
+		const isLoopback = /^(?:localhost|127\.0\.0\.1)/giu.test(PUBLIC_URL)
+		const protocol = isLoopback ? 'http' : 'https'
+		const scopes = 'atproto include:games.gamesgamesgamesgames.authBasic'
+		const clientId = isLoopback
+			? `http://localhost?scope=${encodeURIComponent(scopes)}`
+			: `${protocol}://${PUBLIC_URL}/oauth-client-metadata.json`
 		_client = new HappyViewBrowserClient({
 			instanceUrl: INSTANCE_URL,
-			clientId: `${protocol}://${PUBLIC_URL}/oauth-client-metadata.json`,
+			clientId,
 			clientKey: CLIENT_KEY,
 			fetch: (input, init) => window.fetch(input, init),
-			scopes: 'atproto include:games.gamesgamesgamesgames.authBasic',
+			scopes,
 		})
 	}
 	return _client
