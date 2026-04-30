@@ -933,6 +933,46 @@ export async function getOrgPublishedFeed(
 }
 
 // ---------------------------------------------------------------------------
+// Activity Feed
+// ---------------------------------------------------------------------------
+
+export type ActivityReviewView = {
+	uri: string
+	rating: number
+	text?: string
+	title?: string
+	tags?: string[]
+	containsSpoilers?: boolean
+	createdAt: string
+}
+
+export type ActivityFeedItem = {
+	type: 'like' | 'review'
+	createdAt: string
+	game: GameFeedGame
+	review?: ActivityReviewView
+}
+
+export async function getActivityFeed(
+	did: string,
+	limit = 30,
+	cursor?: string,
+): Promise<{ feed: ActivityFeedItem[]; cursor?: string }> {
+	const params = new URLSearchParams({ did, limit: String(limit) })
+	if (cursor) params.set('cursor', cursor)
+
+	const resp = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.feed.getActivityFeed?${params}`,
+	)
+
+	if (!resp.ok) {
+		return { feed: [] }
+	}
+
+	return resp.json()
+}
+
+// ---------------------------------------------------------------------------
 // Contributions
 // ---------------------------------------------------------------------------
 

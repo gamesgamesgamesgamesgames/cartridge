@@ -1,166 +1,137 @@
-// Module imports
-import { type PropsWithChildren } from 'react'
-
 // Local imports
+import { BoxArt } from '@/components/BoxArt/BoxArt'
 import { Container } from '@/components/Container/Container'
-import { Header } from '@/components/Header/Header'
+import { ProfileActivityFeed } from '@/components/ProfilePage/ProfileActivityFeed'
 import {
-	ProfilePageSubnav,
-	type ProfileSubnavConfig,
-} from '@/components/ProfilePage/ProfilePageSubnav'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
+	ProfileBannerHeader,
+	type ProfileStats,
+} from '@/components/ProfilePage/ProfileBannerHeader'
+import { ProfileSidebarCard } from '@/components/ProfilePage/ProfileSidebarCard'
 import { type ActorProfileDetailView } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 import { type OrgProfileDetailView } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
-import { EditProfileButton } from '@/components/ProfilePage/EditProfileButton'
-import { getBlobUrl } from '@/helpers/getBlobUrl'
-import { resolvePds } from '@/helpers/resolvePds'
+import { type PopfeedReview } from '@/helpers/lexicons/games/gamesgamesgamesgames/getReviews.defs'
+import { type GameRecord } from '@/typedefs/GameRecord'
+import Link from 'next/link'
 
 // Types
-type Props = Readonly<
-	PropsWithChildren<{
-		basePath: string
-		handle: string
-		profile: ActorProfileDetailView | OrgProfileDetailView
-		profileType: 'actor' | 'org'
-	}>
->
+type Props = Readonly<{
+	avatarUrl?: string
+	basePath: string
+	games: GameRecord[]
+	handle: string
+	likeCount: number
+	profile: ActorProfileDetailView | OrgProfileDetailView
+	reviews: PopfeedReview[]
+}>
 
-function isActorProfile(profile: ActorProfileDetailView | OrgProfileDetailView): profile is ActorProfileDetailView {
-	return profile.$type === 'games.gamesgamesgamesgames.defs#actorProfileDetailView'
+function StarRatingCompact(props: { rating: number }) {
+	const stars = props.rating / 2
+	const fullStars = Math.floor(stars)
+
+	return (
+		<span className={'flex items-center gap-0.5 text-xs'}>
+			{Array.from({ length: 5 }, (_, i) => (
+				<span key={i} className={i < fullStars ? '' : 'opacity-30'}>
+					{'★'}
+				</span>
+			))}
+		</span>
+	)
 }
 
-function isOrgProfile(profile: ActorProfileDetailView | OrgProfileDetailView): profile is OrgProfileDetailView {
-	return profile.$type === 'games.gamesgamesgamesgames.defs#orgProfileDetailView'
-}
+export function ProfileLayoutContent(props: Props) {
+	const {
+		avatarUrl,
+		basePath,
+		games,
+		handle,
+		likeCount,
+		profile,
+		reviews,
+	} = props
 
-async function resolveAvatarUrl(
-	profile: ActorProfileDetailView | OrgProfileDetailView,
-	did: string,
-): Promise<string | undefined> {
-	try {
-		const avatar = profile.avatar as
-			| { ref?: { $link: string } | string | unknown }
-			| undefined
-		if (!avatar) return undefined
-
-		const ref = avatar.ref
-		if (!ref) return undefined
-
-		let cid: string
-		if (typeof ref === 'string') {
-			cid = ref
-		} else if (typeof ref === 'object' && ref !== null && '$link' in (ref as Record<string, unknown>)) {
-			cid = (ref as { $link: string }).$link
-		} else {
-			cid = String(ref)
-		}
-
-		if (!cid) return undefined
-
-		const pdsEndpoint = await resolvePds(did)
-		return getBlobUrl(pdsEndpoint, did, cid)
-	} catch {
-		return undefined
+	const stats: ProfileStats = {
+		games: games.length,
+		reviews: reviews.length,
+		likes: likeCount,
+		lists: 0,
 	}
-}
-
-export async function ProfileLayoutContent(props: Props) {
-	const { basePath, children, handle, profile, profileType } = props
-
-	const did = profile.did
-	const avatarUrl = await resolveAvatarUrl(profile, did)
-
-	const aboutSections: ProfileSubnavConfig['about'] = []
-	if (profile.description) {
-		aboutSections.push({ id: 'about-description', label: 'Description' })
-	}
-	if (profile.websites?.length) {
-		aboutSections.push({ id: 'about-websites', label: 'Websites' })
-	}
-
-	const subnavConfig: ProfileSubnavConfig = {
-		about: aboutSections,
-		reviews: [],
-	}
-
-	const displayName = profile.displayName ?? handle
 
 	return (
 		<div className={'flex min-h-screen flex-col'}>
-			<section className={'relative overflow-hidden py-20 shadow-xl/30'}>
-				<Container className={'relative z-10'}>
-					<div className={'relative'}>
-						<div className={'absolute top-0 right-0'}>
-							<EditProfileButton profileDid={did} />
+			<ProfileBannerHeader
+				avatarUrl={avatarUrl}
+				handle={handle}
+				profile={profile}
+				stats={stats}
+			/>
+
+			<section className={'flex-1 bg-secondary py-10'}>
+				<Container className={'overflow-visible'} isScrollable={false}>
+					<div className={'flex flex-col gap-10 lg:flex-row lg:gap-12'}>
+						{/* Main column */}
+						<div className={'flex min-w-0 flex-1 flex-col gap-8'}>
+							<ProfileActivityFeed profileDid={profile.did} />
 						</div>
 
-						<div className={'flex gap-10 items-center'}>
-						<Avatar className={'size-32'}>
-							{avatarUrl && (
-								<AvatarImage
-									src={avatarUrl}
-									alt={displayName}
-								/>
-							)}
-							<AvatarFallback className={'text-4xl'}>
-								{displayName.charAt(0).toUpperCase()}
-							</AvatarFallback>
-						</Avatar>
+						{/* Sidebar */}
+						<div className={'flex w-full flex-col gap-4 lg:w-80 lg:shrink-0 lg:sticky lg:top-20 lg:self-start'}>
+							{/* Reviews card */}
+							<ProfileSidebarCard
+								title={'Reviews'}
+								count={reviews.length}
+								href={`${basePath}/reviews`}>
+								{reviews.length === 0 ? (
+									<p className={'text-sm text-muted-foreground'}>
+										{'No reviews yet'}
+									</p>
+								) : (
+									<div className={'flex flex-col gap-2'}>
+										{reviews.slice(0, 3).map((review) => (
+											<div
+												key={review.uri}
+												className={'flex items-center justify-between gap-2'}>
+												<span className={'truncate text-sm'}>
+													{review.title ?? 'Untitled review'}
+												</span>
+												<StarRatingCompact rating={review.rating} />
+											</div>
+										))}
+									</div>
+								)}
+							</ProfileSidebarCard>
 
-						<div className={'flex flex-col gap-3'}>
-							<Header
-								className={'text-5xl'}
-								level={2}>
-								{displayName}
-							</Header>
+							{/* Lists card (placeholder) */}
+							<ProfileSidebarCard
+								title={'Lists'}
+								count={0}
+								href={`${basePath}/lists`}>
+								<p className={'text-sm text-muted-foreground'}>
+									{'No lists yet'}
+								</p>
+							</ProfileSidebarCard>
 
-							<span className={'text-muted-foreground'}>
-								{'@'}{handle}
-							</span>
-
-							{isActorProfile(profile) && profile.pronouns && (
-								<span className={'text-sm text-muted-foreground'}>
-									{profile.pronouns}
-								</span>
-							)}
-
-							{isOrgProfile(profile) && (
-								<div className={'flex items-center gap-3'}>
-									{profile.status && (
-										<Badge variant={profile.status === 'active' ? 'default' : 'secondary'}>
-											{profile.status.charAt(0).toUpperCase() + profile.status.slice(1)}
-										</Badge>
-									)}
-									{profile.country && (
-										<span className={'text-sm text-muted-foreground'}>
-											{profile.country}
-										</span>
-									)}
-									{profile.foundedAt && (
-										<span className={'text-sm text-muted-foreground'}>
-											{'Founded '}{new Date(profile.foundedAt).getFullYear()}
-										</span>
-									)}
-								</div>
+							{/* Games card — only shown if user has games */}
+							{games.length > 0 && (
+								<ProfileSidebarCard
+									title={'Games'}
+									count={games.length}
+									href={`${basePath}/games`}>
+									<div className={'grid grid-cols-3 gap-2'}>
+										{games.slice(0, 6).map((game) => (
+											<Link
+												key={game.uri}
+												href={`/game/${game.slug ?? game.uri}`}>
+												<BoxArt
+													className={'rounded-sm'}
+													gameRecord={game}
+												/>
+											</Link>
+										))}
+									</div>
+								</ProfileSidebarCard>
 							)}
 						</div>
-					</div>
-				</div>
-				</Container>
-			</section>
-
-			<section className={'flex-1 bg-secondary py-20'}>
-				<Container className={'overflow-visible'}>
-					<div className={'flex gap-20'}>
-						<div className={'sticky top-20 self-start'}>
-							<ProfilePageSubnav
-								basePath={basePath}
-								subnavConfig={subnavConfig}
-							/>
-						</div>
-
-						<div className={'flex flex-1 flex-col gap-10'}>{children}</div>
 					</div>
 				</Container>
 			</section>

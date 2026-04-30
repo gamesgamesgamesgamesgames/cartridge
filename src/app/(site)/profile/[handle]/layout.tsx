@@ -4,7 +4,6 @@ import { type PropsWithChildren } from 'react'
 
 import * as API from '@/helpers/API'
 import { OrgProfileLayoutContent } from '@/components/OrgProfilePage/OrgProfileLayoutContent'
-import { ProfileLayoutContent } from '@/components/ProfilePage/ProfileLayoutContent'
 import { type OrgProfileDetailView } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 
 type Props = Readonly<
@@ -47,13 +46,5 @@ export default async function ProfileLayout(props: Props) {
 		)
 	}
 
-	return (
-		<ProfileLayoutContent
-			basePath={`/profile/${handle}`}
-			handle={result.handle ?? handle}
-			profile={result.profile}
-			profileType={result.profileType}>
-			{children}
-		</ProfileLayoutContent>
-	)
+	return <>{children}</>
 }
