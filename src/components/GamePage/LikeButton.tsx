@@ -6,6 +6,7 @@ import { useCallback, useEffect, useState } from 'react'
 
 // Local imports
 import * as API from '@/helpers/API'
+import { Button } from '@/components/ui/button'
 import { consumePendingLike, isAuthenticated, setPendingLike } from '@/helpers/oauth'
 
 // Types
@@ -70,17 +71,18 @@ export function LikeButton(props: Props) {
 	}, []) // eslint-disable-line react-hooks/exhaustive-deps
 
 	return (
-		<button
-			type={'button'}
-			onClick={handleClick}
+		<Button
+			className={className}
 			disabled={pending}
-			className={`flex items-center gap-2 transition-colors hover:text-red-400${className ? ` ${className}` : ''}`}>
+			onClick={handleClick}
+			size={'sm'}
+			variant={'ghost'}>
 			<Heart
-				className={`size-6 transition-colors ${liked ? 'fill-red-500 text-red-500' : 'text-muted-foreground'}`}
+				className={`transition-colors ${liked ? 'fill-red-500 text-red-500' : ''}`}
 			/>
-			<span className={'text-sm font-medium tabular-nums'}>
+			<span className={'tabular-nums'}>
 				{count}
 			</span>
-		</button>
+		</Button>
 	)
 }

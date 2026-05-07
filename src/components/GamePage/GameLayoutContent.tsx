@@ -17,13 +17,12 @@ import {
 } from '@/components/DataList/DataList'
 import { Header } from '@/components/Header/Header'
 import { ArtworkBackground } from '@/components/GamePage/ArtworkBackground'
-import { LikeButton } from '@/components/GamePage/LikeButton'
+import { ActionBar } from '@/components/GamePage/ActionBar'
 import { ReleaseTimeline } from '@/components/GamePage/ReleaseTimeline'
 import { ReviewsTab } from '@/components/GamePage/ReviewsTab'
 import { ScreenshotGallery } from '@/components/GamePage/ScreenshotGallery'
 import { SidebarMeta } from '@/components/GamePage/SidebarMeta'
 import { SimilarGames } from '@/components/GamePage/SimilarGames'
-import { SuggestEditButton } from '@/components/GamePage/SuggestEditButton'
 import { TrailerSection } from '@/components/GamePage/TrailerSection'
 import { GAME_APPLICATION_TYPES } from '@/constants/GAME_APPLICATION_TYPES'
 import { GAME_GENRES } from '@/constants/GAME_GENRES'
@@ -147,16 +146,6 @@ export function GameLayoutContent(props: Props) {
 									</div>
 								</div>
 							</ViewTransition>
-							<div className={'mt-3 flex items-center justify-start gap-4'}>
-								<LikeButton
-									gameUri={gameRecord.uri}
-									initialCount={likes.count}
-									initialLiked={likes.liked}
-								/>
-								{gameRecord.slug && (
-									<SuggestEditButton slug={gameRecord.slug} />
-								)}
-							</div>
 						</div>
 
 						<div className={'flex flex-col gap-6 md:gap-10'}>
@@ -245,6 +234,13 @@ export function GameLayoutContent(props: Props) {
 					</div>
 				</Container>
 			</section>
+
+			<ActionBar
+				gameUri={gameRecord.uri}
+				initialLikeCount={likes.count}
+				initialLiked={likes.liked}
+				slug={gameRecord.slug}
+			/>
 
 			<div className={'bg-secondary flex flex-grow flex-col py-10 md:py-16'}>
 				{/* Screenshots */}
