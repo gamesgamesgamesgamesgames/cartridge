@@ -50,21 +50,35 @@ export default async function ProfilePage(props: Props) {
 	const did = profile.did
 	const resolvedHandle = result.handle ?? handle
 
-	const [avatarUrl, { reviews }, { games }, { count: likeCount }] = await Promise.all([
+	const [
+		avatarUrl,
+		{ reviews },
+		{ games },
+		{ count: gameCount },
+		{ count: reviewCount },
+		{ count: likeCount },
+		{ count: listCount },
+	] = await Promise.all([
 		resolveAvatarUrl(profile, did),
 		API.getReviews(profile.uri),
 		API.listGames(20, undefined, undefined, undefined, did),
-		API.getLikes(profile.uri),
+		API.getGameCount(did),
+		API.getReviewCount(did),
+		API.getLikeCount(did),
+		API.getListCount(did),
 	])
 
 	return (
 		<ProfileLayoutContent
 			avatarUrl={avatarUrl}
 			basePath={`/profile/${handle}`}
+			gameCount={gameCount}
 			games={games}
 			handle={resolvedHandle}
 			likeCount={likeCount}
+			listCount={listCount}
 			profile={profile}
+			reviewCount={reviewCount}
 			reviews={reviews}
 		/>
 	)

@@ -488,6 +488,66 @@ export async function getLikes(
 	return resp.json()
 }
 
+export async function getLikeCount(
+	did: string,
+): Promise<{ count: number }> {
+	const params = new URLSearchParams({ did })
+	const resp = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.graph.getLikeCount?${params}`,
+	)
+
+	if (!resp.ok) {
+		return { count: 0 }
+	}
+
+	return resp.json()
+}
+
+export async function getGameCount(
+	did: string,
+): Promise<{ count: number }> {
+	const params = new URLSearchParams({ did })
+	const resp = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.getGameCount?${params}`,
+	)
+
+	if (!resp.ok) {
+		return { count: 0 }
+	}
+
+	return resp.json()
+}
+
+export async function getReviewCount(
+	did: string,
+): Promise<{ count: number }> {
+	const params = new URLSearchParams({ did })
+	const resp = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.getReviewCount?${params}`,
+	)
+
+	if (!resp.ok) {
+		return { count: 0 }
+	}
+
+	return resp.json()
+}
+
+export async function getListCount(
+	did: string,
+): Promise<{ count: number }> {
+	const params = new URLSearchParams({ did })
+	const resp = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.getListCount?${params}`,
+	)
+
+	if (!resp.ok) {
+		return { count: 0 }
+	}
+
+	return resp.json()
+}
+
 // ---------------------------------------------------------------------------
 // Feeds
 // ---------------------------------------------------------------------------

@@ -17,10 +17,13 @@ import Link from 'next/link'
 type Props = Readonly<{
 	avatarUrl?: string
 	basePath: string
+	gameCount: number
 	games: GameRecord[]
 	handle: string
 	likeCount: number
+	listCount: number
 	profile: ActorProfileDetailView | OrgProfileDetailView
+	reviewCount: number
 	reviews: PopfeedReview[]
 }>
 
@@ -43,18 +46,21 @@ export function ProfileLayoutContent(props: Props) {
 	const {
 		avatarUrl,
 		basePath,
+		gameCount,
 		games,
 		handle,
 		likeCount,
+		listCount,
 		profile,
+		reviewCount,
 		reviews,
 	} = props
 
 	const stats: ProfileStats = {
-		games: games.length,
-		reviews: reviews.length,
+		games: gameCount,
+		reviews: reviewCount,
 		likes: likeCount,
-		lists: 0,
+		lists: listCount,
 	}
 
 	return (
