@@ -1,6 +1,7 @@
 'use client'
 
 // Module imports
+import { List } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
@@ -53,6 +54,7 @@ function StarRating(props: { rating: number }) {
 
 function LikeItem(props: Props) {
 	const { item } = props
+	if (!item.game) return null
 	const href = item.game.slug ? `/game/${item.game.slug}` : '#'
 
 	return (
@@ -83,6 +85,7 @@ function LikeItem(props: Props) {
 function ReviewItem(props: Props) {
 	const { item } = props
 	const [expanded, setExpanded] = useState(false)
+	if (!item.game) return null
 	const href = item.game.slug ? `/game/${item.game.slug}` : '#'
 	const review = item.review
 
@@ -140,12 +143,75 @@ function ReviewItem(props: Props) {
 	)
 }
 
+function ListCreateItem(props: Props) {
+	const { item } = props
+
+	return (
+		<div className={'flex items-center gap-3 py-3'}>
+			<div className={'flex size-10 shrink-0 items-center justify-center rounded-sm bg-muted'}>
+				<List className={'size-5 text-muted-foreground'} />
+			</div>
+
+			<div className={'flex min-w-0 flex-1 items-center justify-between gap-2'}>
+				<p className={'truncate text-sm'}>
+					{'Created list '}
+					<span className={'font-semibold'}>{item.list?.name}</span>
+				</p>
+
+				<time className={'shrink-0 text-xs text-muted-foreground'}>
+					{formatRelativeTime(item.createdAt)}
+				</time>
+			</div>
+		</div>
+	)
+}
+
+function ListAddGameItem(props: Props) {
+	const { item } = props
+	const href = item.game?.slug ? `/game/${item.game.slug}` : '#'
+
+	return (
+		<div className={'flex items-center gap-3 py-3'}>
+			{item.game && (
+				<Link href={href} className={'shrink-0'}>
+					<BoxArt
+						className={'w-10 rounded-sm'}
+						gameRecord={item.game}
+					/>
+				</Link>
+			)}
+
+			<div className={'flex min-w-0 flex-1 items-center justify-between gap-2'}>
+				<p className={'truncate text-sm'}>
+					{'Added '}
+					{item.game && (
+						<Link href={href} className={'font-semibold text-foreground hover:text-primary'}>
+							{item.game.name}
+						</Link>
+					)}
+					{' to '}
+					<span className={'font-semibold'}>{item.list?.name}</span>
+				</p>
+
+				<time className={'shrink-0 text-xs text-muted-foreground'}>
+					{formatRelativeTime(item.createdAt)}
+				</time>
+			</div>
+		</div>
+	)
+}
+
 export function ProfileActivityItem(props: Props) {
 	const { item } = props
 
-	if (item.type === 'review') {
-		return <ReviewItem item={item} />
+	switch (item.type) {
+		case 'review':
+			return <ReviewItem item={item} />
+		case 'listCreate':
+			return <ListCreateItem item={item} />
+		case 'listAddGame':
+			return <ListAddGameItem item={item} />
+		default:
+			return <LikeItem item={item} />
 	}
-
-	return <LikeItem item={item} />
 }

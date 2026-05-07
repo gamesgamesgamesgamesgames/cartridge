@@ -1006,11 +1006,18 @@ export type ActivityReviewView = {
 	createdAt: string
 }
 
-export type ActivityFeedItem = {
-	type: 'like' | 'review'
+export type ActivityListView = {
+	uri: string
+	name: string
 	createdAt: string
-	game: GameFeedGame
+}
+
+export type ActivityFeedItem = {
+	type: 'like' | 'review' | 'listCreate' | 'listAddGame'
+	createdAt: string
+	game?: GameFeedGame
 	review?: ActivityReviewView
+	list?: ActivityListView
 }
 
 export async function getActivityFeed(
@@ -1030,6 +1037,82 @@ export async function getActivityFeed(
 	}
 
 	return resp.json()
+}
+
+// ---------------------------------------------------------------------------
+// User Lists
+// ---------------------------------------------------------------------------
+
+export type UserListView = {
+	uri: string
+	name: string
+	description?: string
+	itemCount: number
+	hasGame?: boolean
+	createdAt: string
+}
+
+export async function getUserLists(
+	did: string,
+	gameUri?: string,
+): Promise<{ lists: UserListView[]; cursor?: string }> {
+	const params = new URLSearchParams({ did })
+	if (gameUri) params.set('gameUri', gameUri)
+
+	const resp = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.getUserLists?${params}`,
+	)
+
+	if (!resp.ok) {
+		return { lists: [] }
+	}
+
+	return resp.json()
+}
+
+export async function createList(
+	name: string,
+	description?: string,
+): Promise<{ uri: string; cid: string }> {
+	const body: Record<string, string> = { name }
+	if (description) body.description = description
+
+	const response = await queryAPI(
+		'/xrpc/games.gamesgamesgamesgames.createList',
+		{
+			isAuthenticated: true,
+			method: 'POST',
+			body: JSON.stringify(body),
+		},
+	)
+
+	if (!response.ok) {
+		const errorBody = await response.text()
+		throw new Error(`createList failed (${response.status}): ${errorBody}`)
+	}
+
+	return response.json()
+}
+
+export async function toggleListItem(
+	listUri: string,
+	gameUri: string,
+): Promise<{ uri?: string; cid?: string; action: 'added' | 'removed' }> {
+	const response = await queryAPI(
+		'/xrpc/games.gamesgamesgamesgames.toggleListItem',
+		{
+			isAuthenticated: true,
+			method: 'POST',
+			body: JSON.stringify({ listUri, gameUri }),
+		},
+	)
+
+	if (!response.ok) {
+		const errorBody = await response.text()
+		throw new Error(`toggleListItem failed (${response.status}): ${errorBody}`)
+	}
+
+	return response.json()
 }
 
 // ---------------------------------------------------------------------------

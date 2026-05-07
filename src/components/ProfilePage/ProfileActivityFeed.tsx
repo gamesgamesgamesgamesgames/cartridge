@@ -149,7 +149,7 @@ export function ProfileActivityFeed(props: Props) {
 					<div className={'divide-y divide-border'}>
 						{group.items.map((item, index) => (
 							<ProfileActivityItem
-								key={`${item.type}-${item.game.uri}-${index}`}
+								key={`${item.type}-${item.game?.uri ?? item.list?.uri ?? index}-${index}`}
 								item={item}
 							/>
 						))}

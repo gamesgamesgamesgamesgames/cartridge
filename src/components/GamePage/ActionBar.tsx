@@ -1,9 +1,10 @@
 'use client'
 
 // Module imports
-import { ListPlus, MessageSquareText } from 'lucide-react'
+import { MessageSquareText } from 'lucide-react'
 
 // Local imports
+import { AddToListButton } from '@/components/GamePage/AddToListButton'
 import { Button } from '@/components/ui/button'
 import { Container } from '@/components/Container/Container'
 import { LikeButton } from '@/components/GamePage/LikeButton'
@@ -48,18 +49,7 @@ export function ActionBar(props: Props) {
 						<TooltipContent>{'Coming soon'}</TooltipContent>
 					</Tooltip>
 
-					<Tooltip>
-						<TooltipTrigger asChild>
-							<Button
-								variant={'ghost'}
-								size={'sm'}
-								disabled>
-								<ListPlus />
-								{'Add to List'}
-							</Button>
-						</TooltipTrigger>
-						<TooltipContent>{'Coming soon'}</TooltipContent>
-					</Tooltip>
+					<AddToListButton gameUri={gameUri} />
 
 					{slug && (
 						<div className={'ml-auto'}>

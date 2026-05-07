@@ -11,6 +11,7 @@ const INSTANCE_URL = process.env.NEXT_PUBLIC_HAPPYVIEW_URL!
 const CLIENT_KEY = process.env.NEXT_PUBLIC_HAPPYVIEW_CLIENT_KEY!
 const RETURN_URL_KEY = 'pentaract_return_url'
 const PENDING_LIKE_KEY = 'pentaract_pending_like'
+const PENDING_LIST_ADD_KEY = 'pentaract_pending_list_add'
 
 // Types
 export type MeResponse = {
@@ -137,6 +138,16 @@ export function setPendingLike(gameUri: string) {
 export function consumePendingLike(): string | null {
 	const uri = sessionStorage.getItem(PENDING_LIKE_KEY)
 	sessionStorage.removeItem(PENDING_LIKE_KEY)
+	return uri
+}
+
+export function setPendingListAdd(gameUri: string) {
+	sessionStorage.setItem(PENDING_LIST_ADD_KEY, gameUri)
+}
+
+export function consumePendingListAdd(): string | null {
+	const uri = sessionStorage.getItem(PENDING_LIST_ADD_KEY)
+	sessionStorage.removeItem(PENDING_LIST_ADD_KEY)
 	return uri
 }
 
