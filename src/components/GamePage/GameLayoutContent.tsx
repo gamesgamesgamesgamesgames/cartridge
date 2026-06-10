@@ -3,8 +3,10 @@ import { ViewTransition } from 'react'
 import Link from 'next/link'
 
 // Local imports
+import { LikeProvider } from '@/context/LikeContext/LikeContext'
 import { AdditionalMedia } from '@/components/GamePage/AdditionalMedia'
 import { AgeRatingBadge } from '@/components/GamePage/AgeRatingBadge'
+import { BackToTop } from '@/components/BackToTop/BackToTop'
 import { BoxArt } from '@/components/BoxArt/BoxArt'
 import { CollectionsTab } from '@/components/GamePage/CollectionsTab'
 import { CommaSeparatedList } from '@/components/CommaSeparatedList/CommaSeparatedList'
@@ -18,6 +20,8 @@ import {
 import { Header } from '@/components/Header/Header'
 import { ArtworkBackground } from '@/components/GamePage/ArtworkBackground'
 import { ActionBar } from '@/components/GamePage/ActionBar'
+import { ActionBarButtons } from '@/components/GamePage/ActionBarButtons'
+import { GamePageCTA } from '@/components/GamePage/GamePageCTA'
 import { ReleaseTimeline } from '@/components/GamePage/ReleaseTimeline'
 import { ReviewsTab } from '@/components/GamePage/ReviewsTab'
 import { ScreenshotGallery } from '@/components/GamePage/ScreenshotGallery'
@@ -118,6 +122,7 @@ export function GameLayoutContent(props: Props) {
 		return earliest?.slice(0, 4)
 	})()
 
+	const coverMedia = gameRecord.media?.find((item) => item.mediaType === 'cover')
 	const hasMedia = Boolean(gameRecord.media?.length)
 	const hasVideos = Boolean(gameRecord.videos?.length)
 	const hasCredits = Boolean(gameRecord.actorCredits?.length)
@@ -126,9 +131,16 @@ export function GameLayoutContent(props: Props) {
 	const hasSidebar = Boolean(gameRecord.timeToBeat) || Boolean(gameRecord.alternativeNames?.length) || Boolean(gameRecord.orgCredits?.length) || hasMeta
 
 	return (
+		<LikeProvider
+			gameUri={gameRecord.uri}
+			gameName={gameRecord.name}
+			initialCount={likes.count}
+			initialLiked={likes.liked}>
 		<div className={'flex min-h-screen flex-col'}>
+			{/* Game section — ActionBar sticks to bottom within this wrapper */}
+			<div>
 			{/* Hero */}
-			<section className={'relative overflow-hidden py-10 shadow-xl/30 md:py-20'}>
+			<section id={'game-hero'} className={'relative overflow-hidden py-10 shadow-xl/30 md:py-20'}>
 				<ArtworkBackground gameRecord={gameRecord} />
 				<Container className={'relative z-10'}>
 					<div className={'flex flex-col items-center gap-6 md:flex-row md:items-center md:gap-20'}>
@@ -230,22 +242,28 @@ export function GameLayoutContent(props: Props) {
 									})}
 								</div>
 							)}
+
 						</div>
 					</div>
 				</Container>
 			</section>
 
-			<ActionBar
-				gameUri={gameRecord.uri}
-				initialLikeCount={likes.count}
-				initialLiked={likes.liked}
-				slug={gameRecord.slug}
-			/>
+			<div id={'hero-actions'} className={'border-b border-border bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80'}>
+				<Container isScrollable={false}>
+					<div className={'flex items-center justify-center py-2.5 md:justify-start md:py-3'}>
+						<ActionBarButtons
+							gameName={gameRecord.name}
+							gameUri={gameRecord.uri}
+							slug={gameRecord.slug}
+						/>
+					</div>
+				</Container>
+			</div>
 
 			<div className={'bg-secondary flex flex-grow flex-col py-10 md:py-16'}>
 				{/* Screenshots */}
 				{hasMedia && (
-					<section>
+					<section id={'screenshots'}>
 						<Container>
 							<ScreenshotGallery
 								uri={gameRecord.uri}
@@ -398,7 +416,7 @@ export function GameLayoutContent(props: Props) {
 
 				{/* Release Timeline */}
 				{Boolean(gameRecord.releases?.length) && (
-					<section className={'mt-12 md:mt-16'}>
+					<section id={'releases'} className={'mt-12 md:mt-16'}>
 						<Container>
 							<Header className={'mb-6 text-lg'} level={4}>{'Releases'}</Header>
 							<ReleaseTimeline releases={gameRecord.releases!} />
@@ -406,29 +424,43 @@ export function GameLayoutContent(props: Props) {
 					</section>
 				)}
 
-				{/* Full-width sections */}
-				<div className={'mt-16 flex flex-col gap-16 md:mt-24'}>
-					{reviews.length > 0 && (
-						<section id={'reviews'}>
-							<Container>
-								<Header className={'mb-8 text-xl'} level={3}>{'Reviews'}</Header>
-								<ReviewsTab reviews={reviews} />
-							</Container>
-						</section>
-					)}
+				{reviews.length > 0 && (
+					<section id={'reviews'} className={'mt-16 md:mt-24'}>
+						<Container>
+							<Header className={'mb-8 text-xl'} level={3}>{'Reviews'}</Header>
+							<ReviewsTab reviews={reviews} />
+						</Container>
+					</section>
+				)}
 
-					{nonFranchiseCollections && nonFranchiseCollections.length > 0 && (
-						<section id={'collections'}>
-							<Container>
-								<Header className={'mb-8 text-xl'} level={3}>{'Collections'}</Header>
-								<CollectionsTab collections={nonFranchiseCollections} />
-							</Container>
-						</section>
-					)}
-
-					{similarGames.length > 0 && <SimilarGames games={similarGames} />}
-				</div>
+				{nonFranchiseCollections && nonFranchiseCollections.length > 0 && (
+					<section id={'collections'} className={'mt-16'}>
+						<Container>
+							<Header className={'mb-8 text-xl'} level={3}>{'Collections'}</Header>
+							<CollectionsTab collections={nonFranchiseCollections} />
+						</Container>
+					</section>
+				)}
 			</div>
+
+			<ActionBar
+				coverBlob={coverMedia?.blob}
+				gameName={gameRecord.name}
+				gameUri={gameRecord.uri}
+				slug={gameRecord.slug}
+			/>
+			</div>
+
+			{similarGames.length > 0 && <SimilarGames games={similarGames} />}
+
+			<GamePageCTA
+				gameName={gameRecord.name}
+				gameUri={gameRecord.uri}
+				slug={gameRecord.slug}
+			/>
+
+			<BackToTop />
 		</div>
+		</LikeProvider>
 	)
 }

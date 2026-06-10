@@ -2,6 +2,7 @@ import Link from 'next/link'
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
+import { StarRating } from '@/components/StarRating/StarRating'
 import { getReviewerProfile, type ReviewerProfile } from '@/helpers/getReviewerProfile'
 import { type PopfeedReview } from '@/helpers/lexicons/games/gamesgamesgamesgames/getReviews.defs'
 
@@ -17,29 +18,6 @@ function getPopfeedReviewUrl(atUri: string) {
 
 function getPopfeedProfileUrl(handle: string) {
 	return `${POPFEED_BASE}/profile/${handle}`
-}
-
-function StarRating({ rating, compact }: { rating: number; compact?: boolean }) {
-	const stars = rating / 2
-	const fullStars = Math.floor(stars)
-	const hasHalf = stars - fullStars >= 0.5
-
-	return (
-		<span className={`flex items-center gap-0.5 ${compact ? 'text-sm' : 'text-lg gap-1'}`}>
-			{Array.from({ length: 5 }, (_, i) => {
-				if (i < fullStars) return <span key={i}>{'★'}</span>
-				if (i === fullStars && hasHalf) return <span key={i}>{'★'}</span>
-				return (
-					<span
-						key={i}
-						className={'opacity-30'}>
-						{'★'}
-					</span>
-				)
-			})}
-			<span className={`ml-1 text-muted-foreground ${compact ? 'text-xs' : 'text-sm'}`}>{rating}/10</span>
-		</span>
-	)
 }
 
 function FullReviewCard(props: {

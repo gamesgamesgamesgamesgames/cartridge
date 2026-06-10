@@ -75,6 +75,8 @@ function BackgroundImage({
 	return (
 		<img
 			alt={''}
+			aria-hidden={'true'}
+			loading={isActive ? undefined : 'lazy'}
 			className={`absolute inset-0 h-full w-full object-cover blur-sm ${isActive ? 'opacity-20' : 'opacity-0'}`}
 			src={blobUrl}
 			style={{

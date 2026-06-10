@@ -131,9 +131,9 @@ export function SidebarMeta(props: Props) {
 								href={website.url}
 								target={'_blank'}
 								rel={'noopener noreferrer'}
-								className={'flex items-center justify-between rounded-md border border-border bg-card px-3 py-2 text-sm transition-colors hover:bg-accent'}>
+								className={'flex items-center justify-between rounded-md border border-border bg-card px-3 py-2 text-sm transition-colors hover:border-primary/40 hover:bg-accent'}>
 								<span>{WEBSITE_TYPE_LABELS[website.type ?? 'other'] ?? website.type}</span>
-								<span className={'text-muted-foreground'}>{'→'}</span>
+								<span className={'text-primary transition-transform group-hover:translate-x-0.5'}>{'→'}</span>
 							</a>
 						))}
 					</div>

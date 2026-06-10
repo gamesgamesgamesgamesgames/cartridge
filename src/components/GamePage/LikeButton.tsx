@@ -1,88 +1,83 @@
 'use client'
 
-// Module imports
-import { Heart } from 'lucide-react'
-import { useCallback, useEffect, useState } from 'react'
+import { Heart, Loader2 } from 'lucide-react'
+import { useCallback, useEffect, useRef } from 'react'
 
-// Local imports
-import * as API from '@/helpers/API'
 import { Button } from '@/components/ui/button'
-import { consumePendingLike, isAuthenticated, setPendingLike } from '@/helpers/oauth'
+import { useLike } from '@/context/LikeContext/LikeContext'
 
-// Types
 type Props = Readonly<{
 	className?: string
-	gameUri: string
-	initialCount: number
-	initialLiked: boolean
+	gameName: string
 }>
 
+function formatCount(n: number): string {
+	if (n >= 10_000) return `${(n / 1000).toFixed(1).replace(/\.0$/, '')}K`
+	if (n >= 1_000) return n.toLocaleString()
+	return String(n)
+}
+
+function likeLabel(count: number, liked: boolean): string {
+	if (count === 0) return liked ? 'Liked' : 'Like'
+	return `${formatCount(count)} ${count === 1 ? 'Like' : 'Likes'}`
+}
+
+const POP_CLASS = 'motion-safe:animate-[like-pop_400ms_cubic-bezier(0.34,1.56,0.64,1)]'
+const DEFLATE_CLASS = 'motion-safe:animate-[like-deflate_250ms_ease-out]'
+
 export function LikeButton(props: Props) {
-	const { className, gameUri, initialCount, initialLiked } = props
+	const { className, gameName } = props
+	const { liked, count, pending, toggle } = useLike()
 
-	const [liked, setLiked] = useState(initialLiked)
-	const [count, setCount] = useState(initialCount)
-	const [pending, setPending] = useState(false)
+	const heartRef = useRef<SVGSVGElement>(null)
+	const prevLiked = useRef(liked)
+	const prevPending = useRef(pending)
 
-	const toggleLike = useCallback(async () => {
-		if (pending) return
-
-		const wasLiked = liked
-		const prevCount = count
-		setLiked(!wasLiked)
-		setCount(wasLiked ? prevCount - 1 : prevCount + 1)
-		setPending(true)
-
-		try {
-			await API.toggleLike(gameUri)
-		} catch {
-			setLiked(wasLiked)
-			setCount(prevCount)
-		} finally {
-			setPending(false)
-		}
-	}, [gameUri, liked, count, pending])
-
-	const handleClick = useCallback(() => {
-		if (!isAuthenticated()) {
-			setPendingLike(gameUri)
-			const returnTo = window.location.pathname + window.location.search
-			window.location.href = `/login?returnTo=${encodeURIComponent(returnTo)}`
-			return
-		}
-
-		toggleLike()
-	}, [gameUri, toggleLike])
+	const clearAnim = useCallback(() => {
+		heartRef.current?.classList.remove(POP_CLASS, DEFLATE_CLASS)
+	}, [])
 
 	useEffect(() => {
-		if (!isAuthenticated()) return
+		const likedChanged = liked !== prevLiked.current
+		const saveCompleted = prevPending.current && !pending
 
-		// Server can't check liked status (no auth token), so fetch it client-side
-		API.getLikes(gameUri).then(({ count: freshCount, liked: freshLiked }) => {
-			setLiked(freshLiked)
-			setCount(freshCount)
+		prevLiked.current = liked
+		prevPending.current = pending
 
-			// Execute pending like after we know the real state
-			const pendingUri = consumePendingLike()
-			if (pendingUri === gameUri && !freshLiked) {
-				toggleLike()
-			}
-		})
-	}, []) // eslint-disable-line react-hooks/exhaustive-deps
+		if ((likedChanged && !pending) || saveCompleted) {
+			const el = heartRef.current
+			if (!el) return
+			el.classList.remove(POP_CLASS, DEFLATE_CLASS)
+			el.classList.add(liked ? POP_CLASS : DEFLATE_CLASS)
+			el.addEventListener('animationend', clearAnim, { once: true })
+		}
+	}, [liked, pending, clearAnim])
 
 	return (
 		<Button
-			className={className}
-			disabled={pending}
-			onClick={handleClick}
-			size={'sm'}
-			variant={'ghost'}>
-			<Heart
-				className={`transition-colors ${liked ? 'fill-red-500 text-red-500' : ''}`}
-			/>
-			<span className={'tabular-nums'}>
-				{count}
-			</span>
+			aria-label={liked ? `Unlike ${gameName}` : `Like ${gameName}`}
+			aria-busy={pending || undefined}
+			aria-pressed={liked}
+			className={[
+				className,
+				liked
+					? 'text-liked border-liked/25 hover:bg-liked/15 hover:border-liked/40 hover:text-liked dark:hover:bg-liked/15 dark:hover:border-liked/40'
+					: 'hover:border-primary/50 hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/10 dark:hover:border-primary/50',
+				pending && 'cursor-wait',
+			].filter(Boolean).join(' ')}
+			onClick={toggle}
+			size={'default'}
+			variant={'outline'}>
+			{pending ? (
+				<Loader2 className={'animate-spin'} aria-hidden={'true'} />
+			) : (
+				<Heart
+					ref={heartRef}
+					aria-hidden={'true'}
+					className={`motion-safe:transition-colors ${liked ? 'fill-liked text-liked' : ''}`}
+				/>
+			)}
+			{likeLabel(count, liked)}
 		</Button>
 	)
 }

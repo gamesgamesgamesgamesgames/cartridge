@@ -30,7 +30,7 @@ export function CollectionsTab(props: Props) {
 							<Link
 								key={game.uri}
 								className={'group transition-transform duration-200 hover:scale-105'}
-								href={`/game/${game.slug}`}>
+								href={`/game/${game.slug ?? game.uri}`}>
 								<BoxArt
 									className={'mb-2'}
 									gameRecord={game} />

@@ -1,8 +1,7 @@
 'use client'
 
 // Module imports
-import { faPenToSquare } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { SquarePen } from 'lucide-react'
 import Link from 'next/link'
 import { useStore } from 'statery'
 
@@ -24,10 +23,11 @@ export function SuggestEditButton(props: Props) {
 	return (
 		<Button
 			asChild
-			size={'sm'}
-			variant={'outline'}>
+			size={'default'}
+			variant={'outline'}
+			className={'hover:border-primary/50 hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/10 dark:hover:border-primary/50'}>
 			<Link href={`/dashboard/contribute/${slug}`}>
-				<FontAwesomeIcon icon={faPenToSquare} />
+				<SquarePen />
 				{'Suggest Edit'}
 			</Link>
 		</Button>

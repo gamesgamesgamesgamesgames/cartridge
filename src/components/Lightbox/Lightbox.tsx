@@ -1,7 +1,7 @@
 'use client'
 
 // Module imports
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import { ChevronLeft, ChevronRight, X } from 'lucide-react'
 import { createPortal } from 'react-dom'
 
@@ -22,6 +22,8 @@ type Props = Readonly<{
 
 export function Lightbox(props: Props) {
 	const { sectionLabel, images, currentIndex, onClose, onNavigate } = props
+	const dialogRef = useRef<HTMLDivElement>(null)
+	const previousFocusRef = useRef<HTMLElement | null>(null)
 
 	const hasPrev = currentIndex > 0
 	const hasNext = currentIndex < images.length - 1
@@ -35,6 +37,9 @@ export function Lightbox(props: Props) {
 	}, [hasNext, currentIndex, onNavigate])
 
 	useEffect(() => {
+		previousFocusRef.current = document.activeElement as HTMLElement
+		dialogRef.current?.focus()
+
 		function handleKeyDown(e: KeyboardEvent) {
 			switch (e.key) {
 				case 'Escape':
@@ -46,6 +51,27 @@ export function Lightbox(props: Props) {
 				case 'ArrowRight':
 					goToNext()
 					break
+				case 'Tab': {
+					const dialog = dialogRef.current
+					if (!dialog) break
+					const focusable = dialog.querySelectorAll<HTMLElement>(
+						'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+					)
+					if (focusable.length === 0) {
+						e.preventDefault()
+						break
+					}
+					const first = focusable[0]
+					const last = focusable[focusable.length - 1]
+					if (e.shiftKey && document.activeElement === first) {
+						e.preventDefault()
+						last.focus()
+					} else if (!e.shiftKey && document.activeElement === last) {
+						e.preventDefault()
+						first.focus()
+					}
+					break
+				}
 			}
 		}
 
@@ -55,6 +81,7 @@ export function Lightbox(props: Props) {
 		return () => {
 			document.removeEventListener('keydown', handleKeyDown)
 			document.body.style.overflow = ''
+			previousFocusRef.current?.focus()
 		}
 	}, [onClose, goToPrev, goToNext])
 
@@ -63,7 +90,12 @@ export function Lightbox(props: Props) {
 
 	return createPortal(
 		<div
-			className={'fixed inset-0 z-50 flex items-center justify-center bg-black/90'}
+			ref={dialogRef}
+			role={'dialog'}
+			aria-modal={'true'}
+			aria-label={`${sectionLabel} viewer, image ${currentIndex + 1} of ${images.length}`}
+			tabIndex={-1}
+			className={'fixed inset-0 z-50 flex items-center justify-center bg-black/90 outline-none'}
 			onClick={onClose}>
 			<div
 				className={'absolute top-4 left-4 flex items-center gap-3'}
@@ -73,7 +105,7 @@ export function Lightbox(props: Props) {
 				</span>
 
 				{images.length > 1 && (
-					<span className={'text-sm text-white/60'}>
+					<span className={'text-sm text-white/60'} aria-live={'polite'}>
 						{currentIndex + 1} / {images.length}
 					</span>
 				)}
@@ -81,32 +113,35 @@ export function Lightbox(props: Props) {
 
 			<button
 				type={'button'}
+				aria-label={'Close lightbox'}
 				className={'absolute top-4 right-4 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20'}
 				onClick={onClose}>
-				<X className={'size-6'} />
+				<X className={'size-6'} aria-hidden={'true'} />
 			</button>
 
 			{hasPrev && (
 				<button
 					type={'button'}
+					aria-label={'Previous image'}
 					className={'absolute left-4 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20'}
 					onClick={(e) => {
 						e.stopPropagation()
 						goToPrev()
 					}}>
-					<ChevronLeft className={'size-6'} />
+					<ChevronLeft className={'size-6'} aria-hidden={'true'} />
 				</button>
 			)}
 
 			{hasNext && (
 				<button
 					type={'button'}
+					aria-label={'Next image'}
 					className={'absolute right-4 rounded-full bg-white/10 p-2 text-white transition-colors hover:bg-white/20'}
 					onClick={(e) => {
 						e.stopPropagation()
 						goToNext()
 					}}>
-					<ChevronRight className={'size-6'} />
+					<ChevronRight className={'size-6'} aria-hidden={'true'} />
 				</button>
 			)}
 

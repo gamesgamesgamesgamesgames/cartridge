@@ -7,7 +7,6 @@ import { Scroller } from '@/components/ui/scroller'
 import { type MediaItem } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 import { useBlobUrl } from '@/hooks/use-blob-url'
 import { SCREENSHOT_TYPES } from '@/constants/MEDIA_CATEGORIES'
-import { type MediaType } from '@/typedefs/MediaType'
 
 type GameMediaItem = {
 	blob?: unknown
@@ -29,9 +28,10 @@ function ScreenshotImage(props: {
 	uri: string
 	item: GameMediaItem
 	gameName: string
+	index: number
 	onClick: () => void
 }) {
-	const { uri, item, gameName, onClick } = props
+	const { uri, item, gameName, index, onClick } = props
 	const blobUrl = useBlobUrl(uri, item.blob as MediaItem['blob'])
 
 	if (!blobUrl) return null
@@ -39,11 +39,12 @@ function ScreenshotImage(props: {
 	return (
 		<button
 			type={'button'}
+			aria-label={`View screenshot ${index + 1} from ${gameName}`}
 			className={'group relative block h-full shrink-0 cursor-pointer overflow-hidden rounded-lg'}
 			onClick={onClick}>
 			<img
 				alt={''}
-				aria-hidden
+				aria-hidden={'true'}
 				className={'absolute inset-0 h-full w-full scale-110 object-cover blur-xl'}
 				src={blobUrl}
 			/>
@@ -56,7 +57,8 @@ function ScreenshotImage(props: {
 	)
 }
 
-function useScreenshotBlobUrls(uri: string, items: GameMediaItem[]) {
+function useBlobUrls(uri: string, items: GameMediaItem[]) {
+	// Safe: item count is derived from static game data and won't change between renders
 	const urls: (string | undefined)[] = []
 	for (const item of items) {
 		// eslint-disable-next-line react-hooks/rules-of-hooks
@@ -74,7 +76,7 @@ export function ScreenshotGallery(props: Props) {
 		[media],
 	)
 
-	const blobUrls = useScreenshotBlobUrls(uri, screenshots)
+	const blobUrls = useBlobUrls(uri, screenshots)
 
 	const lightboxImages = useMemo(
 		() =>
@@ -97,14 +99,14 @@ export function ScreenshotGallery(props: Props) {
 				hideScrollbar
 				withNavigation
 				scrollStep={400}
-				className={'-mx-4 flex gap-3 px-4 py-2 md:gap-4'}
-				style={{ height: '220px' }}>
+				className={'-mx-4 flex h-40 gap-3 px-4 py-2 md:h-56 md:gap-4 lg:h-72'}>
 				{screenshots.map((item, index) => (
 					<ScreenshotImage
 						key={index}
 						uri={uri}
 						item={item}
 						gameName={gameName}
+						index={index}
 						onClick={() => setLightboxIndex(index)}
 					/>
 				))}

@@ -3,6 +3,7 @@
 // Module imports
 import { ListPlus, Loader2, Plus } from 'lucide-react'
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { toast } from 'sonner'
 
 // Local imports
 import * as API from '@/helpers/API'
@@ -47,7 +48,7 @@ export function AddToListButton(props: Props) {
 			const { lists: fetched } = await API.getUserLists(did, gameUri)
 			setLists(fetched)
 		} catch {
-			// silently fail
+			toast.error('Couldn\'t load your lists.')
 		} finally {
 			setLoading(false)
 		}
@@ -72,6 +73,7 @@ export function AddToListButton(props: Props) {
 						l.uri === listUri ? { ...l, hasGame: !l.hasGame } : l,
 					),
 				)
+				toast.error('Couldn\'t update list. Try again.')
 			} finally {
 				setTogglingUri(null)
 			}
@@ -98,7 +100,7 @@ export function AddToListButton(props: Props) {
 
 			await API.toggleListItem(uri, gameUri)
 		} catch {
-			// silently fail
+			toast.error('Couldn\'t create list. Try again.')
 		} finally {
 			setCreating(false)
 		}
@@ -138,7 +140,8 @@ export function AddToListButton(props: Props) {
 			<PopoverTrigger asChild>
 				<Button
 					variant={'ghost'}
-					size={'sm'}
+					size={'default'}
+					className={'hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/10'}
 					onClick={handleTriggerClick}>
 					<ListPlus />
 					{'Add to List'}
@@ -147,7 +150,10 @@ export function AddToListButton(props: Props) {
 
 			<PopoverContent
 				align={'start'}
-				className={'w-64 p-0'}>
+				aria-label={'Your lists'}
+				side={'top'}
+				className={'w-64 p-0'}
+				collisionPadding={16}>
 				<div className={'max-h-60 overflow-y-auto'}>
 					{loading && (
 						<div className={'flex items-center justify-center py-6'}>
@@ -189,6 +195,7 @@ export function AddToListButton(props: Props) {
 							handleCreate()
 						}}>
 						<Input
+							aria-label={'New list name'}
 							className={'h-8 text-sm'}
 							placeholder={'New list name...'}
 							value={newListName}

@@ -23,7 +23,7 @@ export function CopyableValue(props: Props) {
 	return (
 		<button
 			type={'button'}
-			className={'group flex w-full cursor-pointer items-start justify-between gap-2 rounded-md px-1.5 py-1 -mx-1.5 transition-colors hover:bg-accent'}
+			className={'group flex min-h-11 w-full cursor-pointer items-center justify-between gap-2 rounded-md px-1.5 py-2 -mx-1.5 transition-colors hover:bg-accent'}
 			onClick={handleCopy}>
 			<span className={'text-muted-foreground shrink-0'}>{label}</span>
 			<span className={'flex items-center gap-1.5 min-w-0'}>
