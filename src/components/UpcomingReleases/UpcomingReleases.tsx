@@ -65,7 +65,7 @@ export function UpcomingReleases() {
 	if (games.length === 0) return null
 
 	return (
-		<section className={'bg-secondary pb-12'}>
+		<section className={'relative bg-secondary pb-12'}>
 			<Container className={'-mt-30'}>
 				<Header
 					className={'mb-6'}

@@ -1,4 +1,5 @@
 // Local imports
+import { CommunityFire } from '@/components/CommunityFire/CommunityFire'
 import { GenrePills } from '@/components/HomePage/GenrePills'
 import { PopularRightNow } from '@/components/HomePage/PopularRightNow'
 import { StatsBar } from '@/components/HomePage/StatsBar'
@@ -19,7 +20,7 @@ export default async function Home() {
 		<>
 			<div
 				className={
-					'flex flex-col flex-grow items-center justify-center bg-background px-4 h-[calc(100dvh-5rem)]'
+					'relative flex flex-col flex-grow items-center justify-center bg-background px-4 h-[calc(100dvh-5rem)]'
 				}>
 				<main className={'flex flex-col gap-6 items-center w-full'}>
 					<Logo />
@@ -28,6 +29,8 @@ export default async function Home() {
 
 					<SuggestedQueries />
 				</main>
+
+				<CommunityFire />
 			</div>
 
 			<UpcomingReleases />
