@@ -27,7 +27,7 @@ export function EditProfileButton(props: Props) {
 			variant={'outline'}
 			size={'sm'}>
 			<Link href={'/settings/profile'}>
-				<FontAwesomeIcon icon={faPen} />
+				<FontAwesomeIcon icon={faPen} aria-hidden={'true'} />
 				{'Edit Profile'}
 			</Link>
 		</Button>

@@ -1043,6 +1043,13 @@ export async function getActivityFeed(
 // User Lists
 // ---------------------------------------------------------------------------
 
+export type ListPreviewItem = {
+	uri: string
+	name: string
+	slug?: string
+	media?: GameRecord['media']
+}
+
 export type UserListView = {
 	uri: string
 	name: string
@@ -1050,6 +1057,7 @@ export type UserListView = {
 	itemCount: number
 	hasGame?: boolean
 	createdAt: string
+	previewItems?: ListPreviewItem[]
 }
 
 export async function getUserLists(
@@ -1113,6 +1121,67 @@ export async function toggleListItem(
 	}
 
 	return response.json()
+}
+
+// ---------------------------------------------------------------------------
+// List detail
+// ---------------------------------------------------------------------------
+
+export type ListCreatorView = {
+	did: string
+	handle: string
+	displayName?: string
+	avatar?: unknown
+}
+
+export type ListDetailView = {
+	uri: string
+	name: string
+	description?: string
+	itemCount: number
+	createdAt: string
+	creator: ListCreatorView
+}
+
+export type ListItemView = {
+	uri: string
+	addedAt: string
+	game: GameFeedGame
+}
+
+export async function getList(
+	uri: string,
+): Promise<{ list: ListDetailView } | null> {
+	const params = new URLSearchParams({ uri })
+
+	const resp = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.feed.getList?${params}`,
+	)
+
+	if (!resp.ok) {
+		return null
+	}
+
+	return resp.json()
+}
+
+export async function getListItems(
+	listUri: string,
+	limit = 30,
+	cursor?: string,
+): Promise<{ items: ListItemView[]; cursor?: string }> {
+	const params = new URLSearchParams({ listUri, limit: String(limit) })
+	if (cursor) params.set('cursor', cursor)
+
+	const resp = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.feed.getListItems?${params}`,
+	)
+
+	if (!resp.ok) {
+		return { items: [] }
+	}
+
+	return resp.json()
 }
 
 // ---------------------------------------------------------------------------
@@ -1327,4 +1396,98 @@ export async function unlinkExternal(
 	}
 
 	return response.json()
+}
+
+// ---------------------------------------------------------------------------
+// Follow
+// ---------------------------------------------------------------------------
+
+export async function toggleFollow(
+	did: string,
+): Promise<{ action: 'followed' | 'unfollowed' }> {
+	const response = await queryAPI(
+		'/xrpc/games.gamesgamesgamesgames.graph.toggleFollow',
+		{
+			isAuthenticated: true,
+			method: 'POST',
+			body: JSON.stringify({ subject: did }),
+		},
+	)
+
+	if (!response.ok) {
+		throw new Error(`toggleFollow failed (${response.status})`)
+	}
+
+	return response.json()
+}
+
+export async function getFollowerCount(
+	did: string,
+): Promise<{ count: number }> {
+	const resp = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.graph.getFollowerCount?did=${did}`,
+	)
+
+	if (!resp.ok) return { count: 0 }
+	return resp.json()
+}
+
+export async function getFollowingCount(
+	did: string,
+): Promise<{ count: number }> {
+	const resp = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.graph.getFollowingCount?did=${did}`,
+	)
+
+	if (!resp.ok) return { count: 0 }
+	return resp.json()
+}
+
+export async function getFollowStatus(
+	did: string,
+): Promise<{ isFollowing: boolean; isFollowedBy: boolean }> {
+	const resp = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.graph.getFollowStatus?did=${did}`,
+		{ isAuthenticated: true },
+	)
+
+	if (!resp.ok) return { isFollowing: false, isFollowedBy: false }
+	return resp.json()
+}
+
+// ---------------------------------------------------------------------------
+// Taste
+// ---------------------------------------------------------------------------
+
+export type GenrePreference = {
+	genre: string
+	count: number
+	percentage: number
+}
+
+export type TasteProfile = {
+	genres: GenrePreference[]
+	favorites: GameFeedGame[]
+}
+
+export async function getTasteProfile(
+	did: string,
+	genreLimit = 5,
+	favoriteLimit = 6,
+): Promise<TasteProfile> {
+	const queryParams = new URLSearchParams({
+		did,
+		genreLimit: String(genreLimit),
+		favoriteLimit: String(favoriteLimit),
+	})
+
+	const resp = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.actor.getTasteProfile?${queryParams}`,
+	)
+
+	if (!resp.ok) {
+		return { genres: [], favorites: [] }
+	}
+
+	return resp.json()
 }

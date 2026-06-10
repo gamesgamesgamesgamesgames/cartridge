@@ -14,6 +14,7 @@ import '@radix-ui/themes/styles.css'
 // Local imports
 import { StoreInitializer } from '@/components/StoreInitializer/StoreInitializer'
 import { ThemeProvider } from '@/context/ThemeProvider/ThemeProvider'
+import { Toaster } from '@/components/ui/sonner'
 
 import './fonts.css'
 
@@ -83,6 +84,7 @@ export default function RootLayoutWrapper(props: Props) {
 					disableTransitionOnChange>
 					<StoreInitializer />
 					{children}
+					<Toaster />
 				</ThemeProvider>
 			</body>
 

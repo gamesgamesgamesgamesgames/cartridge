@@ -58,25 +58,40 @@ export default async function ProfilePage(props: Props) {
 		{ count: reviewCount },
 		{ count: likeCount },
 		{ count: listCount },
+		{ lists },
+		taste,
+		{ count: followerCount },
+		{ count: followingCount },
 	] = await Promise.all([
 		resolveAvatarUrl(profile, did),
-		API.getReviews(profile.uri),
-		API.listGames(20, undefined, undefined, undefined, did),
-		API.getGameCount(did),
-		API.getReviewCount(did),
-		API.getLikeCount(did),
-		API.getListCount(did),
+		API.getReviews(profile.uri).catch(() => ({ reviews: [] as never[] })),
+		API.listGames(20, undefined, undefined, undefined, did).catch(() => ({ games: [] as never[] })),
+		API.getGameCount(did).catch(() => ({ count: 0 })),
+		API.getReviewCount(did).catch(() => ({ count: 0 })),
+		API.getLikeCount(did).catch(() => ({ count: 0 })),
+		API.getListCount(did).catch(() => ({ count: 0 })),
+		API.getUserLists(did).catch(() => ({ lists: [] as never[] })),
+		API.getTasteProfile(did).catch(() => ({ genres: [], favorites: [] })),
+		API.getFollowerCount(did).catch(() => ({ count: 0 })),
+		API.getFollowingCount(did).catch(() => ({ count: 0 })),
 	])
 
 	return (
 		<ProfileLayoutContent
 			avatarUrl={avatarUrl}
 			basePath={`/profile/${handle}`}
+			favorites={taste.favorites}
 			gameCount={gameCount}
 			games={games}
+			genres={taste.genres}
 			handle={resolvedHandle}
+			followerCount={followerCount}
+			followingCount={followingCount}
+			isFollowing={false}
+			isFollowedBy={false}
 			likeCount={likeCount}
 			listCount={listCount}
+			lists={lists}
 			profile={profile}
 			reviewCount={reviewCount}
 			reviews={reviews}

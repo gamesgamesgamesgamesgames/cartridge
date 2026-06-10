@@ -12,7 +12,7 @@ type Props = Readonly<
 export function Header(props: Props) {
 	const { children, className, level } = props
 
-	const baseClassName = `scroll-m-20 font-[family-name:var(--font-cartridge)] font-extrabold text-left`
+	const baseClassName = `scroll-m-20 font-[family-name:var(--font-cartridge)] font-black text-left`
 
 	switch (level) {
 		case 6:

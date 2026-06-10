@@ -1,24 +1,23 @@
 'use client'
 
-// Module imports
 import { List } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 
-// Local imports
 import { BoxArt } from '@/components/BoxArt/BoxArt'
+import { StarRating } from '@/components/ui/star-rating'
 import { type ActivityFeedItem } from '@/helpers/API'
 
-// Types
 type Props = Readonly<{
 	item: ActivityFeedItem
 }>
 
 function formatRelativeTime(dateString: string): string {
-	const now = Date.now()
 	const then = new Date(dateString).getTime()
-	const diffSeconds = Math.floor((now - then) / 1000)
+	if (Number.isNaN(then)) return ''
 
+	const diffSeconds = Math.floor((Date.now() - then) / 1000)
+	if (diffSeconds < 0) return 'just now'
 	if (diffSeconds < 60) return 'just now'
 	const diffMinutes = Math.floor(diffSeconds / 60)
 	if (diffMinutes < 60) return `${diffMinutes}m ago`
@@ -29,37 +28,18 @@ function formatRelativeTime(dateString: string): string {
 	return new Date(dateString).toLocaleDateString()
 }
 
-function StarRating(props: { rating: number }) {
-	const stars = props.rating / 2
-	const fullStars = Math.floor(stars)
-	const hasHalf = stars - fullStars >= 0.5
-
-	return (
-		<span className={'flex items-center gap-0.5 text-sm'}>
-			{Array.from({ length: 5 }, (_, i) => {
-				if (i < fullStars) return <span key={i}>{'★'}</span>
-				if (i === fullStars && hasHalf) return <span key={i}>{'★'}</span>
-				return (
-					<span key={i} className={'opacity-30'}>
-						{'★'}
-					</span>
-				)
-			})}
-			<span className={'ml-1 text-xs text-muted-foreground'}>
-				{props.rating}/10
-			</span>
-		</span>
-	)
+function gameHref(item: ActivityFeedItem): string {
+	if (!item.game?.slug) return `/game/${encodeURIComponent(item.game?.uri ?? '')}`
+	return `/game/${item.game.slug}`
 }
 
 function LikeItem(props: Props) {
 	const { item } = props
 	if (!item.game) return null
-	const href = item.game.slug ? `/game/${item.game.slug}` : '#'
 
 	return (
-		<div className={'flex items-center gap-3 py-3'}>
-			<Link href={href} className={'shrink-0'}>
+		<article className={'flex items-center gap-3 py-3'}>
+			<Link href={gameHref(item)} className={'shrink-0'}>
 				<BoxArt
 					className={'w-10 rounded-sm'}
 					gameRecord={item.game}
@@ -69,16 +49,18 @@ function LikeItem(props: Props) {
 			<div className={'flex min-w-0 flex-1 items-center justify-between gap-2'}>
 				<p className={'truncate text-sm'}>
 					{'Liked '}
-					<Link href={href} className={'font-semibold text-foreground hover:text-primary'}>
+					<Link href={gameHref(item)} className={'font-semibold text-foreground hover:text-primary'}>
 						{item.game.name}
 					</Link>
 				</p>
 
-				<time className={'shrink-0 text-xs text-muted-foreground'}>
+				<time
+					className={'shrink-0 text-xs text-muted-foreground'}
+					dateTime={item.createdAt}>
 					{formatRelativeTime(item.createdAt)}
 				</time>
 			</div>
-		</div>
+		</article>
 	)
 }
 
@@ -86,60 +68,65 @@ function ReviewItem(props: Props) {
 	const { item } = props
 	const [expanded, setExpanded] = useState(false)
 	if (!item.game) return null
-	const href = item.game.slug ? `/game/${item.game.slug}` : '#'
-	const review = item.review
 
-	const previewLength = 200
+	const review = item.review
+	const previewLength = 280
 	const text = review?.text ?? ''
 	const needsTruncation = text.length > previewLength
 	const displayText = expanded || !needsTruncation
 		? text
-		: text.slice(0, previewLength) + '…'
+		: text.slice(0, previewLength) + '...'
 
 	return (
-		<div className={'flex gap-3 py-3'}>
-			<Link href={href} className={'shrink-0'}>
-				<BoxArt
-					className={'w-10 rounded-sm'}
-					gameRecord={item.game}
-				/>
-			</Link>
+		<article className={'rounded-lg bg-card/50 p-4 my-2'}>
+			<div className={'flex gap-4'}>
+				<Link href={gameHref(item)} className={'shrink-0'}>
+					<BoxArt
+						className={'w-16 rounded-md shadow-md'}
+						gameRecord={item.game}
+					/>
+				</Link>
 
-			<div className={'flex min-w-0 flex-1 flex-col gap-1.5'}>
-				<div className={'flex items-center justify-between gap-2'}>
-					<p className={'truncate text-sm'}>
-						{'Reviewed '}
-						<Link href={href} className={'font-semibold text-foreground hover:text-primary'}>
-							{item.game.name}
-						</Link>
-					</p>
+				<div className={'flex min-w-0 flex-1 flex-col gap-2'}>
+					<div className={'flex items-start justify-between gap-2'}>
+						<div>
+							<p className={'text-sm font-medium'}>
+								{'Reviewed '}
+								<Link href={gameHref(item)} className={'text-foreground hover:text-primary'}>
+									{item.game.name}
+								</Link>
+							</p>
+							{review && <StarRating rating={review.rating} size={'md'} showNumeric />}
+						</div>
 
-					<time className={'shrink-0 text-xs text-muted-foreground'}>
-						{formatRelativeTime(item.createdAt)}
-					</time>
-				</div>
-
-				{review && <StarRating rating={review.rating} />}
-
-				{review?.title && (
-					<p className={'text-sm font-medium'}>{review.title}</p>
-				)}
-
-				{text && (
-					<div className={'text-sm leading-relaxed text-muted-foreground'}>
-						<p>{displayText}</p>
-						{needsTruncation && (
-							<button
-								type={'button'}
-								className={'mt-1 text-xs text-primary hover:underline'}
-								onClick={() => setExpanded(!expanded)}>
-								{expanded ? 'Show less' : 'Read more'}
-							</button>
-						)}
+						<time
+							className={'shrink-0 text-xs text-muted-foreground'}
+							dateTime={item.createdAt}>
+							{formatRelativeTime(item.createdAt)}
+						</time>
 					</div>
-				)}
+
+					{review?.title && (
+						<p className={'truncate text-sm font-semibold'}>{review.title}</p>
+					)}
+
+					{text && (
+						<div className={'text-sm leading-relaxed text-muted-foreground'}>
+							<p>{displayText}</p>
+							{needsTruncation && (
+								<button
+									type={'button'}
+									className={'mt-1.5 text-xs font-medium text-primary hover:underline'}
+									aria-expanded={expanded}
+									onClick={() => setExpanded(!expanded)}>
+									{expanded ? 'Show less' : 'Read more'}
+								</button>
+							)}
+						</div>
+					)}
+				</div>
 			</div>
-		</div>
+		</article>
 	)
 }
 
@@ -147,33 +134,34 @@ function ListCreateItem(props: Props) {
 	const { item } = props
 
 	return (
-		<div className={'flex items-center gap-3 py-3'}>
+		<article className={'flex items-center gap-3 py-3'}>
 			<div className={'flex size-10 shrink-0 items-center justify-center rounded-sm bg-muted'}>
-				<List className={'size-5 text-muted-foreground'} />
+				<List className={'size-5 text-muted-foreground'} aria-hidden={'true'} />
 			</div>
 
 			<div className={'flex min-w-0 flex-1 items-center justify-between gap-2'}>
 				<p className={'truncate text-sm'}>
 					{'Created list '}
-					<span className={'font-semibold'}>{item.list?.name}</span>
+					<span className={'font-semibold'}>{item.list?.name ?? 'Unnamed list'}</span>
 				</p>
 
-				<time className={'shrink-0 text-xs text-muted-foreground'}>
+				<time
+					className={'shrink-0 text-xs text-muted-foreground'}
+					dateTime={item.createdAt}>
 					{formatRelativeTime(item.createdAt)}
 				</time>
 			</div>
-		</div>
+		</article>
 	)
 }
 
 function ListAddGameItem(props: Props) {
 	const { item } = props
-	const href = item.game?.slug ? `/game/${item.game.slug}` : '#'
 
 	return (
-		<div className={'flex items-center gap-3 py-3'}>
+		<article className={'flex items-center gap-3 py-3'}>
 			{item.game && (
-				<Link href={href} className={'shrink-0'}>
+				<Link href={gameHref(item)} className={'shrink-0'}>
 					<BoxArt
 						className={'w-10 rounded-sm'}
 						gameRecord={item.game}
@@ -185,19 +173,21 @@ function ListAddGameItem(props: Props) {
 				<p className={'truncate text-sm'}>
 					{'Added '}
 					{item.game && (
-						<Link href={href} className={'font-semibold text-foreground hover:text-primary'}>
+						<Link href={gameHref(item)} className={'font-semibold text-foreground hover:text-primary'}>
 							{item.game.name}
 						</Link>
 					)}
 					{' to '}
-					<span className={'font-semibold'}>{item.list?.name}</span>
+					<span className={'font-semibold'}>{item.list?.name ?? 'a list'}</span>
 				</p>
 
-				<time className={'shrink-0 text-xs text-muted-foreground'}>
+				<time
+					className={'shrink-0 text-xs text-muted-foreground'}
+					dateTime={item.createdAt}>
 					{formatRelativeTime(item.createdAt)}
 				</time>
 			</div>
-		</div>
+		</article>
 	)
 }
 

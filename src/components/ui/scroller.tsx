@@ -29,7 +29,7 @@ const scrollerVariants = cva("", {
         "data-[top-bottom-scroll=true]:[mask-image:linear-gradient(#000,#000,transparent_0,#000_var(--scroll-shadow-size),#000_calc(100%_-_var(--scroll-shadow-size)),transparent)]",
       ],
       horizontal: [
-        "overflow-x-auto",
+        "overflow-x-auto scroll-smooth snap-x snap-proximity",
         "data-[left-scroll=true]:[mask-image:linear-gradient(270deg,#000_calc(100%_-_var(--scroll-shadow-size)),transparent)]",
         "data-[right-scroll=true]:[mask-image:linear-gradient(90deg,#000_calc(100%_-_var(--scroll-shadow-size)),transparent)]",
         "data-[left-right-scroll=true]:[mask-image:linear-gradient(to_right,#000,#000,transparent_0,#000_var(--scroll-shadow-size),#000_calc(100%_-_var(--scroll-shadow-size)),transparent)]",
@@ -61,6 +61,7 @@ interface ScrollerProps
   withNavigation?: boolean;
   scrollStep?: number;
   scrollTriggerMode?: "press" | "hover" | "click";
+  "aria-label"?: string;
 }
 
 function Scroller(props: ScrollerProps) {
@@ -226,16 +227,44 @@ function Scroller(props: ScrollerProps) {
     return orientation === "vertical" ? ["up", "down"] : ["left", "right"];
   }, [orientation, withNavigation]);
 
+  const handleKeyDown = React.useCallback(
+    (e: React.KeyboardEvent) => {
+      const keyMap: Record<string, ScrollDirection | undefined> = {
+        ArrowLeft: "left",
+        ArrowRight: "right",
+        ArrowUp: "up",
+        ArrowDown: "down",
+      };
+      const dir = keyMap[e.key];
+      if (!dir) return;
+
+      const isRelevant =
+        orientation === "horizontal"
+          ? dir === "left" || dir === "right"
+          : dir === "up" || dir === "down";
+      if (!isRelevant) return;
+
+      e.preventDefault();
+      onScrollBy(dir);
+    },
+    [onScrollBy, orientation],
+  );
+
   const ScrollerPrimitive = asChild ? Slot : "div";
 
   const ScrollerImpl = (
     <ScrollerPrimitive
       data-slot="scroller"
+      tabIndex={withNavigation ? 0 : undefined}
+      role={withNavigation ? "region" : undefined}
+      onKeyDown={withNavigation ? handleKeyDown : undefined}
       {...scrollerProps}
       ref={composedRef}
       style={composedStyle}
       className={cn(
         scrollerVariants({ orientation, hideScrollbar, className }),
+        withNavigation && orientation === "horizontal" && "md:scroll-pl-14 md:scroll-pr-14 lg:scroll-pl-0 lg:scroll-pr-0",
+        withNavigation && "focus-visible:outline-2 focus-visible:outline-ring/50 focus-visible:rounded-sm",
       )}
     />
   );
@@ -275,7 +304,7 @@ function Scroller(props: ScrollerProps) {
 }
 
 const scrollButtonVariants = cva(
-  "absolute z-10 transition-opacity [&>svg]:size-4 [&>svg]:opacity-80 hover:[&>svg]:opacity-100",
+  "absolute z-10 hidden min-h-11 min-w-11 items-center justify-center rounded-full bg-card/80 shadow-sm backdrop-blur transition-opacity md:flex [&>svg]:size-4 [&>svg]:opacity-80 hover:[&>svg]:opacity-100",
   {
     variants: {
       direction: {
@@ -296,6 +325,13 @@ const directionToIcon: Record<ScrollDirection, React.ElementType> = {
   down: ChevronDown,
   left: ChevronLeft,
   right: ChevronRight,
+} as const;
+
+const directionToLabel: Record<ScrollDirection, string> = {
+  up: 'Scroll up',
+  down: 'Scroll down',
+  left: 'Scroll left',
+  right: 'Scroll right',
 } as const;
 
 interface ScrollButtonProps extends React.ComponentProps<"button"> {
@@ -374,6 +410,7 @@ function ScrollButton(props: ScrollButtonProps) {
   return (
     <button
       type="button"
+      aria-label={directionToLabel[direction]}
       {...buttonProps}
       {...eventHandlers}
       ref={ref}
