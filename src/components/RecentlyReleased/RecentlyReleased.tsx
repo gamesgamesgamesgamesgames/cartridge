@@ -1,17 +1,16 @@
 'use client'
 
-// Local imports
-import { BoxArt } from '@/components/BoxArt/BoxArt'
-import { Container } from '@/components/Container/Container'
+import Link from 'next/link'
+import { BrowseGameCard } from '@/components/BrowsePage/BrowseGameCard'
 import { Header } from '@/components/Header/Header'
-import { TiltCard } from '@/components/TiltCard/TiltCard'
 import { Scroller } from '@/components/ui/scroller'
 import { type GameFeedGame } from '@/helpers/API'
-import Link from 'next/link'
 
-// Types
 type Props = Readonly<{
+	id?: string
 	games: GameFeedGame[]
+	now?: string
+	seeAllHref?: string
 }>
 
 function getFirstReleaseDate(game: GameFeedGame): string | undefined {
@@ -54,52 +53,50 @@ function formatReleaseDate(date: string): string {
 }
 
 export function RecentlyReleased(props: Props) {
-	const { games } = props
+	const { id, games, now, seeAllHref } = props
+
+	const thirtyDaysAgo = now ? new Date(now).getTime() - 30 * 24 * 60 * 60 * 1000 : 0
 
 	if (games.length === 0) return null
 
 	return (
-		<section>
-			<Container>
+		<section id={id} className={'scroll-mt-32'}>
+			<div className={'mb-4 flex items-baseline justify-between px-4 md:px-10 lg:px-16'}>
 				<Header
-					className={'mb-6'}
+					className={'text-xl'}
 					level={3}>
 					{'Recently Released'}
 				</Header>
+				{seeAllHref && (
+					<Link
+						href={seeAllHref}
+						className={'text-sm font-medium text-primary hover:underline'}>
+						{'See all'}
+					</Link>
+				)}
+			</div>
 
-				<Scroller
-					orientation={'horizontal'}
-					hideScrollbar
-					withNavigation
-					scrollStep={176}
-					className={'-mx-4 flex gap-4 px-4 py-4'}>
-					{games.map((game) => {
-						const releaseDate = getFirstReleaseDate(game)
-						const href = game.slug ? `/game/${game.slug}` : '#'
-
-						return (
-							<Link
-								key={game.uri}
-								href={href}
-								className={'block w-40 shrink-0'}>
-								<TiltCard>
-									<BoxArt gameRecord={game} />
-								</TiltCard>
-								<div className={'mt-1.5 px-0.5'}>
-									<div className={'truncate text-sm font-medium'}>
-										{game.name}
-									</div>
-									{releaseDate && (
-										<div className={'truncate text-xs text-muted-foreground'}>
-											{formatReleaseDate(releaseDate)}
-										</div>
-									)}
-								</div>
-							</Link>
-						)
-					})}
-				</Scroller>
-			</Container>
+			<Scroller
+				aria-label={'Recently Released games'}
+				orientation={'horizontal'}
+				hideScrollbar
+				withNavigation
+				size={60}
+				scrollStep={176}
+				className={'flex gap-4 px-4 py-4 md:px-10 lg:px-16'}>
+				{games.map((game) => {
+					const releaseDate = getFirstReleaseDate(game)
+					const isNew = now && releaseDate ? new Date(releaseDate).getTime() > thirtyDaysAgo : false
+					return (
+						<BrowseGameCard
+							key={game.uri}
+							game={game}
+							subtitle={releaseDate ? formatReleaseDate(releaseDate) : undefined}
+							badge={isNew ? 'New' : undefined}
+						/>
+					)
+				})}
+			</Scroller>
 		</section>
 	)
 }

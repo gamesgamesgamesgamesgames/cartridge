@@ -564,6 +564,9 @@ export type GameFeedGame = {
 	firstReleaseDate?: string
 	slug?: string
 	likeCount?: number
+	weeklyLikes?: number
+	weeklyReviews?: number
+	weeklyListAdds?: number
 }
 
 export type GameFeedItem = {
@@ -781,6 +784,58 @@ export async function getGenreCounts(): Promise<{ genres: GenreCountItem[] }> {
 	}
 
 	return response.json()
+}
+
+export async function getGamesByGenre(
+	genre: string,
+	limit = 20,
+): Promise<GameFeedGame[]> {
+	const params = new URLSearchParams({ genre, limit: String(limit) })
+
+	const resp = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.feed.getGamesByGenreFeed?${params}`,
+	)
+
+	if (!resp.ok) {
+		return []
+	}
+
+	const data = await resp.json()
+	return (data.feed ?? []).map((item: GameFeedItem) => item.game)
+}
+
+export async function getMostReviewedGames(
+	limit = 20,
+): Promise<GameFeedGame[]> {
+	const params = new URLSearchParams({ limit: String(limit) })
+
+	const resp = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.feed.getMostReviewedFeed?${params}`,
+	)
+
+	if (!resp.ok) {
+		return []
+	}
+
+	const data = await resp.json()
+	return (data.feed ?? []).map((item: GameFeedItem) => item.game)
+}
+
+export async function getMostListedGames(
+	limit = 20,
+): Promise<GameFeedGame[]> {
+	const params = new URLSearchParams({ limit: String(limit) })
+
+	const resp = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.feed.getMostListedFeed?${params}`,
+	)
+
+	if (!resp.ok) {
+		return []
+	}
+
+	const data = await resp.json()
+	return (data.feed ?? []).map((item: GameFeedItem) => item.game)
 }
 
 // ---------------------------------------------------------------------------
@@ -1018,6 +1073,39 @@ export type ActivityFeedItem = {
 	game?: GameFeedGame
 	review?: ActivityReviewView
 	list?: ActivityListView
+}
+
+export type CommunityFeedActorView = {
+	did: string
+	handle?: string
+	displayName?: string
+}
+
+export type CommunityFeedItem = {
+	type: 'like' | 'review' | 'listCreate' | 'listAddGame'
+	createdAt: string
+	actor: CommunityFeedActorView
+	game?: GameFeedGame
+	review?: ActivityReviewView
+	list?: ActivityListView
+}
+
+export async function getCommunityFeed(
+	limit = 20,
+	cursor?: string,
+): Promise<{ feed: CommunityFeedItem[]; cursor?: string }> {
+	const params = new URLSearchParams({ limit: String(limit) })
+	if (cursor) params.set('cursor', cursor)
+
+	const resp = await queryAPI(
+		`/xrpc/games.gamesgamesgamesgames.feed.getCommunityFeed?${params}`,
+	)
+
+	if (!resp.ok) {
+		return { feed: [] }
+	}
+
+	return resp.json()
 }
 
 export async function getActivityFeed(
