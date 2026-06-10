@@ -17,8 +17,8 @@
         "@fortawesome/free-regular-svg-icons": "^7.1.0",
         "@fortawesome/free-solid-svg-icons": "^7.1.0",
         "@fortawesome/react-fontawesome": "^3.1.1",
-        "@happyview/oauth-client": "1.0.1",
-        "@happyview/oauth-client-browser": "1.1.0",
+        "@happyview/oauth-client": "1.1.1",
+        "@happyview/oauth-client-browser": "1.2.0",
         "@hookform/resolvers": "^5.2.2",
         "@next/third-parties": "^16.1.6",
         "@radix-ui/react-aspect-ratio": "^1.1.8",
@@ -240,9 +240,9 @@
 
     "@fortawesome/react-fontawesome": ["@fortawesome/react-fontawesome@3.1.1", "", { "peerDependencies": { "@fortawesome/fontawesome-svg-core": "~6 || ~7", "react": "^18.0.0 || ^19.0.0" } }, "sha512-EDllr9hpodc21odmUywHS1alXNiCd4E8sp5GJ5s7wYINz8vSmMiNWpALTiuYODb865YyQ/NlyiN4mbXp7HCNqg=="],
 
-    "@happyview/oauth-client": ["@happyview/oauth-client@1.0.1", "", { "dependencies": { "@atproto/jwk": "^0.6.0", "@atproto/jwk-webcrypto": "^0.2.0" } }, "sha512-mSmpygKu9VM1mVJXHdqUHCGy08ljwDEatQ2ZMBCuhcloktaC46MgmzVjJcpmFozo6QwIJ5am/o+vzKeJZYsrpA=="],
+    "@happyview/oauth-client": ["@happyview/oauth-client@1.1.1", "", { "dependencies": { "@atproto/jwk": "^0.6.0", "@atproto/jwk-webcrypto": "^0.2.0" } }, "sha512-vzUM5h0P5lA11MJhEUFQc+4esRKt1aZ4HmNRtI/iRlhb+gGLU1M8eYRYdNyavJirOcVxSpsU62ug7LE+RGM4Xg=="],
 
-    "@happyview/oauth-client-browser": ["@happyview/oauth-client-browser@1.1.0", "", { "dependencies": { "@atproto-labs/did-resolver": "^0.2.6", "@atproto-labs/handle-resolver": "^0.3.6", "@atproto/did": "^0.3.0", "@happyview/oauth-client": "^1.0.1" } }, "sha512-hb7l/TgI+OFDAAGT0g562SFkusWpJVqY5Xq18dx7azBuCdXw/PFSggmvN7ySop6nhHTQ2mEjYoIltgCeSwQ6TA=="],
+    "@happyview/oauth-client-browser": ["@happyview/oauth-client-browser@1.2.0", "", { "dependencies": { "@atproto-labs/did-resolver": "^0.2.6", "@atproto-labs/handle-resolver": "^0.3.6", "@atproto/did": "^0.3.0", "@happyview/oauth-client": "^1.1.0" } }, "sha512-Or9BHmsLm7VlYXdpWO2kxVKTwaD0uAfL4gVbHnWD4RY3VFfewTdzhWE125d7uTtpFLA7dlZ1ODVRfK4gUt4Uuw=="],
 
     "@hookform/resolvers": ["@hookform/resolvers@5.2.2", "", { "dependencies": { "@standard-schema/utils": "^0.3.0" }, "peerDependencies": { "react-hook-form": "^7.55.0" } }, "sha512-A/IxlMLShx3KjV/HeTcTfaMxdwy690+L/ZADoeaTltLx+CVuzkeVIPuybK3jrRfw7YZnmdKsVVHAlEPIAEUNlA=="],
 
