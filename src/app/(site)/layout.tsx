@@ -2,6 +2,7 @@
 import { type PropsWithChildren, Suspense } from 'react'
 
 // Local imports
+import { ReauthBanner } from '@/components/ReauthBanner/ReauthBanner'
 import { ScrollToTop } from '@/components/ScrollToTop/ScrollToTop'
 import { SearchProvider } from '@/context/SearchContext/SearchContext'
 import { SiteFooter } from '@/components/SiteFooter/SiteFooter'
@@ -20,6 +21,7 @@ export default function SiteLayout(props: Props) {
 				<div className={'flex flex-col'}>
 					<div className={'flex flex-col justify-stretch min-h-screen'}>
 						<SiteHeader />
+						<ReauthBanner />
 
 						{children}
 					</div>

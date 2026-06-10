@@ -6,9 +6,11 @@ export type ProfileType = 'actor' | 'org'
 
 export type GlobalState = {
 	authDid: null | string
+	authScopes: string[]
 	gamesCatalog: null | Game[]
 	gamesCatalogCursor: null | string
 	gamesCatalogHasNextPage: boolean
+	needsReauth: boolean
 	profileType: null | ProfileType
 	user: null | User
 }

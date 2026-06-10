@@ -1,5 +1,5 @@
 // Local imports
-import { handleCallback, restoreSession } from '@/helpers/oauth'
+import { handleCallback, hasRequiredScopes, restoreSession } from '@/helpers/oauth'
 import { setAuthCookie } from '@/helpers/setAuthCookie'
 import { setProfileTypeCookie } from '@/helpers/setProfileTypeCookie'
 import { getUserProfile } from '@/store/actions/getUserProfile'
@@ -8,8 +8,13 @@ import { subscribe } from '@/store/subscribe'
 
 export async function loginFromCallback() {
 	const session = await handleCallback()
+	const scopes = session.scopes ?? []
 
-	store.set(() => ({ authDid: session.did }))
+	store.set(() => ({
+		authDid: session.did,
+		authScopes: scopes,
+		needsReauth: !hasRequiredScopes(scopes),
+	}))
 	setAuthCookie()
 	await getUserProfile()
 
@@ -28,7 +33,12 @@ export async function loginFromStorage() {
 		throw new Error('Not authenticated')
 	}
 
-	store.set(() => ({ authDid: session.did }))
+	const scopes = session.scopes ?? []
+	store.set(() => ({
+		authDid: session.did,
+		authScopes: scopes,
+		needsReauth: !hasRequiredScopes(scopes),
+	}))
 	setAuthCookie()
 	await getUserProfile()
 

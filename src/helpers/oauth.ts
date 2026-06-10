@@ -3,6 +3,7 @@ import { HappyViewBrowserClient } from '@happyview/oauth-client-browser'
 import type { HappyViewSession } from '@happyview/oauth-client-browser'
 
 // Local imports
+import { REQUIRED_SCOPES } from '@/constants/REQUIRED_SCOPES'
 import { store } from '@/store/store'
 
 // Constants
@@ -26,7 +27,14 @@ export function getClient(): HappyViewBrowserClient {
 	if (!_client) {
 		const isLoopback = /^(?:localhost|127\.0\.0\.1)/giu.test(PUBLIC_URL)
 		const protocol = isLoopback ? 'http' : 'https'
-		const scopes = 'atproto include:games.gamesgamesgamesgames.authBasic'
+		const scopes = [
+			'atproto',
+			'include:games.gamesgamesgamesgames.authProfiles',
+			'include:games.gamesgamesgamesgames.authGameInteractions',
+			'include:games.gamesgamesgamesgames.authContributions',
+			'include:games.gamesgamesgamesgames.authCustomFeeds',
+			'include:games.gamesgamesgamesgames.authGameBrowsing',
+		].join(' ')
 		const clientId = isLoopback
 			? `http://localhost?scope=${encodeURIComponent(scopes)}`
 			: `${protocol}://${PUBLIC_URL}/oauth-client-metadata.json`
@@ -123,6 +131,14 @@ export async function restoreSession(): Promise<HappyViewSession | null> {
 
 export function isAuthenticated(): boolean {
 	return store.state.authDid !== null
+}
+
+export function hasRequiredScopes(scopes: string[]): boolean {
+	const missing = REQUIRED_SCOPES.filter((scope) => !scopes.includes(scope))
+	if (missing.length > 0) {
+		console.log('[auth] missing scopes:', missing)
+	}
+	return missing.length === 0
 }
 
 export function getReturnUrl(): string | null {

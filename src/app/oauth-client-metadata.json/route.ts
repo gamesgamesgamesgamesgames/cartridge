@@ -13,7 +13,14 @@ export function GET() {
 		redirect_uris: [`${uri}/oauth/callback`],
 		token_endpoint_auth_method: 'none',
 		grant_types: ['authorization_code', 'refresh_token'],
-		scope: 'atproto include:games.gamesgamesgamesgames.authBasic',
+		scope: [
+			'atproto',
+			'include:games.gamesgamesgamesgames.authProfiles',
+			'include:games.gamesgamesgamesgames.authGameInteractions',
+			'include:games.gamesgamesgamesgames.authContributions',
+			'include:games.gamesgamesgamesgames.authCustomFeeds',
+			'include:games.gamesgamesgamesgames.authGameBrowsing',
+		].join(' '),
 		application_type: 'web',
 		dpop_bound_access_tokens: true,
 	})

@@ -1,5 +1,5 @@
 // Local imports
-import { restoreSession } from '@/helpers/oauth'
+import { hasRequiredScopes, restoreSession } from '@/helpers/oauth'
 import { setProfileTypeCookie } from '@/helpers/setProfileTypeCookie'
 import { getUserProfile } from '@/store/actions/getUserProfile'
 import { store } from '@/store/store'
@@ -13,7 +13,12 @@ export async function initialize() {
 	const session = await restoreSession()
 
 	if (session) {
-		store.set(() => ({ authDid: session.did }))
+		const scopes = session.scopes ?? []
+		store.set(() => ({
+			authDid: session.did,
+			authScopes: scopes,
+			needsReauth: !hasRequiredScopes(scopes),
+		}))
 
 		await getUserProfile()
 
