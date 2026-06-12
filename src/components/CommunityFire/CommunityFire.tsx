@@ -300,12 +300,10 @@ export function CommunityFire() {
 						style={{
 							left: `${ember.x}%`,
 							animation: `ember-rise ${LIFETIME_MS}ms ease-out forwards`,
-							willChange: 'transform, opacity',
 						}}>
 						<div
 							style={{
 								animation: `ember-wobble ${ember.wobbleDuration}ms ease-in-out ${ember.wobbleDelay}ms infinite`,
-								willChange: 'transform',
 							}}
 							className={
 								'flex items-center gap-1 whitespace-nowrap rounded-full bg-background/50 px-2.5 py-1 text-xs text-muted-foreground backdrop-blur-sm'

@@ -3,6 +3,11 @@ type Props = Readonly<{
 	compact?: boolean
 }>
 
+function formatRating(rating: number): string {
+	const out5 = rating / 2
+	return out5 % 1 === 0 ? `${out5}/5` : `${out5.toFixed(1)}/5`
+}
+
 export function StarRating(props: Props) {
 	const { rating, compact } = props
 	const stars = rating / 2
@@ -12,7 +17,7 @@ export function StarRating(props: Props) {
 	return (
 		<span
 			className={`flex items-center gap-0.5 ${compact ? 'text-sm' : 'gap-1 text-lg'}`}
-			aria-label={`${rating} out of 10`}>
+			aria-label={formatRating(rating)}>
 			{Array.from({ length: 5 }, (_, i) => {
 				if (i < fullStars) {
 					return (
@@ -38,7 +43,7 @@ export function StarRating(props: Props) {
 				)
 			})}
 			<span className={`ml-1 text-muted-foreground ${compact ? 'text-xs' : 'text-sm'}`}>
-				{rating}/10
+				{formatRating(rating)}
 			</span>
 		</span>
 	)

@@ -13,7 +13,8 @@ type Props = Readonly<
 >
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
-	const { handle } = await props.params
+	const { handle: rawHandle } = await props.params
+	const handle = decodeURIComponent(rawHandle)
 	const result = await API.getProfileByHandle(handle)
 	if (!result.profile || !result.profileType) return {}
 
@@ -32,7 +33,8 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 
 export default async function ProfileLayout(props: Props) {
 	const { children } = props
-	const { handle } = await props.params
+	const { handle: rawHandle } = await props.params
+	const handle = decodeURIComponent(rawHandle)
 
 	const result = await API.getProfileByHandle(handle)
 	if (!result.profile || !result.profileType) notFound()

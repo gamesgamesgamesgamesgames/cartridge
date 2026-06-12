@@ -40,7 +40,7 @@ export function SiteHeader() {
 					className={'flex items-center shrink-0 py-3'}>
 					<Image
 						src={'/images/branding/logomark.color.svg'}
-						alt={'Pentaract'}
+						alt={'Cartridge'}
 						width={48}
 						height={48}
 					/>

@@ -3,7 +3,6 @@
 import Link from 'next/link'
 
 import { BoxArt } from '@/components/BoxArt/BoxArt'
-import { Container } from '@/components/Container/Container'
 import { Header } from '@/components/Header/Header'
 import { TiltCard } from '@/components/TiltCard/TiltCard'
 import { Scroller } from '@/components/ui/scroller'
@@ -19,43 +18,40 @@ export function PopularRightNow({ games }: Props) {
 
 	return (
 		<section className={'py-12'}>
-			<Container>
+			<div className={'mb-2 flex items-baseline justify-between px-4 md:px-10 lg:px-16'}>
 				<Header level={3}>{'Popular Right Now'}</Header>
-				<Scroller
-					orientation={'horizontal'}
-					hideScrollbar
-					withNavigation
-					scrollStep={176}>
-					<div className={'-mx-4 flex gap-4 px-4 py-4'}>
-						{games.map((game) => (
-							<Link
-								key={game.uri}
-								href={`/game/${game.slug}`}
-								className={'group w-40 shrink-0'}>
-								<TiltCard>
-									<div className={'relative'}>
-										<BoxArt gameRecord={game} />
-										<span
-											className={
-												'absolute left-1.5 top-1.5 rounded bg-amber-500/90 px-1.5 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white'
-											}>
-											{'Trending'}
-										</span>
-									</div>
-								</TiltCard>
-								<div className={'mt-2'}>
-									<p className={'truncate text-sm font-medium'}>{game.name}</p>
-									{game.applicationType && (
-										<p className={'truncate text-xs text-muted-foreground'}>
-											{game.applicationType}
-										</p>
-									)}
-								</div>
-							</Link>
-						))}
-					</div>
-				</Scroller>
-			</Container>
+				<Link
+					href={'/browse'}
+					className={'text-sm font-medium text-primary hover:underline'}>
+					{'View all'}
+				</Link>
+			</div>
+
+			<Scroller
+				orientation={'horizontal'}
+				hideScrollbar
+				withNavigation
+				scrollStep={176}
+				className={'flex gap-4 px-4 py-4 md:px-10 lg:px-16'}>
+				{games.map((game) => (
+					<Link
+						key={game.uri}
+						href={`/game/${game.slug}`}
+						className={'group w-40 shrink-0'}>
+						<TiltCard>
+							<BoxArt gameRecord={game} />
+						</TiltCard>
+						<div className={'mt-2'}>
+							<p className={'truncate text-sm font-medium'}>{game.name}</p>
+							{game.applicationType && (
+								<p className={'truncate text-xs text-muted-foreground'}>
+									{game.applicationType}
+								</p>
+							)}
+						</div>
+					</Link>
+				))}
+			</Scroller>
 		</section>
 	)
 }

@@ -41,7 +41,8 @@ async function resolveAvatarUrl(
 }
 
 export default async function ProfilePage(props: Props) {
-	const { handle } = await props.params
+	const { handle: rawHandle } = await props.params
+	const handle = decodeURIComponent(rawHandle)
 
 	const result = await API.getProfileByHandle(handle)
 	if (!result.profile || !result.profileType) notFound()

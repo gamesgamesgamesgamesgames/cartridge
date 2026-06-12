@@ -1,15 +1,13 @@
 'use client'
 
-// Module imports
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
-// Local imports
 import { BoxArt } from '@/components/BoxArt/BoxArt'
-import { Container } from '@/components/Container/Container'
 import { Header } from '@/components/Header/Header'
 import { TiltCard } from '@/components/TiltCard/TiltCard'
 import { Scroller } from '@/components/ui/scroller'
+import { Skeleton } from '@/components/ui/skeleton'
 import * as API from '@/helpers/API'
 import { type GameFeedGame } from '@/helpers/API'
 
@@ -52,60 +50,93 @@ function formatReleaseDate(date: string): string {
 	return date
 }
 
+function LoadingSkeleton() {
+	return (
+		<div className={'flex gap-4 px-4 py-4 md:px-10 lg:px-16'} aria-hidden={'true'}>
+			{Array.from({ length: 7 }, (_, i) => (
+				<div key={i} className={'w-40 shrink-0'}>
+					<Skeleton className={'aspect-[3/4] w-full rounded-lg'} />
+					<Skeleton className={'mt-1.5 h-4 w-3/4'} />
+					<Skeleton className={'mt-1 h-3 w-1/2'} />
+				</div>
+			))}
+		</div>
+	)
+}
+
 export function UpcomingReleases() {
 	const [games, setGames] = useState<GameFeedGame[]>([])
+	const [isLoading, setIsLoading] = useState(true)
 
 	useEffect(() => {
 		const now = API.getLocalNow()
-		API.getUpcomingReleases(20, undefined, now).then((result) => {
-			setGames(result.feed)
-		})
+		API.getUpcomingReleases(20, undefined, now)
+			.then((result) => {
+				setGames(result.feed)
+			})
+			.finally(() => {
+				setIsLoading(false)
+			})
 	}, [])
 
-	if (games.length === 0) return null
+	if (!isLoading && games.length === 0) return null
 
 	return (
 		<section className={'relative bg-secondary pb-12'}>
-			<Container className={'-mt-30'}>
-				<Header
-					className={'mb-6'}
-					level={3}>
-					{'Upcoming Releases'}
-				</Header>
+			<div className={'-mt-30'}>
+				<div className={'mb-2 flex items-baseline justify-between px-4 pt-4 md:px-10 lg:px-16'}>
+					<Header level={3}>
+						{'Upcoming Releases'}
+					</Header>
+					<Link
+						href={'/browse'}
+						className={'text-sm font-medium text-primary hover:underline'}>
+						{'View all'}
+					</Link>
+				</div>
 
-				<Scroller
-					orientation={'horizontal'}
-					hideScrollbar
-					withNavigation
-					scrollStep={176}
-					className={'-mx-4 flex gap-4 px-4 py-4'}>
-					{games.map((game) => {
-						const releaseDate = getFirstReleaseDate(game)
-						const href = game.slug ? `/game/${game.slug}` : '#'
+				{isLoading ? (
+					<>
+						<div className={'sr-only'} role={'status'} aria-live={'polite'}>
+							{'Loading upcoming releases'}
+						</div>
+						<LoadingSkeleton />
+					</>
+				) : (
+					<Scroller
+						orientation={'horizontal'}
+						hideScrollbar
+						withNavigation
+						scrollStep={176}
+						className={'flex gap-4 px-4 py-4 md:px-10 lg:px-16'}>
+						{games.map((game) => {
+							const releaseDate = getFirstReleaseDate(game)
+							const href = game.slug ? `/game/${game.slug}` : '#'
 
-						return (
-							<Link
-								key={game.uri}
-								href={href}
-								className={'block w-40 shrink-0'}>
-								<TiltCard>
-									<BoxArt gameRecord={game} />
-								</TiltCard>
-								<div className={'mt-1.5 px-0.5'}>
-									<div className={'truncate text-sm font-medium'}>
-										{game.name}
-									</div>
-									{releaseDate && (
-										<div className={'truncate text-xs text-muted-foreground'}>
-											{formatReleaseDate(releaseDate)}
+							return (
+								<Link
+									key={game.uri}
+									href={href}
+									className={'block w-40 shrink-0'}>
+									<TiltCard>
+										<BoxArt gameRecord={game} />
+									</TiltCard>
+									<div className={'mt-1.5 px-0.5'}>
+										<div className={'truncate text-sm font-medium'}>
+											{game.name}
 										</div>
-									)}
-								</div>
-							</Link>
-						)
-					})}
-				</Scroller>
-			</Container>
+										{releaseDate && (
+											<div className={'truncate text-xs text-muted-foreground'}>
+												{formatReleaseDate(releaseDate)}
+											</div>
+										)}
+									</div>
+								</Link>
+							)
+						})}
+					</Scroller>
+				)}
+			</div>
 		</section>
 	)
 }

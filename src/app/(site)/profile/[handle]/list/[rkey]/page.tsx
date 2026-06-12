@@ -39,7 +39,8 @@ async function resolveCreatorAvatarUrl(
 }
 
 export async function generateMetadata(props: Props): Promise<Metadata> {
-	const { handle, rkey } = await props.params
+	const { handle: rawHandle, rkey } = await props.params
+	const handle = decodeURIComponent(rawHandle)
 
 	const profileResult = await API.getProfileByHandle(handle)
 	if (!profileResult.profile) return {}
@@ -55,7 +56,8 @@ export async function generateMetadata(props: Props): Promise<Metadata> {
 }
 
 export default async function ListDetailPage(props: Props) {
-	const { handle, rkey } = await props.params
+	const { handle: rawHandle, rkey } = await props.params
+	const handle = decodeURIComponent(rawHandle)
 
 	const profileResult = await API.getProfileByHandle(handle)
 	if (!profileResult.profile || !profileResult.profileType) notFound()

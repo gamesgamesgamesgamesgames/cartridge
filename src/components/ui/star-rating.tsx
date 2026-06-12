@@ -26,12 +26,13 @@ export function StarRating(props: Props) {
 	const normalized = rating / (max / 5)
 	const fullStars = Math.floor(normalized)
 	const hasHalf = normalized - fullStars >= 0.5
+	const display5 = normalized % 1 === 0 ? `${normalized}/5` : `${normalized.toFixed(1)}/5`
 
 	return (
 		<span
 			className={cn('inline-flex items-center', sizeClasses[size], className)}
 			role={'img'}
-			aria-label={`${rating} out of ${max}`}>
+			aria-label={display5}>
 			{Array.from({ length: 5 }, (_, i) => {
 				const filled = i < fullStars || (i === fullStars && hasHalf)
 				return (
@@ -45,7 +46,7 @@ export function StarRating(props: Props) {
 			})}
 			{showNumeric && (
 				<span className={'ml-1 text-muted-foreground'}>
-					{rating}/{max}
+					{display5}
 				</span>
 			)}
 		</span>

@@ -30,7 +30,8 @@ export default async function ProfileOGImage({
 }: {
 	params: Promise<{ handle: string }>
 }) {
-	const { handle } = await params
+	const { handle: rawHandle } = await params
+	const handle = decodeURIComponent(rawHandle)
 	const result = await API.getProfileByHandle(handle)
 
 	const cartridgeFont = await readFile(

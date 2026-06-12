@@ -8,7 +8,8 @@ type Props = Readonly<{
 }>
 
 export default async function ProfileGamesPage(props: Props) {
-	const { handle } = await props.params
+	const { handle: rawHandle } = await props.params
+	const handle = decodeURIComponent(rawHandle)
 
 	const result = await API.getProfileByHandle(handle)
 	if (!result.profile) notFound()
