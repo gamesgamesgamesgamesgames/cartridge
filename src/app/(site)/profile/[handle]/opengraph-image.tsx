@@ -12,6 +12,31 @@ export const alt = 'Profile on Cartridge'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
+function getPdsBlobUrl(pds: string, did: string, cid: string): string {
+	return `${pds}/xrpc/com.atproto.sync.getBlob?did=${encodeURIComponent(did)}&cid=${encodeURIComponent(cid)}`
+}
+
+async function fetchImageAsDataUri(
+	primaryUrl: string,
+	pds: string,
+	did: string,
+	cid: string,
+): Promise<string | null> {
+	for (const url of [primaryUrl, getPdsBlobUrl(pds, did, cid)]) {
+		try {
+			const res = await fetch(url)
+			if (res.ok) {
+				const buffer = await res.arrayBuffer()
+				const contentType = res.headers.get('content-type') ?? 'image/jpeg'
+				return `data:${contentType};base64,${Buffer.from(buffer).toString('base64')}`
+			}
+		} catch {
+			// try next URL
+		}
+	}
+	return null
+}
+
 async function resolveImageDataUri(
 	uri: string,
 	blob: unknown,
@@ -22,16 +47,7 @@ async function resolveImageDataUri(
 	if (!cid) return null
 	const { did } = parseATURI(uri as AtUriString)
 	const pds = await resolvePds(did)
-	const url = getBlobUrl(pds, did, cid)
-	try {
-		const res = await fetch(url)
-		if (!res.ok) return null
-		const buffer = await res.arrayBuffer()
-		const contentType = res.headers.get('content-type') ?? 'image/jpeg'
-		return `data:${contentType};base64,${Buffer.from(buffer).toString('base64')}`
-	} catch {
-		return null
-	}
+	return fetchImageAsDataUri(getBlobUrl(pds, did, cid), pds, did, cid)
 }
 
 export default async function ProfileOGImage({

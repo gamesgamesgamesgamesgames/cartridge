@@ -62,6 +62,31 @@ const AGE_RATING_FILES: Record<string, Record<string, string>> = {
 	},
 }
 
+function getPdsBlobUrl(pds: string, did: string, cid: string): string {
+	return `${pds}/xrpc/com.atproto.sync.getBlob?did=${encodeURIComponent(did)}&cid=${encodeURIComponent(cid)}`
+}
+
+async function fetchImageAsDataUri(
+	primaryUrl: string,
+	pds: string,
+	did: string,
+	cid: string,
+): Promise<string | null> {
+	for (const url of [primaryUrl, getPdsBlobUrl(pds, did, cid)]) {
+		try {
+			const res = await fetch(url)
+			if (res.ok) {
+				const buffer = await res.arrayBuffer()
+				const contentType = res.headers.get('content-type') ?? 'image/jpeg'
+				return `data:${contentType};base64,${Buffer.from(buffer).toString('base64')}`
+			}
+		} catch {
+			// try next URL
+		}
+	}
+	return null
+}
+
 export const alt = 'Game on Cartridge'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
@@ -132,17 +157,7 @@ export default async function GameOGImage({
 		if (cid) {
 			const { did } = parseATURI(game.uri as AtUriString)
 			const pds = await resolvePds(did)
-			const coverUrl = getBlobUrl(pds, did, cid)
-			try {
-				const res = await fetch(coverUrl)
-				if (res.ok) {
-					const buffer = await res.arrayBuffer()
-					const contentType = res.headers.get('content-type') ?? 'image/jpeg'
-					coverDataUri = `data:${contentType};base64,${Buffer.from(buffer).toString('base64')}`
-				}
-			} catch {
-				// fall through to "No cover" placeholder
-			}
+			coverDataUri = await fetchImageAsDataUri(getBlobUrl(pds, did, cid), pds, did, cid)
 		}
 	}
 
