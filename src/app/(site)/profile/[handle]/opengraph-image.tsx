@@ -163,7 +163,7 @@ export default async function ProfileOGImage({
 								color: '#ffffff',
 								lineClamp: 1,
 								overflow: 'hidden',
-								lineHeight: 1.1,
+								lineHeight: 1.05,
 							}}>
 							{displayName}
 						</div>

@@ -229,7 +229,7 @@ export default async function GameOGImage({
 							fontFamily: 'Cartridge',
 							fontWeight: 700 as const,
 							color: '#ffffff',
-							lineHeight: 1.3,
+							lineHeight: 1.05,
 						}
 						if (parts.length === 2) {
 							return (
@@ -249,12 +249,12 @@ export default async function GameOGImage({
 					{game?.summary && (
 						<div
 							style={{
-								fontSize: 22,
+								fontSize: 32,
 								fontFamily: 'Readex Pro',
 								color: '#a0a0b8',
 								lineClamp: 3,
 								overflow: 'hidden',
-								lineHeight: 1.4,
+								lineHeight: 1.3,
 							}}>
 							{game.summary.length > 200
 								? game.summary.slice(0, 197) + '...'
