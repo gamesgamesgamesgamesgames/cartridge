@@ -1,5 +1,10 @@
 // Module imports
-import { IconBrandBluesky, IconBrandGithub, IconMessage } from '@tabler/icons-react'
+import {
+	IconBrandBluesky,
+	IconBrandDiscord,
+	IconBrandGithub,
+	IconMessage,
+} from '@tabler/icons-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -13,6 +18,11 @@ const SOCIALS = [
 		icon: IconBrandGithub,
 		label: 'GitHub',
 		href: 'https://github.com/gamesgamesgamesgamesgames/cartridge',
+	},
+	{
+		icon: IconBrandDiscord,
+		label: 'Discord',
+		href: 'https://discord.gg/BUPnjaBwRZ',
 	},
 	{
 		icon: IconMessage,
@@ -39,7 +49,9 @@ export function SiteFooter() {
 					className={
 						'flex flex-col gap-8 md:flex-row md:items-start md:justify-between'
 					}>
-					<Link href={'/'} className={'hidden md:block'}>
+					<Link
+						href={'/'}
+						className={'hidden md:block'}>
 						<Image
 							src={'/images/branding/logo.color.svg'}
 							alt={'Cartridge'}
