@@ -165,7 +165,12 @@ export function ReleaseTimeline(props: Props) {
 	const activeScrollRef = useCallback((node: HTMLDivElement | null) => {
 		if (node) {
 			requestAnimationFrame(() => {
-				node.scrollIntoView({ inline: 'center', block: 'nearest' })
+				const scroller = node.closest('[data-slot="scroller"]')
+				if (scroller) {
+					const scrollerRect = scroller.getBoundingClientRect()
+					const nodeRect = node.getBoundingClientRect()
+					scroller.scrollLeft += nodeRect.left - scrollerRect.left - (scrollerRect.width - nodeRect.width) / 2
+				}
 			})
 		}
 	}, [])
