@@ -124,7 +124,7 @@ export default async function GameOGImage({
 		}
 	}
 
-	let coverUrl: string | null = null
+	let coverDataUri: string | null = null
 	const blob = game?.media?.[0]?.blob
 	if (blob && game?.uri) {
 		const ref = (blob as unknown as { ref: { $link: string } }).ref
@@ -132,7 +132,17 @@ export default async function GameOGImage({
 		if (cid) {
 			const { did } = parseATURI(game.uri as AtUriString)
 			const pds = await resolvePds(did)
-			coverUrl = getBlobUrl(pds, did, cid)
+			const coverUrl = getBlobUrl(pds, did, cid)
+			try {
+				const res = await fetch(coverUrl)
+				if (res.ok) {
+					const buffer = await res.arrayBuffer()
+					const contentType = res.headers.get('content-type') ?? 'image/jpeg'
+					coverDataUri = `data:${contentType};base64,${Buffer.from(buffer).toString('base64')}`
+				}
+			} catch {
+				// fall through to "No cover" placeholder
+			}
 		}
 	}
 
@@ -149,9 +159,9 @@ export default async function GameOGImage({
 				gap: 48,
 			}}>
 			{/* Cover art */}
-			{coverUrl ? (
+			{coverDataUri ? (
 				<img
-					src={coverUrl}
+					src={coverDataUri}
 					width={330}
 					height={440}
 					style={{

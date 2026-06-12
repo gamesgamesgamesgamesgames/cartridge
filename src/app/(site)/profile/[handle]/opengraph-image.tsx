@@ -12,7 +12,7 @@ export const alt = 'Profile on Cartridge'
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
-async function resolveImageUrl(
+async function resolveImageDataUri(
 	uri: string,
 	blob: unknown,
 ): Promise<string | null> {
@@ -22,7 +22,16 @@ async function resolveImageUrl(
 	if (!cid) return null
 	const { did } = parseATURI(uri as AtUriString)
 	const pds = await resolvePds(did)
-	return getBlobUrl(pds, did, cid)
+	const url = getBlobUrl(pds, did, cid)
+	try {
+		const res = await fetch(url)
+		if (!res.ok) return null
+		const buffer = await res.arrayBuffer()
+		const contentType = res.headers.get('content-type') ?? 'image/jpeg'
+		return `data:${contentType};base64,${Buffer.from(buffer).toString('base64')}`
+	} catch {
+		return null
+	}
 }
 
 export default async function ProfileOGImage({
@@ -45,9 +54,9 @@ export default async function ProfileOGImage({
 	const profile = result.profile
 	const displayName = profile?.displayName ?? result.handle ?? handle
 
-	let avatarUrl: string | null = null
+	let avatarDataUri: string | null = null
 	if (profile && 'uri' in profile && 'avatar' in profile && profile.avatar) {
-		avatarUrl = await resolveImageUrl(
+		avatarDataUri = await resolveImageDataUri(
 			(profile as { uri: string }).uri,
 			profile.avatar,
 		)
@@ -56,7 +65,7 @@ export default async function ProfileOGImage({
 	// Fetch 5 most recently liked games
 	let likedGames: Array<{
 		name: string
-		coverUrl: string | null
+		coverDataUri: string | null
 	}> = []
 
 	if (profile && 'did' in profile && profile.did) {
@@ -64,11 +73,11 @@ export default async function ProfileOGImage({
 		likedGames = await Promise.all(
 			likesResult.feed.map(async (item) => {
 				const media = item.game.media
-				let coverUrl: string | null = null
+				let coverDataUri: string | null = null
 				if (media && media.length > 0 && media[0].blob) {
-					coverUrl = await resolveImageUrl(item.game.uri, media[0].blob)
+					coverDataUri = await resolveImageDataUri(item.game.uri, media[0].blob)
 				}
-				return { name: item.game.name, coverUrl }
+				return { name: item.game.name, coverDataUri }
 			}),
 		)
 	}
@@ -92,9 +101,9 @@ export default async function ProfileOGImage({
 						gap: 36,
 					}}>
 					{/* Avatar */}
-					{avatarUrl ? (
+					{avatarDataUri ? (
 						<img
-							src={avatarUrl}
+							src={avatarDataUri}
 							width={140}
 							height={140}
 							style={{
@@ -173,9 +182,9 @@ export default async function ProfileOGImage({
 									position: 'relative',
 									flexShrink: 0,
 								}}>
-								{game.coverUrl ? (
+								{game.coverDataUri ? (
 									<img
-										src={game.coverUrl}
+										src={game.coverDataUri}
 										width={140}
 										height={187}
 										style={{
