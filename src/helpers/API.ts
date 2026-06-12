@@ -684,10 +684,12 @@ export async function getUpcomingReleases(
 	limit = 20,
 	cursor?: string,
 	now?: string,
+	shuffle?: boolean,
 ): Promise<{ feed: GameFeedGame[]; cursor?: string }> {
 	const params = new URLSearchParams({ limit: String(limit) })
 	if (cursor) params.set('cursor', cursor)
 	if (now) params.set('now', now)
+	if (shuffle) params.set('shuffle', 'true')
 
 	const resp = await queryAPI(
 		`/xrpc/games.gamesgamesgamesgames.feed.getUpcomingReleasesFeed?${params}`,

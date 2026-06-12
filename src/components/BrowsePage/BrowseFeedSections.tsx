@@ -256,7 +256,7 @@ export function BrowseFeedSections() {
 		[] as GameFeedGame[],
 	)
 	const upcoming = useFeed(
-		useCallback(() => API.getUpcomingReleases(20, undefined, now).then((r) => r.feed), [now]),
+		useCallback(() => API.getUpcomingReleases(20, undefined, now, true).then((r) => r.feed), [now]),
 		[] as GameFeedGame[],
 	)
 	const recentlyReleased = useFeed(
@@ -472,7 +472,7 @@ export function BrowseFeedSections() {
 						<FeedSection
 							title={'Upcoming'}
 							games={upcoming.data}
-							seeAllHref={'/search?sort=upcoming'}
+							seeAllHref={'/upcoming'}
 							showGenres
 							activityMap={activityMap}
 						/>

@@ -70,7 +70,7 @@ export function UpcomingReleases() {
 
 	useEffect(() => {
 		const now = API.getLocalNow()
-		API.getUpcomingReleases(20, undefined, now)
+		API.getUpcomingReleases(20, undefined, now, true)
 			.then((result) => {
 				setGames(result.feed)
 			})
@@ -89,7 +89,7 @@ export function UpcomingReleases() {
 						{'Upcoming Releases'}
 					</Header>
 					<Link
-						href={'/browse'}
+						href={'/upcoming'}
 						className={'text-sm font-medium text-primary hover:underline'}>
 						{'View all'}
 					</Link>
