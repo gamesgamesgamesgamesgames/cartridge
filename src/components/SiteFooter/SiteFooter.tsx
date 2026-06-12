@@ -1,5 +1,5 @@
 // Module imports
-import { IconBrandBluesky, IconBrandGithub } from '@tabler/icons-react'
+import { IconBrandBluesky, IconBrandGithub, IconMessage } from '@tabler/icons-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
@@ -13,6 +13,11 @@ const SOCIALS = [
 		icon: IconBrandGithub,
 		label: 'GitHub',
 		href: 'https://github.com/gamesgamesgamesgamesgames/cartridge',
+	},
+	{
+		icon: IconMessage,
+		label: 'Send Feedback',
+		href: 'https://userinput.app/#/s/cartridge.dev/3mnrrgh5rz622',
 	},
 ] as const
 

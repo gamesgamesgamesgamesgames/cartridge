@@ -1,7 +1,7 @@
 'use client'
 
 // Module imports
-import { ChevronDown, LogOut, Monitor, Moon, Settings, Sun, User } from 'lucide-react'
+import { ChevronDown, LogOut, MessageSquare, Monitor, Moon, Settings, Sun, User } from 'lucide-react'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
 import { usePathname, useSearchParams } from 'next/navigation'
@@ -113,6 +113,15 @@ export function UserMenu() {
 								<Settings className={'size-4'} />
 								{'Account Settings'}
 							</Link>
+						</DropdownMenuItem>
+						<DropdownMenuItem asChild>
+							<a
+								href={'https://userinput.app/#/s/cartridge.dev/3mnrrgh5rz622'}
+								rel={'noopener noreferrer'}
+								target={'_blank'}>
+								<MessageSquare className={'size-4'} />
+								{'Send Feedback'}
+							</a>
 						</DropdownMenuItem>
 						<DropdownMenuSeparator />
 					</>
