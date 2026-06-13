@@ -47,6 +47,13 @@ export function LoginPage() {
 		restoreSession().then((session) => {
 			if (session) {
 				router.replace(returnTo)
+				return
+			}
+
+			const handle = searchParams.get('handle')
+			if (handle) {
+				setSaveState('active')
+				loginWithRedirect(handle, returnTo !== '/' ? returnTo : undefined)
 			}
 		})
 	}, [router, searchParams])

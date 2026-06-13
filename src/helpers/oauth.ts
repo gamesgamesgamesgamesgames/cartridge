@@ -35,13 +35,18 @@ export function getClient(): HappyViewBrowserClient {
 			'include:games.gamesgamesgamesgames.authCustomFeeds',
 			'include:games.gamesgamesgamesgames.authGameBrowsing',
 		].join(' ')
+		const loopbackUrl = PUBLIC_URL.replace(/^localhost/, '127.0.0.1')
+		const redirectUri = isLoopback
+			? `http://${loopbackUrl}/oauth/callback`
+			: undefined
 		const clientId = isLoopback
-			? `http://localhost?scope=${encodeURIComponent(scopes)}`
+			? `http://localhost?scope=${encodeURIComponent(scopes)}&redirect_uri=${encodeURIComponent(redirectUri!)}`
 			: `${protocol}://${PUBLIC_URL}/oauth-client-metadata.json`
 		_client = new HappyViewBrowserClient({
 			instanceUrl: INSTANCE_URL,
 			clientId,
 			clientKey: CLIENT_KEY,
+			redirectUri,
 			fetch: (input, init) => window.fetch(input, init),
 			scopes,
 		})
@@ -83,6 +88,19 @@ export function setSession(session: HappyViewSession | null) {
 
 // Public API
 export async function loginWithRedirect(handle?: string, returnUrl?: string) {
+	if (window.location.hostname === 'localhost') {
+		const url = new URL(window.location.href)
+		url.hostname = '127.0.0.1'
+		if (!url.searchParams.has('handle') && handle) {
+			url.searchParams.set('handle', handle)
+		}
+		if (!url.searchParams.has('returnTo') && returnUrl) {
+			url.searchParams.set('returnTo', returnUrl)
+		}
+		window.location.href = url.toString()
+		return
+	}
+
 	// Store the page to return to after login
 	let destination =
 		returnUrl ?? window.location.pathname + window.location.search
@@ -133,8 +151,27 @@ export function isAuthenticated(): boolean {
 	return store.state.authDid !== null
 }
 
+function normalizeScopes(scopes: string[]): Set<string> {
+	const normalized = new Set<string>()
+	for (const scope of scopes) {
+		if (scope.startsWith('repo?collection=')) {
+			const params = new URLSearchParams(scope.slice(4))
+			for (const collection of params.getAll('collection')) {
+				normalized.add(`repo:${collection}`)
+			}
+		} else {
+			normalized.add(scope)
+		}
+	}
+	return normalized
+}
+
 export function hasRequiredScopes(scopes: string[]): boolean {
-	const missing = REQUIRED_SCOPES.filter((scope) => !scopes.includes(scope))
+	const normalized = normalizeScopes(scopes)
+	const missing = REQUIRED_SCOPES.filter((scope) => {
+		const base = scope.split('?')[0]!
+		return !normalized.has(base) && !normalized.has(scope)
+	})
 	if (missing.length > 0) {
 		console.log('[auth] missing scopes:', missing)
 	}

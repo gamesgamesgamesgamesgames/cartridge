@@ -27,6 +27,8 @@ export function TiltCard(props: Props) {
 
 	const handleMouseMove = useCallback(
 		(e: React.MouseEvent<HTMLDivElement>) => {
+			if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+
 			const el = ref.current
 			if (!el) return
 

@@ -36,7 +36,7 @@ const IMAGE_CYCLE_MS = 5_000
 const IMAGE_PAN_MS = 6_000
 const IMAGE_FADE_MS = 1_000
 
-export const ARTWORK_TYPES = new Set(['artwork', 'conceptArt', 'keyArt', 'keyArtLogo'])
+export const ARTWORK_TYPES = new Set(['artwork'])
 export const SCREENSHOT_TYPES = new Set(['screenshot', 'gameplayImage'])
 
 const PAN_DIRECTIONS = [
@@ -153,7 +153,7 @@ function SlideBackgrounds({ game, isSlideActive, reducedMotion }: {
 	const media = game.media ?? []
 	const artworks = media.filter((item) => ARTWORK_TYPES.has(item.mediaType ?? ''))
 	const screenshots = media.filter((item) => SCREENSHOT_TYPES.has(item.mediaType ?? ''))
-	const images: GameMediaItem[] = artworks.length > 0 ? artworks : screenshots
+	const images: GameMediaItem[] = artworks.length >= 2 ? artworks : [...artworks, ...screenshots]
 
 	const coverMedia = media.find((item) => item.mediaType === 'cover')
 	const coverUrl = useBlobUrl(game.uri, coverMedia?.blob as MediaItem['blob'])
