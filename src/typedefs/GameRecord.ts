@@ -9,6 +9,11 @@ import {
 	type OrgCreditView,
 } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 
+export type VerifiedOwner = {
+	did: string
+	accountType: 'studio' | 'developer' | 'publisher'
+}
+
 export type GameRecord = Omit<GameLexicon, 'media'> & {
 	media?: (Omit<MediaItem, 'blob'> & {
 		blob?: BlobRef & { url: string }
@@ -18,4 +23,5 @@ export type GameRecord = Omit<GameLexicon, 'media'> & {
 	actorCredits?: ActorCreditView[]
 	slug?: string
 	uri: AtUriString
+	verifiedOwner?: VerifiedOwner
 }

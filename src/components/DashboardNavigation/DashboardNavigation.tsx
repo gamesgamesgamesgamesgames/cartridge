@@ -3,14 +3,10 @@
 // Module import
 import {
 	faBook,
-	faChartPie,
+	faCircleCheck,
 	faClipboardList,
-	faGamepad,
 	faGavel,
 	faHandshake,
-	faPeopleGroup,
-	faStar,
-	faStore,
 } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import Link from 'next/link'
@@ -29,7 +25,6 @@ import {
 	SidebarGroupLabel,
 	SidebarHeader,
 	SidebarMenu,
-	SidebarMenuBadge,
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from '@/components/ui/sidebar'
@@ -59,59 +54,6 @@ export function DashboardNavigation() {
 
 			<SidebarContent>
 				<SidebarGroup>
-					<SidebarGroupLabel>{'General'}</SidebarGroupLabel>
-					<SidebarGroupContent>
-						<SidebarMenuItem>
-							<SidebarMenuButton
-								asChild
-								className={'text-muted-foreground'}>
-								<Link href={'#'}>
-									<FontAwesomeIcon icon={faStore} />
-									<span>{'Store'}</span>
-								</Link>
-							</SidebarMenuButton>
-							<SidebarMenuBadge>{'Soon!'}</SidebarMenuBadge>
-						</SidebarMenuItem>
-
-						<SidebarMenuItem>
-							<SidebarMenuButton
-								asChild
-								className={'text-muted-foreground'}>
-								<Link href={'#'}>
-									<FontAwesomeIcon icon={faGamepad} />
-									<span>{'Library'}</span>
-								</Link>
-							</SidebarMenuButton>
-							<SidebarMenuBadge>{'Soon!'}</SidebarMenuBadge>
-						</SidebarMenuItem>
-
-						<SidebarMenuItem>
-							<SidebarMenuButton
-								asChild
-								className={'text-muted-foreground'}>
-								<Link href={'#'}>
-									<FontAwesomeIcon icon={faStar} />
-									<span>{'Achievements'}</span>
-								</Link>
-							</SidebarMenuButton>
-							<SidebarMenuBadge>{'Soon!'}</SidebarMenuBadge>
-						</SidebarMenuItem>
-
-						<SidebarMenuItem>
-							<SidebarMenuButton
-								asChild
-								className={'text-muted-foreground'}>
-								<Link href={'#'}>
-									<FontAwesomeIcon icon={faChartPie} />
-									<span>{'Stats'}</span>
-								</Link>
-							</SidebarMenuButton>
-							<SidebarMenuBadge>{'Soon!'}</SidebarMenuBadge>
-						</SidebarMenuItem>
-					</SidebarGroupContent>
-				</SidebarGroup>
-
-				<SidebarGroup>
 					<SidebarGroupLabel>{'Manage'}</SidebarGroupLabel>
 
 					<SidebarGroupContent>
@@ -124,29 +66,6 @@ export function DashboardNavigation() {
 							</SidebarMenuButton>
 						</SidebarMenuItem>
 
-						<SidebarMenuItem>
-							<SidebarMenuButton
-								asChild
-								className={'text-muted-foreground'}>
-								<Link href={'#'}>
-									<FontAwesomeIcon icon={faStar} />
-									<span>{'Achievements'}</span>
-								</Link>
-							</SidebarMenuButton>
-							<SidebarMenuBadge>{'Soon!'}</SidebarMenuBadge>
-						</SidebarMenuItem>
-
-						<SidebarMenuItem>
-							<SidebarMenuButton
-								asChild
-								className={'text-muted-foreground'}>
-								<Link href={'#'}>
-									<FontAwesomeIcon icon={faPeopleGroup} />
-									<span>{'Team'}</span>
-								</Link>
-							</SidebarMenuButton>
-							<SidebarMenuBadge>{'Soon!'}</SidebarMenuBadge>
-						</SidebarMenuItem>
 						<SidebarMenuItem>
 							<SidebarMenuButton asChild>
 								<Link href={'/dashboard/claims'}>
@@ -161,6 +80,15 @@ export function DashboardNavigation() {
 								<Link href={'/dashboard/contributions'}>
 									<FontAwesomeIcon icon={faHandshake} />
 									<span>{'My Contributions'}</span>
+								</Link>
+							</SidebarMenuButton>
+						</SidebarMenuItem>
+
+						<SidebarMenuItem>
+							<SidebarMenuButton asChild>
+								<Link href={'/dashboard/verification'}>
+									<FontAwesomeIcon icon={faCircleCheck} />
+									<span>{'Verification'}</span>
 								</Link>
 							</SidebarMenuButton>
 						</SidebarMenuItem>
@@ -185,6 +113,15 @@ export function DashboardNavigation() {
 									<Link href={'/dashboard/admin/contributions'}>
 										<FontAwesomeIcon icon={faHandshake} />
 										<span>{'Contributions'}</span>
+									</Link>
+								</SidebarMenuButton>
+							</SidebarMenuItem>
+
+							<SidebarMenuItem>
+								<SidebarMenuButton asChild>
+									<Link href={'/dashboard/admin/verification-requests'}>
+										<FontAwesomeIcon icon={faCircleCheck} />
+										<span>{'Verification'}</span>
 									</Link>
 								</SidebarMenuButton>
 							</SidebarMenuItem>

@@ -44,7 +44,7 @@ export function DashboardCatalog() {
 		() => (
 			<Button
 				asChild
-				className={'hidden sm:flex'}
+				className={'flex'}
 				size={'sm'}
 				variant={'secondary'}>
 				<Link href={`/dashboard/catalog/new-game`}>
@@ -72,8 +72,16 @@ export function DashboardCatalog() {
 
 		if (!gamesCatalog.length) {
 			return (
-				<div className={'flex h-full items-center justify-center'}>
-					{'No games found.'}
+				<div className={'flex h-full flex-col items-center justify-center gap-4 py-20 text-center'}>
+					<p className={'text-muted-foreground'}>
+						{'No games in your catalog yet.'}
+					</p>
+					<Button asChild>
+						<Link href={'/dashboard/catalog/new-game'}>
+							<FontAwesomeIcon icon={faPlus} />
+							{'Add your first game'}
+						</Link>
+					</Button>
 				</div>
 			)
 		}
@@ -90,7 +98,7 @@ export function DashboardCatalog() {
 						<div
 							key={rkey}
 							className={
-								'duration-[0.1s] group hover:scale-[1.1] relative shadow-md hover:shadow-xl transition-all'
+								'group relative shadow-md transition-shadow duration-200 hover:shadow-xl focus-within:shadow-xl'
 							}>
 							<BoxArt
 								key={parseATURI(game.record.uri).rkey}
@@ -99,12 +107,13 @@ export function DashboardCatalog() {
 
 							<div
 								className={
-									'absolute inset-0 opacity-0 group-hover:opacity-100 transition-[opacity]'
+									'absolute inset-0 opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100'
 								}>
-								<div className={'absolute flex gap-2 right-2 top-2'}>
+								<div className={'absolute right-2 top-2 flex gap-2'}>
 									<Button
 										asChild
-										size={'icon'}>
+										size={'icon'}
+										aria-label={`View ${game.record.name}`}>
 										<Link href={`/game/${game.record.slug}`}>
 											<FontAwesomeIcon icon={faEye} />
 										</Link>
@@ -112,7 +121,8 @@ export function DashboardCatalog() {
 
 									<Button
 										asChild
-										size={'icon'}>
+										size={'icon'}
+										aria-label={`Edit ${game.record.name}`}>
 										<Link href={`/dashboard/catalog/${did}/${rkey}`}>
 											<FontAwesomeIcon icon={faEdit} />
 										</Link>
@@ -120,7 +130,7 @@ export function DashboardCatalog() {
 								</div>
 
 								<div
-									className={'absolute align-end bottom-0 flex left-0 right-0'}>
+									className={'absolute inset-x-0 bottom-0 flex items-end'}>
 									<div
 										className={
 											'absolute inset-0 bg-linear-to-b from-transparent opacity-70 to-background'
@@ -134,7 +144,7 @@ export function DashboardCatalog() {
 				})}
 			</div>
 		)
-	}, [gamesCatalog, state])
+	}, [gamesCatalog])
 
 	useEffect(() => {
 		if (gamesCatalog === null && state === 'idle') {

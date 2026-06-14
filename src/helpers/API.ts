@@ -1585,3 +1585,108 @@ export async function getTasteProfile(
 
 	return resp.json()
 }
+
+// ---------------------------------------------------------------------------
+// Verification
+// ---------------------------------------------------------------------------
+
+export interface VerificationRequestView {
+	id: string
+	requesterDid: string
+	accountType: 'studio' | 'developer' | 'publisher'
+	message: string
+	contact?: string
+	status: 'pending' | 'approved' | 'denied'
+	reviewReason?: string
+	reviewedBy?: string
+	reviewedAt?: string
+	createdAt: string
+}
+
+export async function createVerificationRequest(input: {
+	accountType: 'studio' | 'developer' | 'publisher'
+	message: string
+	contact: string
+}): Promise<string> {
+	const response = await queryAPI(
+		'/xrpc/dev.cartridge.createVerificationRequest',
+		{
+			isAuthenticated: true,
+			method: 'POST',
+			body: JSON.stringify(input),
+		},
+	)
+
+	if (!response.ok) {
+		const errorBody = await response.text()
+		throw new Error(`createVerificationRequest failed (${response.status}): ${errorBody}`)
+	}
+
+	const data = await response.json()
+	return data.id as string
+}
+
+export async function getVerificationRequest(options?: {
+	id?: string
+	requesterDid?: string
+}): Promise<VerificationRequestView | null> {
+	const params = new URLSearchParams()
+	if (options?.id) params.set('id', options.id)
+	if (options?.requesterDid) params.set('requesterDid', options.requesterDid)
+
+	const response = await queryAPI(
+		`/xrpc/dev.cartridge.getVerificationRequest?${params}`,
+		{ isAuthenticated: true },
+	)
+
+	if (!response.ok) {
+		return null
+	}
+
+	const data = await response.json()
+	return data.request as VerificationRequestView
+}
+
+export async function listVerificationRequests(options?: {
+	status?: 'pending' | 'approved' | 'denied'
+	limit?: number
+	cursor?: string
+}): Promise<{ requests: VerificationRequestView[]; cursor?: string }> {
+	const params = new URLSearchParams()
+	if (options?.status) params.set('status', options.status)
+	if (options?.limit) params.set('limit', String(options.limit))
+	if (options?.cursor) params.set('cursor', options.cursor)
+
+	const response = await queryAPI(
+		`/xrpc/dev.cartridge.listVerificationRequests?${params}`,
+		{ isAuthenticated: true },
+	)
+
+	if (!response.ok) {
+		return { requests: [] }
+	}
+
+	return response.json()
+}
+
+export async function reviewVerificationRequest(input: {
+	requestId: string
+	status: 'approved' | 'denied'
+	reason?: string
+}): Promise<{ requestId: string; verificationUri?: string }> {
+	const response = await queryAPI(
+		'/xrpc/dev.cartridge.reviewVerificationRequest',
+		{
+			isAuthenticated: true,
+			method: 'POST',
+			body: JSON.stringify(input),
+		},
+	)
+
+	if (!response.ok) {
+		const errorBody = await response.text()
+		throw new Error(`reviewVerificationRequest failed (${response.status}): ${errorBody}`)
+	}
+
+	return response.json()
+}

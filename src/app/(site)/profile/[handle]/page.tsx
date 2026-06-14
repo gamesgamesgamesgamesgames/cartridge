@@ -96,6 +96,7 @@ export default async function ProfilePage(props: Props) {
 			profile={profile}
 			reviewCount={reviewCount}
 			reviews={reviews}
+			verifiedAccountType={profile.verifiedAccountType}
 		/>
 	)
 }

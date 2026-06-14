@@ -45,6 +45,7 @@ type Props = Readonly<{
 	profile: ActorProfileDetailView | OrgProfileDetailView
 	reviewCount: number
 	reviews: PopfeedReview[]
+	verifiedAccountType?: 'studio' | 'developer' | 'publisher'
 }>
 
 export function ProfileLayoutContent(props: Props) {
@@ -66,6 +67,7 @@ export function ProfileLayoutContent(props: Props) {
 		profile,
 		reviewCount,
 		reviews,
+		verifiedAccountType,
 	} = props
 
 	const { user } = useStore(store)
@@ -90,6 +92,7 @@ export function ProfileLayoutContent(props: Props) {
 				isFollowing={isFollowing}
 				isOwnProfile={isOwnProfile}
 				profile={profile}
+				verifiedAccountType={verifiedAccountType}
 			/>
 
 			<section id={'profile-content'} className={'flex-1 bg-background py-6'}>

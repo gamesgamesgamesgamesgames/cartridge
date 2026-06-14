@@ -18,6 +18,7 @@ import {
 } from '@/constants/WEBSITE_TYPES'
 import { type ActorProfileDetailView } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 import { type OrgProfileDetailView } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
+import { VerifiedBadge } from '@/components/VerifiedBadge/VerifiedBadge'
 import { type GameFeedGame, type GenrePreference } from '@/helpers/API'
 
 type Props = Readonly<{
@@ -31,6 +32,7 @@ type Props = Readonly<{
 	isFollowing: boolean
 	isOwnProfile: boolean
 	profile: ActorProfileDetailView | OrgProfileDetailView
+	verifiedAccountType?: 'studio' | 'developer' | 'publisher'
 }>
 
 function isActorProfile(
@@ -120,6 +122,7 @@ export function ProfileHeader(props: Props) {
 		isFollowing,
 		isOwnProfile,
 		profile,
+		verifiedAccountType,
 	} = props
 
 	const displayName = profile.displayName ?? handle
@@ -154,6 +157,12 @@ export function ProfileHeader(props: Props) {
 									level={1}
 									title={displayName}>
 									{displayName}
+									{verifiedAccountType && (
+										<VerifiedBadge
+											accountType={verifiedAccountType}
+											className={'ml-2 inline-block align-middle text-[0.5em]'}
+										/>
+									)}
 								</Header>
 
 								<div className={'mt-0.5 flex flex-wrap items-center gap-x-3 gap-y-1'}>

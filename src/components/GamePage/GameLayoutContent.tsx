@@ -39,6 +39,7 @@ import {
 } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 import { type GameFeedGame } from '@/helpers/API'
 import { type GameRecord } from '@/typedefs/GameRecord'
+import { VerifiedBadge } from '@/components/VerifiedBadge/VerifiedBadge'
 import { type PopfeedReview } from '@/helpers/lexicons/games/gamesgamesgamesgames/getReviews.defs'
 
 type CollectionWithGames = {
@@ -165,6 +166,12 @@ export function GameLayoutContent(props: Props) {
 								className={'text-center text-3xl md:text-left md:text-6xl'}
 								level={2}>
 								{gameRecord.name}
+								{gameRecord.verifiedOwner && (
+									<VerifiedBadge
+										accountType={gameRecord.verifiedOwner.accountType}
+										className={'ml-2 inline-block align-middle text-[0.5em]'}
+									/>
+								)}
 							</Header>
 
 							<DataList className={'gap-x-6 gap-y-4 md:gap-x-10 md:gap-y-6'}>

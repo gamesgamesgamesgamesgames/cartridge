@@ -1,9 +1,11 @@
 'use client'
 
 // Module imports
-import { type ChangeEventHandler, useCallback } from 'react'
+import Link from 'next/link'
+import { type ChangeEventHandler, useCallback, useEffect, useRef, useState } from 'react'
 
 // Local imports
+import * as API from '@/helpers/API'
 import { type ApplicationType } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 import { ApplicationTypeField } from '@/components/ApplicationTypeField/ApplicationTypeField'
 import { Card, CardContent } from '@/components/ui/card'
@@ -22,6 +24,55 @@ export function GeneralContent() {
 		setSummary,
 		state,
 	} = useDashboardCatalogEditGameContext()
+
+	const [titleMatches, setTitleMatches] = useState<Array<{ name: string; slug?: string; uri: string }>>([])
+	const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+	const searchAbortRef = useRef<AbortController | null>(null)
+
+	useEffect(() => {
+		if (searchTimeoutRef.current) {
+			clearTimeout(searchTimeoutRef.current)
+		}
+		if (searchAbortRef.current) {
+			searchAbortRef.current.abort()
+		}
+
+		const title = name?.trim()
+		if (!title || title.length < 3) {
+			setTitleMatches([])
+			return
+		}
+
+		searchTimeoutRef.current = setTimeout(async () => {
+			const controller = new AbortController()
+			searchAbortRef.current = controller
+
+			try {
+				const result = await API.search(title, {
+					limit: 5,
+					signal: controller.signal,
+				})
+				if (!controller.signal.aborted) {
+					setTitleMatches(
+						(result.results ?? []).map((r: any) => ({
+							name: r.record?.name ?? r.name ?? '',
+							slug: r.record?.slug ?? r.slug,
+							uri: r.record?.uri ?? r.uri ?? '',
+						})),
+					)
+				}
+			} catch {
+				if (!controller.signal.aborted) {
+					setTitleMatches([])
+				}
+			}
+		}, 300)
+
+		return () => {
+			if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current)
+			if (searchAbortRef.current) searchAbortRef.current.abort()
+		}
+	}, [name])
 
 	const handleApplicationTypeChange = useCallback((value: ApplicationType) => {
 		setApplicationType(value)
@@ -52,6 +103,24 @@ export function GeneralContent() {
 							onChange={handleNameChange}
 							value={name ?? ''}
 						/>
+
+						{titleMatches.length > 0 && (
+							<div className={'rounded-md border border-border bg-muted/50 p-3'}>
+								<p className={'text-xs text-muted-foreground mb-2'}>
+									{'Similar games already exist. Consider claiming one instead of creating a duplicate:'}
+								</p>
+								<div className={'flex flex-col gap-1'}>
+									{titleMatches.map((match) => (
+										<Link
+											key={match.uri}
+											href={match.slug ? `/game/${match.slug}` : '#'}
+											className={'text-sm text-primary hover:underline truncate'}>
+											{match.name}
+										</Link>
+									))}
+								</div>
+							</div>
+						)}
 
 						<SummaryField
 							disabled={isDisabled}

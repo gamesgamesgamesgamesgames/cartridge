@@ -1,4 +1,5 @@
-// Local imports
-import { DashboardOverview } from '@/components/DashboardOverview/DashboardOverview'
+import { redirect } from 'next/navigation'
 
-export default DashboardOverview
+export default function DashboardPage() {
+	redirect('/dashboard/catalog')
+}
