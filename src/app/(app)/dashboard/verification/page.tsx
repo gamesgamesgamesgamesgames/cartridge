@@ -1,7 +1,5 @@
-import { type Metadata } from 'next'
+import { redirect } from 'next/navigation'
 
-import { VerificationPage } from '@/components/VerificationPage/VerificationPage'
-
-export const metadata: Metadata = { title: 'Verification' }
-
-export default VerificationPage
+export default function DashboardVerificationPage() {
+	redirect('/verify')
+}

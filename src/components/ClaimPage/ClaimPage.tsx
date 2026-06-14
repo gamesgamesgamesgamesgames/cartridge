@@ -6,10 +6,10 @@ import {
 	type ChangeEventHandler,
 	useCallback,
 	useEffect,
-	useMemo,
 	useRef,
 	useState,
 } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useStore } from 'statery'
 
 // Local imports
@@ -17,7 +17,7 @@ import * as API from '@/helpers/API'
 import { BoxArt } from '@/components/BoxArt/BoxArt'
 import { Button } from '@/components/ui/button'
 import { Container } from '@/components/Container/Container'
-import { DashboardHeader } from '@/components/DashboardHeader/DashboardHeader'
+import { Header } from '@/components/Header/Header'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
@@ -48,8 +48,11 @@ type SelectedOrg = {
 
 export function ClaimPage() {
 	const { user } = useStore(store)
+	const searchParams = useSearchParams()
 
-	const [mode, setMode] = useState<ClaimMode>('game')
+	const [mode, setMode] = useState<ClaimMode>(() => {
+		return searchParams.get('org') ? 'org' : 'game'
+	})
 	const [searchQuery, setSearchQuery] = useState('')
 	const [searchResults, setSearchResults] = useState<
 		Array<GameSummaryView | ProfileSummaryView>
@@ -67,14 +70,6 @@ export function ClaimPage() {
 	const [claimUri, setClaimUri] = useState<string | null>(null)
 
 	const searchTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-
-	const breadcrumbs = useMemo(
-		() => [
-			{ label: 'My Claims', url: '/dashboard/claims' },
-			{ label: 'New Claim', url: '/dashboard/claim' },
-		],
-		[],
-	)
 
 	const runSearch = useCallback(async (q: string, currentMode: ClaimMode) => {
 		if (!q.trim()) {
@@ -236,6 +231,21 @@ export function ClaimPage() {
 		}
 	}, [contact, justification, mode, selectedGames, selectedOrg])
 
+	useEffect(() => {
+		const gameUri = searchParams.get('game')
+		if (!gameUri) return
+
+		API.getGame({ uri: gameUri }).then((game) => {
+			if (!game) return
+			setSelectedGames([{
+				uri: game.uri,
+				name: game.name,
+				slug: game.slug,
+				media: game.media,
+			}])
+		}).catch(() => {})
+	}, [searchParams])
+
 	// Clear search timeout on unmount
 	useEffect(() => {
 		return () => {
@@ -247,27 +257,39 @@ export function ClaimPage() {
 
 	if (!user) {
 		return (
-			<>
-				<DashboardHeader breadcrumbs={breadcrumbs} />
-				<Container>
-					<div className={'flex flex-col gap-4'}>
-						<h1 className={'text-2xl font-bold'}>{'Claim Ownership'}</h1>
-						<p className={'text-muted-foreground'}>
-							{'You must be signed in to submit a claim.'}
-						</p>
-					</div>
-				</Container>
-			</>
+			<Container>
+				<div className={'flex flex-col gap-4'}>
+					<Header level={3}>{'Claim Ownership'}</Header>
+					<p className={'text-muted-foreground'}>
+						{'You must be signed in to submit a claim.'}
+					</p>
+				</div>
+			</Container>
+		)
+	}
+
+	if (!user.verifiedAccountType) {
+		return (
+			<Container>
+				<div className={'flex flex-col gap-4 max-w-lg'}>
+					<Header level={3}>{'Claim Ownership'}</Header>
+					<p className={'text-muted-foreground'}>
+						{'You need to be a verified developer or publisher to submit ownership claims. Get verified to unlock studio features.'}
+					</p>
+					<Button asChild>
+						<Link href={'/verify'}>{'Get Verified'}</Link>
+					</Button>
+				</div>
+			</Container>
 		)
 	}
 
 	if (isSuccess) {
 		return (
 			<>
-				<DashboardHeader breadcrumbs={breadcrumbs} />
-				<Container>
+								<Container>
 					<div className={'flex flex-col gap-6 max-w-lg'}>
-						<h1 className={'text-2xl font-bold'}>{'Claim Submitted'}</h1>
+						<Header level={3}>{'Claim Submitted'}</Header>
 
 						<div
 							className={
@@ -323,13 +345,12 @@ export function ClaimPage() {
 
 	return (
 		<>
-			<DashboardHeader breadcrumbs={breadcrumbs} />
-
+			
 			<Container>
 				<div className={'flex flex-col gap-8'}>
 					{/* Header */}
 					<div className={'flex flex-col gap-2'}>
-						<h1 className={'text-2xl font-bold'}>{'Claim Ownership'}</h1>
+						<Header level={3}>{'Claim Ownership'}</Header>
 						<p className={'text-muted-foreground text-sm'}>
 							{
 								'Are you a developer or publisher? Submit a claim to verify your ownership of games or an organization.'

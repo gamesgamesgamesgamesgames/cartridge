@@ -1,7 +1,7 @@
 'use client'
 
 // Module imports
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useStore } from 'statery'
 
@@ -10,7 +10,7 @@ import * as API from '@/helpers/API'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Container } from '@/components/Container/Container'
-import { DashboardHeader } from '@/components/DashboardHeader/DashboardHeader'
+import { Header } from '@/components/Header/Header'
 import { Label } from '@/components/ui/label'
 import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
@@ -32,16 +32,7 @@ export function AdminContributionDetailPage() {
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [submitError, setSubmitError] = useState<string | null>(null)
 
-	const breadcrumbs = useMemo(
-		() => [
-			{ label: 'Admin', url: '/dashboard/admin' },
-			{ label: 'Contributions', url: '/dashboard/admin/contributions' },
-			{ label: 'Review Contribution', url: `/dashboard/admin/contributions/${did}/${rkey}` },
-		],
-		[],
-	)
-
-	useEffect(() => {
+useEffect(() => {
 		let cancelled = false
 
 		async function load() {
@@ -70,7 +61,7 @@ export function AdminContributionDetailPage() {
 				status: 'approved',
 				...(reason.trim() ? { reason: reason.trim() } : {}),
 			})
-			router.push('/dashboard/admin/contributions')
+			router.push('/admin/contributions')
 		} catch (error) {
 			setSubmitError(
 				error instanceof Error ? error.message : 'An unexpected error occurred.',
@@ -90,7 +81,7 @@ export function AdminContributionDetailPage() {
 				status: 'denied',
 				...(reason.trim() ? { reason: reason.trim() } : {}),
 			})
-			router.push('/dashboard/admin/contributions')
+			router.push('/admin/contributions')
 		} catch (error) {
 			setSubmitError(
 				error instanceof Error ? error.message : 'An unexpected error occurred.',
@@ -110,7 +101,7 @@ export function AdminContributionDetailPage() {
 				status: 'needsRevision',
 				...(reason.trim() ? { reason: reason.trim() } : {}),
 			})
-			router.push('/dashboard/admin/contributions')
+			router.push('/admin/contributions')
 		} catch (error) {
 			setSubmitError(
 				error instanceof Error ? error.message : 'An unexpected error occurred.',
@@ -127,29 +118,23 @@ export function AdminContributionDetailPage() {
 
 	if (isLoading) {
 		return (
-			<>
-				<DashboardHeader breadcrumbs={breadcrumbs} />
-				<Container>
-					<div className={'flex items-center justify-center py-16'}>
-						<Spinner className={'size-6'} />
-					</div>
-				</Container>
-			</>
+			<Container>
+				<div className={'flex items-center justify-center py-16'}>
+					<Spinner className={'size-6'} />
+				</div>
+			</Container>
 		)
 	}
 
 	if (!contribution) {
 		return (
-			<>
-				<DashboardHeader breadcrumbs={breadcrumbs} />
-				<Container>
-					<div className={'flex items-center justify-center py-16'}>
-						<p className={'text-muted-foreground text-sm'}>
-							{'Contribution not found.'}
-						</p>
-					</div>
-				</Container>
-			</>
+			<Container>
+				<div className={'flex items-center justify-center py-16'}>
+					<p className={'text-muted-foreground text-sm'}>
+						{'Contribution not found.'}
+					</p>
+				</div>
+			</Container>
 		)
 	}
 
@@ -163,14 +148,11 @@ export function AdminContributionDetailPage() {
 	)
 
 	return (
-		<>
-			<DashboardHeader breadcrumbs={breadcrumbs} />
-
-			<Container>
+		<Container>
 				<div className={'flex flex-col gap-8 max-w-2xl'}>
 					<div className={'flex flex-col gap-2'}>
 						<div className={'flex items-center gap-3'}>
-							<h1 className={'text-2xl font-bold'}>{'Review Contribution'}</h1>
+							<Header level={3}>{'Review Contribution'}</Header>
 							{isReviewed && reviewStatus && (
 								<ReviewStatusBadge status={reviewStatus} />
 							)}
@@ -346,7 +328,6 @@ export function AdminContributionDetailPage() {
 					)}
 				</div>
 			</Container>
-		</>
 	)
 }
 
@@ -372,7 +353,7 @@ function DetailRow({
 function ReviewStatusBadge({ status }: { status: string }) {
 	if (status === 'approved') {
 		return (
-			<Badge className={'bg-green-600 text-white border-transparent'}>
+			<Badge className={'bg-success text-success-foreground border-transparent'}>
 				{'Approved'}
 			</Badge>
 		)
@@ -383,7 +364,7 @@ function ReviewStatusBadge({ status }: { status: string }) {
 	}
 
 	if (status === 'needsRevision') {
-		return <Badge variant={'outline'} className={'border-yellow-500 text-yellow-600'}>{'Needs Revision'}</Badge>
+		return <Badge variant={'outline'} className={'border-warning text-warning-foreground'}>{'Needs Revision'}</Badge>
 	}
 
 	return <Badge variant={'outline'}>{'Pending'}</Badge>

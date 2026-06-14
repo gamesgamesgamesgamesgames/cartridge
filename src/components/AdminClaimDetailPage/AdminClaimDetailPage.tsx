@@ -1,7 +1,7 @@
 'use client'
 
 // Module imports
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useStore } from 'statery'
 
@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Container } from '@/components/Container/Container'
-import { DashboardHeader } from '@/components/DashboardHeader/DashboardHeader'
+import { Header } from '@/components/Header/Header'
 import { Label } from '@/components/ui/label'
 import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
@@ -36,16 +36,7 @@ export function AdminClaimDetailPage() {
 	const [isSubmitting, setIsSubmitting] = useState(false)
 	const [submitError, setSubmitError] = useState<string | null>(null)
 
-	const breadcrumbs = useMemo(
-		() => [
-			{ label: 'Admin', url: '/dashboard/admin' },
-			{ label: 'Claims', url: '/dashboard/admin/claims' },
-			{ label: 'Review Claim', url: `/dashboard/admin/claims/${did}/${rkey}` },
-		],
-		[did, rkey],
-	)
-
-	useEffect(() => {
+useEffect(() => {
 		let cancelled = false
 
 		async function load() {
@@ -99,7 +90,7 @@ export function AdminClaimDetailPage() {
 				approvedGames: Array.from(selectedGameUris),
 				...(reason.trim() ? { reason: reason.trim() } : {}),
 			})
-			router.push('/dashboard/admin/claims')
+			router.push('/admin/claims')
 		} catch (error) {
 			setSubmitError(
 				error instanceof Error ? error.message : 'An unexpected error occurred.',
@@ -119,7 +110,7 @@ export function AdminClaimDetailPage() {
 				status: 'denied',
 				...(reason.trim() ? { reason: reason.trim() } : {}),
 			})
-			router.push('/dashboard/admin/claims')
+			router.push('/admin/claims')
 		} catch (error) {
 			setSubmitError(
 				error instanceof Error ? error.message : 'An unexpected error occurred.',
@@ -136,27 +127,21 @@ export function AdminClaimDetailPage() {
 
 	if (isLoading) {
 		return (
-			<>
-				<DashboardHeader breadcrumbs={breadcrumbs} />
-				<Container>
-					<div className={'flex items-center justify-center py-16'}>
-						<Spinner className={'size-6'} />
-					</div>
-				</Container>
-			</>
+			<Container>
+				<div className={'flex items-center justify-center py-16'}>
+					<Spinner className={'size-6'} />
+				</div>
+			</Container>
 		)
 	}
 
 	if (!claim) {
 		return (
-			<>
-				<DashboardHeader breadcrumbs={breadcrumbs} />
-				<Container>
-					<div className={'flex items-center justify-center py-16'}>
-						<p className={'text-muted-foreground text-sm'}>{'Claim not found.'}</p>
-					</div>
-				</Container>
-			</>
+			<Container>
+				<div className={'flex items-center justify-center py-16'}>
+					<p className={'text-muted-foreground text-sm'}>{'Claim not found.'}</p>
+				</div>
+			</Container>
 		)
 	}
 
@@ -175,14 +160,11 @@ export function AdminClaimDetailPage() {
 		claim.type === 'org' ? orgGames : (claim.games ?? [])
 
 	return (
-		<>
-			<DashboardHeader breadcrumbs={breadcrumbs} />
-
-			<Container>
+		<Container>
 				<div className={'flex flex-col gap-8 max-w-2xl'}>
 					<div className={'flex flex-col gap-2'}>
 						<div className={'flex items-center gap-3'}>
-							<h1 className={'text-2xl font-bold'}>{'Review Claim'}</h1>
+							<Header level={3}>{'Review Claim'}</Header>
 							{isReviewed && reviewStatus && (
 								<ReviewStatusBadge status={reviewStatus} />
 							)}
@@ -355,7 +337,6 @@ export function AdminClaimDetailPage() {
 					)}
 				</div>
 			</Container>
-		</>
 	)
 }
 
@@ -381,7 +362,7 @@ function DetailRow({
 function ReviewStatusBadge({ status }: { status: string }) {
 	if (status === 'approved') {
 		return (
-			<Badge className={'bg-green-600 text-white border-transparent'}>
+			<Badge className={'bg-success text-success-foreground border-transparent'}>
 				{'Approved'}
 			</Badge>
 		)

@@ -10,8 +10,7 @@ import { BoxArt } from '@/components/BoxArt/BoxArt'
 import { Button } from '@/components/ui/button'
 import { Container } from '@/components/Container/Container'
 import { DashboardHeader } from '@/components/DashboardHeader/DashboardHeader'
-import { faEdit, faEye, faPlus } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Eye, Pencil, Plus } from 'lucide-react'
 import { listGames } from '@/store/actions/listGames'
 import { parseATURI } from '@/helpers/parseATURI'
 import { type State } from '@/typedefs/State'
@@ -48,7 +47,7 @@ export function DashboardCatalog() {
 				size={'sm'}
 				variant={'secondary'}>
 				<Link href={`/dashboard/catalog/new-game`}>
-					<FontAwesomeIcon icon={faPlus} />
+					<Plus className={'size-4'} />
 					{'Add Game'}
 				</Link>
 			</Button>
@@ -78,7 +77,7 @@ export function DashboardCatalog() {
 					</p>
 					<Button asChild>
 						<Link href={'/dashboard/catalog/new-game'}>
-							<FontAwesomeIcon icon={faPlus} />
+							<Plus className={'size-4'} />
 							{'Add your first game'}
 						</Link>
 					</Button>
@@ -115,7 +114,7 @@ export function DashboardCatalog() {
 										size={'icon'}
 										aria-label={`View ${game.record.name}`}>
 										<Link href={`/game/${game.record.slug}`}>
-											<FontAwesomeIcon icon={faEye} />
+											<Eye className={'size-4'} />
 										</Link>
 									</Button>
 
@@ -124,7 +123,7 @@ export function DashboardCatalog() {
 										size={'icon'}
 										aria-label={`Edit ${game.record.name}`}>
 										<Link href={`/dashboard/catalog/${did}/${rkey}`}>
-											<FontAwesomeIcon icon={faEdit} />
+											<Pencil className={'size-4'} />
 										</Link>
 									</Button>
 								</div>

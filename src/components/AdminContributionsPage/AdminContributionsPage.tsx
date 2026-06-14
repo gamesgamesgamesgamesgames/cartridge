@@ -10,7 +10,7 @@ import * as API from '@/helpers/API'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Container } from '@/components/Container/Container'
-import { DashboardHeader } from '@/components/DashboardHeader/DashboardHeader'
+import { Header } from '@/components/Header/Header'
 import { Spinner } from '@/components/ui/spinner'
 import { UnderlineTabs } from '@/components/UnderlineTabs/UnderlineTabs'
 import { isAdmin } from '@/helpers/admin'
@@ -33,15 +33,7 @@ export function AdminContributionsPage() {
 	const [isLoading, setIsLoading] = useState(true)
 	const [isLoadingMore, setIsLoadingMore] = useState(false)
 
-	const breadcrumbs = useMemo(
-		() => [
-			{ label: 'Admin', url: '/dashboard/admin' },
-			{ label: 'Contributions', url: '/dashboard/admin/contributions' },
-		],
-		[],
-	)
-
-	const fetchContributions = useCallback(
+const fetchContributions = useCallback(
 		async (filter: StatusFilter, nextCursor?: string) => {
 			const options: Parameters<typeof API.listContributions>[0] = { limit: 25 }
 			if (filter !== 'all') {
@@ -101,7 +93,7 @@ export function AdminContributionsPage() {
 	const handleContributionClick = useCallback(
 		(uri: AtUriString) => {
 			const { did, rkey } = parseATURI(uri)
-			router.push(`/dashboard/admin/contributions/${did}/${rkey}`)
+			router.push(`/admin/contributions/${did}/${rkey}`)
 		},
 		[router],
 	)
@@ -179,13 +171,10 @@ export function AdminContributionsPage() {
 	}
 
 	return (
-		<>
-			<DashboardHeader breadcrumbs={breadcrumbs} />
-
-			<Container>
+		<Container>
 				<div className={'flex flex-col gap-6'}>
 					<div className={'flex flex-col gap-2'}>
-						<h1 className={'text-2xl font-bold'}>{'Contributions'}</h1>
+						<Header level={3}>{'Contributions'}</Header>
 						<p className={'text-muted-foreground text-sm'}>
 							{'Review and manage community contributions.'}
 						</p>
@@ -222,8 +211,7 @@ export function AdminContributionsPage() {
 						</Button>
 					)}
 				</div>
-			</Container>
-		</>
+		</Container>
 	)
 }
 
@@ -234,7 +222,7 @@ export function AdminContributionsPage() {
 function StatusBadge({ status }: { status: string }) {
 	if (status === 'approved') {
 		return (
-			<Badge className={'bg-green-600 text-white border-transparent'}>
+			<Badge className={'bg-success text-success-foreground border-transparent'}>
 				{'Approved'}
 			</Badge>
 		)
@@ -245,7 +233,7 @@ function StatusBadge({ status }: { status: string }) {
 	}
 
 	if (status === 'needsRevision') {
-		return <Badge variant={'outline'} className={'border-yellow-500 text-yellow-600'}>{'Needs Revision'}</Badge>
+		return <Badge variant={'outline'} className={'border-warning text-warning-foreground'}>{'Needs Revision'}</Badge>
 	}
 
 	return <Badge variant={'outline'}>{'Pending'}</Badge>

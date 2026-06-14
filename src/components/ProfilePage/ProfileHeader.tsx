@@ -9,6 +9,7 @@ import { BoxArt } from '@/components/BoxArt/BoxArt'
 import { Button } from '@/components/ui/button'
 import { Container } from '@/components/Container/Container'
 import { EditProfileButton } from '@/components/ProfilePage/EditProfileButton'
+import { VerificationCTA } from '@/components/ProfilePage/VerificationCTA'
 import { FollowButton } from '@/components/ProfilePage/FollowButton'
 import { Header } from '@/components/Header/Header'
 import {
@@ -204,7 +205,11 @@ export function ProfileHeader(props: Props) {
 								</div>
 							</div>
 
-							<div className={'shrink-0'}>
+							<div className={'flex shrink-0 items-center gap-2'}>
+								<VerificationCTA
+									isOwnProfile={isOwnProfile}
+									isVerified={Boolean(verifiedAccountType)}
+								/>
 								<EditProfileButton profileDid={profile.did} />
 								<FollowButton
 									profileDid={profile.did}

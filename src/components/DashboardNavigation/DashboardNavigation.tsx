@@ -86,7 +86,7 @@ export function DashboardNavigation() {
 
 						<SidebarMenuItem>
 							<SidebarMenuButton asChild>
-								<Link href={'/dashboard/verification'}>
+								<Link href={'/verify'}>
 									<FontAwesomeIcon icon={faCircleCheck} />
 									<span>{'Verification'}</span>
 								</Link>
@@ -101,7 +101,7 @@ export function DashboardNavigation() {
 						<SidebarGroupContent>
 							<SidebarMenuItem>
 								<SidebarMenuButton asChild>
-									<Link href={'/dashboard/admin/claims'}>
+									<Link href={'/admin/claims'}>
 										<FontAwesomeIcon icon={faGavel} />
 										<span>{'Claims'}</span>
 									</Link>
@@ -110,7 +110,7 @@ export function DashboardNavigation() {
 
 							<SidebarMenuItem>
 								<SidebarMenuButton asChild>
-									<Link href={'/dashboard/admin/contributions'}>
+									<Link href={'/admin/contributions'}>
 										<FontAwesomeIcon icon={faHandshake} />
 										<span>{'Contributions'}</span>
 									</Link>
@@ -119,7 +119,7 @@ export function DashboardNavigation() {
 
 							<SidebarMenuItem>
 								<SidebarMenuButton asChild>
-									<Link href={'/dashboard/admin/verification-requests'}>
+									<Link href={'/admin/verification-requests'}>
 										<FontAwesomeIcon icon={faCircleCheck} />
 										<span>{'Verification'}</span>
 									</Link>

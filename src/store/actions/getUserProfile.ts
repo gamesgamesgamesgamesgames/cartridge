@@ -24,6 +24,7 @@ export async function getUserProfile() {
 			displayName: profile?.displayName ?? blueskyProfile?.displayName,
 			description: profile?.description ?? blueskyProfile?.description,
 			avatarURL: rewriteImageUrl(blueskyProfile?.avatarURL),
+			verifiedAccountType: profile?.verifiedAccountType,
 		},
 	}))
 }

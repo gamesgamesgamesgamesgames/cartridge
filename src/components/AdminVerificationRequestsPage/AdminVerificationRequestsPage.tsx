@@ -11,7 +11,7 @@ import { type VerificationRequestView } from '@/helpers/API'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Container } from '@/components/Container/Container'
-import { DashboardHeader } from '@/components/DashboardHeader/DashboardHeader'
+import { Header } from '@/components/Header/Header'
 import { Spinner } from '@/components/ui/spinner'
 import { UnderlineTabs } from '@/components/UnderlineTabs/UnderlineTabs'
 import { isAdmin } from '@/helpers/admin'
@@ -37,15 +37,7 @@ export function AdminVerificationRequestsPage() {
 	const [isLoading, setIsLoading] = useState(true)
 	const [isLoadingMore, setIsLoadingMore] = useState(false)
 
-	const breadcrumbs = useMemo(
-		() => [
-			{ label: 'Admin', url: '/dashboard/admin' },
-			{ label: 'Verification Requests', url: '/dashboard/admin/verification-requests' },
-		],
-		[],
-	)
-
-	const fetchRequests = useCallback(
+const fetchRequests = useCallback(
 		async (filter: StatusFilter, nextCursor?: string) => {
 			const options: Parameters<typeof API.listVerificationRequests>[0] = { limit: 25 }
 			if (filter !== 'all') {
@@ -136,7 +128,7 @@ export function AdminVerificationRequestsPage() {
 						<button
 							key={request.id}
 							type={'button'}
-							onClick={() => router.push(`/dashboard/admin/verification-requests/${request.id}`)}
+							onClick={() => router.push(`/admin/verification-requests/${request.id}`)}
 							className={'w-full text-left px-4 py-3 flex items-center gap-4 hover:bg-accent transition-colors bg-background focus-visible:bg-accent focus-visible:outline-none'}>
 							<div className={'flex-1 flex flex-col gap-0.5 min-w-0'}>
 								<div className={'flex items-center gap-2 flex-wrap'}>
@@ -166,13 +158,10 @@ export function AdminVerificationRequestsPage() {
 	}
 
 	return (
-		<>
-			<DashboardHeader breadcrumbs={breadcrumbs} />
-
-			<Container>
+		<Container>
 				<div className={'flex flex-col gap-6'}>
 					<div className={'flex flex-col gap-2'}>
-						<h1 className={'text-2xl font-bold'}>{'Verification Requests'}</h1>
+						<Header level={3}>{'Verification Requests'}</Header>
 						<p className={'text-muted-foreground text-sm'}>
 							{'Review verification requests from studios, developers, and publishers.'}
 						</p>
@@ -208,8 +197,7 @@ export function AdminVerificationRequestsPage() {
 						</Button>
 					)}
 				</div>
-			</Container>
-		</>
+		</Container>
 	)
 }
 
@@ -220,7 +208,7 @@ export function AdminVerificationRequestsPage() {
 function StatusBadge({ status }: { status: string }) {
 	if (status === 'approved') {
 		return (
-			<Badge className={'bg-green-600 text-white border-transparent'}>
+			<Badge className={'bg-success text-success-foreground border-transparent'}>
 				{'Approved'}
 			</Badge>
 		)

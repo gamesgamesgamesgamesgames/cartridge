@@ -1,20 +1,23 @@
 'use client'
 
+import { useCallback, useEffect, useState } from 'react'
 import { useStore } from 'statery'
 
-import { Gamepad2, ListChecks, MessageSquareText } from 'lucide-react'
+import { Gamepad2, ListChecks, MessageSquareText, Plus, Shield } from 'lucide-react'
 
+import * as API from '@/helpers/API'
 import { BoxArt } from '@/components/BoxArt/BoxArt'
 import { Button } from '@/components/ui/button'
 import { Container } from '@/components/Container/Container'
-import { Header } from '@/components/Header/Header'
+import { PendingClaimCard } from '@/components/ProfilePage/PendingClaimCard'
 import { ProfileActivityFeed } from '@/components/ProfilePage/ProfileActivityFeed'
+import { ProfileGameCard } from '@/components/ProfilePage/ProfileGameCard'
 import { ProfileHeader } from '@/components/ProfilePage/ProfileHeader'
 import { StarRating } from '@/components/ui/star-rating'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { type ActorProfileDetailView } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 import { type OrgProfileDetailView } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
-import { type GameFeedGame, type GenrePreference, type UserListView } from '@/helpers/API'
+import { type ClaimView, type GameFeedGame, type GenrePreference, type UserListView } from '@/helpers/API'
 import { type PopfeedReview } from '@/helpers/lexicons/games/gamesgamesgamesgames/getReviews.defs'
 import { type GameRecord } from '@/typedefs/GameRecord'
 import { store } from '@/store/store'
@@ -73,6 +76,17 @@ export function ProfileLayoutContent(props: Props) {
 	const { user } = useStore(store)
 	const isOwnProfile = user?.did === profile.did
 
+	const [pendingContributionCount, setPendingContributionCount] = useState(0)
+
+	useEffect(() => {
+		if (!isOwnProfile || !user?.did) return
+		API.listContributions({ status: 'pending', contributor: user.did, limit: 100 })
+			.then((result) => {
+				setPendingContributionCount(result.contributions.length)
+			})
+			.catch(() => {})
+	}, [isOwnProfile, user?.did])
+
 	return (
 		<div className={'flex min-h-screen flex-col'}>
 			<a
@@ -101,15 +115,22 @@ export function ProfileLayoutContent(props: Props) {
 						<TabsList variant={'line'} className={'w-full justify-start border-b border-border'}>
 							<TabsTrigger value={'activity'}>
 								{'Activity'}
-							</TabsTrigger>
-							<TabsTrigger value={'games'}>
-								{'Games'}
-								{gameCount > 0 && (
-									<span className={'ml-1 text-muted-foreground'}>
-										{'('}{formatTabCount(gameCount)}{')'}
+								{isOwnProfile && pendingContributionCount > 0 && (
+									<span className={'ml-1.5 flex size-5 items-center justify-center rounded-full bg-primary text-[10px] font-semibold text-primary-foreground'}>
+										{pendingContributionCount > 9 ? '9+' : pendingContributionCount}
 									</span>
 								)}
 							</TabsTrigger>
+							{verifiedAccountType && (
+								<TabsTrigger value={'games'}>
+									{'Games'}
+									{gameCount > 0 && (
+										<span className={'ml-1 text-muted-foreground'}>
+											{'('}{formatTabCount(gameCount)}{')'}
+										</span>
+									)}
+								</TabsTrigger>
+							)}
 							<TabsTrigger value={'reviews'}>
 								{'Reviews'}
 								{reviewCount > 0 && (
@@ -140,6 +161,7 @@ export function ProfileLayoutContent(props: Props) {
 								games={games}
 								basePath={basePath}
 								isOwnProfile={isOwnProfile}
+								profileDid={profile.did}
 							/>
 						</TabsContent>
 
@@ -169,50 +191,83 @@ function GamesTabContent(props: {
 	games: GameRecord[]
 	basePath: string
 	isOwnProfile: boolean
+	profileDid: string
 }) {
 	const { games, isOwnProfile } = props
+	const [pendingClaims, setPendingClaims] = useState<ClaimView[]>([])
 
-	if (games.length === 0) {
-		if (!isOwnProfile) {
-			return (
-				<p className={'py-8 text-center text-sm text-muted-foreground'}>
-					{'No games yet'}
-				</p>
-			)
+	const fetchClaims = useCallback(async () => {
+		if (!isOwnProfile) return
+		try {
+			const [pendingResult, deniedResult] = await Promise.all([
+				API.listClaims({ status: 'pending' }),
+				API.listClaims({ status: 'denied' }),
+			])
+			setPendingClaims([...pendingResult.claims, ...deniedResult.claims])
+		} catch {
+			// Claims are supplementary; don't block the page
 		}
+	}, [isOwnProfile])
 
-		return (
-			<div className={'flex flex-col items-center gap-3 py-10'}>
-				<div className={'flex size-10 items-center justify-center rounded-lg bg-muted'}>
-					<Gamepad2 className={'size-5 text-muted-foreground'} aria-hidden={'true'} />
-				</div>
-				<div className={'flex flex-col items-center gap-1 text-center'}>
-					<p className={'text-sm font-medium text-foreground'}>
-						{'No games here yet'}
-					</p>
-					<p className={'max-w-xs text-sm text-muted-foreground'}>
-						{'Games you create or claim ownership of will appear in this tab.'}
-					</p>
-				</div>
-			</div>
-		)
-	}
+	useEffect(() => {
+		fetchClaims()
+	}, [fetchClaims])
+
+	const hasContent = games.length > 0 || pendingClaims.length > 0
 
 	return (
-		<div className={'grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'}>
-			{games.map((game) => (
-				<Link
-					key={game.uri}
-					href={`/game/${game.slug ?? game.uri}`}
-					className={'group flex flex-col gap-2'}>
-					<BoxArt gameRecord={game} className={'rounded-md'} />
-					<Header
-						className={'line-clamp-2 text-sm transition-colors group-hover:text-primary'}
-						level={4}>
-						{game.name}
-					</Header>
-				</Link>
-			))}
+		<div className={'flex flex-col gap-6'}>
+			{isOwnProfile && (
+				<div className={'flex items-center gap-3'}>
+					<Button asChild size={'sm'}>
+						<Link href={'/dashboard/catalog/new-game'}>
+							<Plus className={'size-4'} />
+							{'Add Game'}
+						</Link>
+					</Button>
+					<Button asChild size={'sm'} variant={'outline'}>
+						<Link href={'/claim'}>
+							<Shield className={'size-4'} />
+							{'Claim Games'}
+						</Link>
+					</Button>
+				</div>
+			)}
+
+			{!hasContent ? (
+				isOwnProfile ? (
+					<div className={'flex flex-col items-center gap-3 py-10'}>
+						<div className={'flex size-10 items-center justify-center rounded-lg bg-muted'}>
+							<Gamepad2 className={'size-5 text-muted-foreground'} aria-hidden={'true'} />
+						</div>
+						<div className={'flex flex-col items-center gap-1 text-center'}>
+							<p className={'text-sm font-medium text-foreground'}>
+								{'No games here yet'}
+							</p>
+							<p className={'max-w-xs text-sm text-muted-foreground'}>
+								{'Add your first game or claim ownership of existing ones.'}
+							</p>
+						</div>
+					</div>
+				) : (
+					<p className={'py-8 text-center text-sm text-muted-foreground'}>
+						{'No games yet'}
+					</p>
+				)
+			) : (
+				<div className={'grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'}>
+					{games.map((game) => (
+						<ProfileGameCard
+							key={game.uri}
+							game={game}
+							isOwnProfile={isOwnProfile}
+						/>
+					))}
+					{pendingClaims.map((claim) => (
+						<PendingClaimCard key={claim.uri} claim={claim} />
+					))}
+				</div>
+			)}
 		</div>
 	)
 }

@@ -1,4 +1,6 @@
-// Local imports
+import { type ReactNode, useMemo } from 'react'
+import Link from 'next/link'
+
 import {
 	Breadcrumb,
 	BreadcrumbItem,
@@ -7,12 +9,7 @@ import {
 	BreadcrumbPage,
 	BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
-import { type ReactNode, useMemo } from 'react'
-import { Separator } from '@/components/ui/separator'
-import { SidebarTrigger } from '@/components/ui/sidebar'
-import Link from 'next/link'
 
-// Types
 type Props = Readonly<{
 	breadcrumbs: {
 		label: string
@@ -56,17 +53,8 @@ export function DashboardHeader(props: Props) {
 	}, [breadcrumbs])
 
 	return (
-		<header
-			className={
-				'flex h-(--header-height) shrink-0 items-center gap-2 border-b transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-(--header-height)'
-			}>
-			<div className={'flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6'}>
-				<SidebarTrigger className={'-ml-1'} />
-				<Separator
-					orientation={'vertical'}
-					className={'mx-2 data-[orientation=vertical]:h-4'}
-				/>
-
+		<header className={'flex h-12 shrink-0 items-center border-b'}>
+			<div className={'flex w-full items-center gap-2 px-4 lg:px-6'}>
 				{breadcrumbElements}
 
 				{Boolean(controls) && (

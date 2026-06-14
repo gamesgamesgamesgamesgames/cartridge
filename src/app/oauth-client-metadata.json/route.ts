@@ -20,6 +20,8 @@ export function GET() {
 			'include:games.gamesgamesgamesgames.authContributions',
 			'include:games.gamesgamesgamesgames.authCustomFeeds',
 			'include:games.gamesgamesgamesgames.authGameBrowsing',
+			'include:games.gamesgamesgamesgames.authStudioCatalog',
+			'include:games.gamesgamesgamesgames.authStudioOrgs',
 		].join(' '),
 		application_type: 'web',
 		dpop_bound_access_tokens: true,

@@ -3,7 +3,7 @@ import { HappyViewBrowserClient } from '@happyview/oauth-client-browser'
 import type { HappyViewSession } from '@happyview/oauth-client-browser'
 
 // Local imports
-import { REQUIRED_SCOPES } from '@/constants/REQUIRED_SCOPES'
+import { REQUIRED_SCOPES, STUDIO_SCOPES } from '@/constants/REQUIRED_SCOPES'
 import { store } from '@/store/store'
 
 // Constants
@@ -13,6 +13,20 @@ const CLIENT_KEY = process.env.NEXT_PUBLIC_HAPPYVIEW_CLIENT_KEY!
 const RETURN_URL_KEY = 'pentaract_return_url'
 const PENDING_LIKE_KEY = 'pentaract_pending_like'
 const PENDING_LIST_ADD_KEY = 'pentaract_pending_list_add'
+
+const BASE_SCOPES = [
+	'atproto',
+	'include:games.gamesgamesgamesgames.authProfiles',
+	'include:games.gamesgamesgamesgames.authGameInteractions',
+	'include:games.gamesgamesgamesgames.authContributions',
+	'include:games.gamesgamesgamesgames.authCustomFeeds',
+	'include:games.gamesgamesgamesgames.authGameBrowsing',
+]
+
+const STUDIO_SCOPE_BUNDLES = [
+	'include:games.gamesgamesgamesgames.authStudioCatalog',
+	'include:games.gamesgamesgamesgames.authStudioOrgs',
+]
 
 // Types
 export type MeResponse = {
@@ -27,14 +41,8 @@ export function getClient(): HappyViewBrowserClient {
 	if (!_client) {
 		const isLoopback = /^(?:localhost|127\.0\.0\.1)/giu.test(PUBLIC_URL)
 		const protocol = isLoopback ? 'http' : 'https'
-		const scopes = [
-			'atproto',
-			'include:games.gamesgamesgamesgames.authProfiles',
-			'include:games.gamesgamesgamesgames.authGameInteractions',
-			'include:games.gamesgamesgamesgames.authContributions',
-			'include:games.gamesgamesgamesgames.authCustomFeeds',
-			'include:games.gamesgamesgamesgames.authGameBrowsing',
-		].join(' ')
+		const allScopes = [...BASE_SCOPES, ...STUDIO_SCOPE_BUNDLES]
+		const scopes = allScopes.join(' ')
 		const loopbackUrl = PUBLIC_URL.replace(/^localhost/, '127.0.0.1')
 		const redirectUri = isLoopback
 			? `http://${loopbackUrl}/oauth/callback`
@@ -87,6 +95,20 @@ export function setSession(session: HappyViewSession | null) {
 }
 
 // Public API
+async function isHandleVerified(handle: string): Promise<boolean> {
+	try {
+		const params = new URLSearchParams({ handle })
+		const response = await fetch(
+			`${INSTANCE_URL}/xrpc/games.gamesgamesgamesgames.getProfile?${params}`,
+		)
+		if (!response.ok) return false
+		const data = await response.json()
+		return Boolean(data.profile?.verifiedAccountType)
+	} catch {
+		return false
+	}
+}
+
 export async function loginWithRedirect(handle?: string, returnUrl?: string) {
 	if (window.location.hostname === 'localhost') {
 		const url = new URL(window.location.href)
@@ -117,8 +139,13 @@ export async function loginWithRedirect(handle?: string, returnUrl?: string) {
 		throw new Error('Handle is required for login')
 	}
 
+	const verified = await isHandleVerified(handle)
+	const scopes = verified
+		? [...BASE_SCOPES, ...STUDIO_SCOPE_BUNDLES].join(' ')
+		: BASE_SCOPES.join(' ')
+
 	const client = getClient()
-	await client.login(handle)
+	await client.login(handle, { scopes })
 }
 
 export async function handleCallback(): Promise<HappyViewSession> {
@@ -176,6 +203,14 @@ export function hasRequiredScopes(scopes: string[]): boolean {
 		console.log('[auth] missing scopes:', missing)
 	}
 	return missing.length === 0
+}
+
+export function hasStudioScopes(scopes: string[]): boolean {
+	const normalized = normalizeScopes(scopes)
+	return STUDIO_SCOPES.every((scope) => {
+		const base = scope.split('?')[0]!
+		return normalized.has(base) || normalized.has(scope)
+	})
 }
 
 export function getReturnUrl(): string | null {

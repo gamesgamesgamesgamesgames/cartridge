@@ -11,6 +11,7 @@ export type GlobalState = {
 	gamesCatalogCursor: null | string
 	gamesCatalogHasNextPage: boolean
 	needsReauth: boolean
+	needsStudioReauth: boolean
 	profileType: null | ProfileType
 	user: null | User
 }

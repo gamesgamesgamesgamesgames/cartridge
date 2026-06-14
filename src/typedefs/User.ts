@@ -4,4 +4,5 @@ export type User = {
 	displayName?: string
 	description?: string
 	avatarURL?: string
+	verifiedAccountType?: 'studio' | 'developer' | 'publisher'
 }

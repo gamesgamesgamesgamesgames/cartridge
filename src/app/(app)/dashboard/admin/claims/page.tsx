@@ -1,8 +1,5 @@
-import { type Metadata } from 'next'
+import { redirect } from 'next/navigation'
 
-// Local imports
-import { AdminClaimsPage } from '@/components/AdminClaimsPage/AdminClaimsPage'
-
-export const metadata: Metadata = { title: 'Admin: Claims' }
-
-export default AdminClaimsPage
+export default function DashboardAdminClaimsPage() {
+	redirect('/admin/claims')
+}

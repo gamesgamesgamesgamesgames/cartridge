@@ -13,12 +13,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Container } from '@/components/Container/Container'
 import { DashboardHeader } from '@/components/DashboardHeader/DashboardHeader'
-import {
-	faCheck,
-	faClock,
-	faXmark,
-} from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Check, Clock, X } from 'lucide-react'
 import { Spinner } from '@/components/ui/spinner'
 import { store } from '@/store/store'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
@@ -77,8 +72,8 @@ function getClaimLabel(claim: ClaimView): string {
 function StatusBadge({ status }: { status: 'pending' | 'approved' | 'denied' }) {
 	if (status === 'approved') {
 		return (
-			<Badge className={'border-green-600/30 bg-green-600/10 text-green-600 dark:border-green-500/30 dark:bg-green-500/10 dark:text-green-400'}>
-				<FontAwesomeIcon icon={faCheck} className={'mr-1 size-3'} />
+			<Badge className={'border-success/30 bg-success/10 text-success'}>
+				<Check className={'mr-1 size-3'} />
 				{'Approved'}
 			</Badge>
 		)
@@ -87,7 +82,7 @@ function StatusBadge({ status }: { status: 'pending' | 'approved' | 'denied' }) 
 	if (status === 'denied') {
 		return (
 			<Badge variant={'destructive'}>
-				<FontAwesomeIcon icon={faXmark} className={'mr-1 size-3'} />
+				<X className={'mr-1 size-3'} />
 				{'Denied'}
 			</Badge>
 		)
@@ -95,7 +90,7 @@ function StatusBadge({ status }: { status: 'pending' | 'approved' | 'denied' }) 
 
 	return (
 		<Badge variant={'outline'}>
-			<FontAwesomeIcon icon={faClock} className={'mr-1 size-3'} />
+			<Clock className={'mr-1 size-3'} />
 			{'Pending'}
 		</Badge>
 	)
@@ -218,7 +213,7 @@ export function MyClaimsPage() {
 					<Button
 						asChild
 						size={'sm'}>
-						<Link href={'/dashboard/claim'}>{'New Claim'}</Link>
+						<Link href={'/claim'}>{'New Claim'}</Link>
 					</Button>
 				}
 			/>
@@ -272,7 +267,7 @@ export function MyClaimsPage() {
 										<Button
 											asChild
 											variant={'outline'}>
-											<Link href={'/dashboard/claim'}>
+											<Link href={'/claim'}>
 												{'Submit Your First Claim'}
 											</Link>
 										</Button>

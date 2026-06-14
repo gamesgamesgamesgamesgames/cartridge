@@ -12,6 +12,7 @@ import { ApplicationTypeField } from '@/components/ApplicationTypeField/Applicat
 import { Button } from '@/components/ui/button'
 import { Container } from '@/components/Container/Container'
 import { DashboardHeader } from '@/components/DashboardHeader/DashboardHeader'
+import { Header } from '@/components/Header/Header'
 import { Field, FieldLabel } from '@/components/ui/field'
 import { Label } from '@/components/ui/label'
 import { NameField } from '@/components/NameField/NameField'
@@ -189,7 +190,7 @@ export function ContributePage() {
 			<Container>
 				<div className={'flex flex-col gap-8 max-w-2xl'}>
 					<div className={'flex flex-col gap-2'}>
-						<h1 className={'text-2xl font-bold'}>{'Suggest Edit'}</h1>
+						<Header level={3}>{'Suggest Edit'}</Header>
 						<p className={'text-muted-foreground text-sm'}>
 							{'Suggest changes to '}
 							<span className={'font-medium text-foreground'}>{game.name}</span>

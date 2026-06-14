@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useParams, useRouter } from 'next/navigation'
 import { useStore } from 'statery'
 
@@ -9,7 +9,7 @@ import { type VerificationRequestView } from '@/helpers/API'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Container } from '@/components/Container/Container'
-import { DashboardHeader } from '@/components/DashboardHeader/DashboardHeader'
+import { Header } from '@/components/Header/Header'
 import { Label } from '@/components/ui/label'
 import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
@@ -34,16 +34,7 @@ export function AdminVerificationRequestDetailPage() {
   const [denyReason, setDenyReason] = useState('')
   const [showDenyForm, setShowDenyForm] = useState(false)
 
-  const breadcrumbs = useMemo(
-    () => [
-      { label: 'Admin', url: '/dashboard/admin' },
-      { label: 'Verification Requests', url: '/dashboard/admin/verification-requests' },
-      { label: params.id, url: `/dashboard/admin/verification-requests/${params.id}` },
-    ],
-    [params.id],
-  )
-
-  const fetchRequest = useCallback(async () => {
+const fetchRequest = useCallback(async () => {
     setIsLoading(true)
     try {
       const result = await API.getVerificationRequest({ id: params.id })
@@ -105,43 +96,34 @@ export function AdminVerificationRequestDetailPage() {
 
   if (isLoading) {
     return (
-      <>
-        <DashboardHeader breadcrumbs={breadcrumbs} />
-        <Container>
-          <div className={'flex items-center justify-center py-16'}>
-            <Spinner className={'size-6'} />
-          </div>
-        </Container>
-      </>
+      <Container>
+        <div className={'flex items-center justify-center py-16'}>
+          <Spinner className={'size-6'} />
+        </div>
+      </Container>
     )
   }
 
   if (!request) {
     return (
-      <>
-        <DashboardHeader breadcrumbs={breadcrumbs} />
-        <Container>
-          <div className={'flex items-center justify-center py-16'}>
-            <p className={'text-muted-foreground'}>{'Verification request not found.'}</p>
-          </div>
-        </Container>
-      </>
+      <Container>
+        <div className={'flex items-center justify-center py-16'}>
+          <p className={'text-muted-foreground'}>{'Verification request not found.'}</p>
+        </div>
+      </Container>
     )
   }
 
   const isPending = request.status === 'pending'
 
   return (
-    <>
-      <DashboardHeader breadcrumbs={breadcrumbs} />
-
-      <Container>
+    <Container>
         <div className={'mx-auto flex max-w-2xl flex-col gap-6'}>
           <div className={'flex items-center justify-between'}>
-            <h1 className={'text-2xl font-bold'}>{'Verification Request'}</h1>
+            <Header level={3}>{'Verification Request'}</Header>
             <Badge
               variant={request.status === 'approved' ? 'default' : request.status === 'denied' ? 'destructive' : 'outline'}
-              className={request.status === 'approved' ? 'bg-green-600 text-white border-transparent' : ''}>
+              className={request.status === 'approved' ? 'bg-success text-success-foreground border-transparent' : ''}>
               {request.status.charAt(0).toUpperCase() + request.status.slice(1)}
             </Badge>
           </div>
@@ -261,7 +243,6 @@ export function AdminVerificationRequestDetailPage() {
             </div>
           )}
         </div>
-      </Container>
-    </>
+    </Container>
   )
 }

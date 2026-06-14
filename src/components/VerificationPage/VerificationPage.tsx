@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useStore } from 'statery'
 
 import * as API from '@/helpers/API'
@@ -8,14 +8,13 @@ import { type VerificationRequestView } from '@/helpers/API'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Container } from '@/components/Container/Container'
-import { DashboardHeader } from '@/components/DashboardHeader/DashboardHeader'
+import { Header } from '@/components/Header/Header'
 import { Label } from '@/components/ui/label'
 import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 import { VerifiedBadge } from '@/components/VerifiedBadge/VerifiedBadge'
-import { faClock } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Clock } from 'lucide-react'
 import { store } from '@/store/store'
 
 type AccountType = 'studio' | 'developer' | 'publisher'
@@ -31,11 +30,6 @@ export function VerificationPage() {
   const [message, setMessage] = useState('')
   const [contact, setContact] = useState('')
   const fetchIdRef = useRef(0)
-
-  const breadcrumbs = useMemo(
-    () => [{ label: 'Verification', url: '/dashboard/verification' }],
-    [],
-  )
 
   const fetchRequest = useCallback(async () => {
     const fetchId = ++fetchIdRef.current
@@ -84,8 +78,7 @@ export function VerificationPage() {
   if (!user) {
     return (
       <>
-        <DashboardHeader breadcrumbs={breadcrumbs} />
-        <Container>
+                <Container>
           <div className={'flex flex-col items-center gap-4 py-16 text-center'}>
             <p className={'text-muted-foreground'}>
               {'You must be signed in to manage verification.'}
@@ -99,8 +92,7 @@ export function VerificationPage() {
   if (isLoading) {
     return (
       <>
-        <DashboardHeader breadcrumbs={breadcrumbs} />
-        <Container>
+                <Container>
           <div className={'flex items-center justify-center py-16'}>
             <Spinner className={'size-6'} />
           </div>
@@ -113,8 +105,7 @@ export function VerificationPage() {
   if (request?.status === 'approved') {
     return (
       <>
-        <DashboardHeader breadcrumbs={breadcrumbs} />
-        <Container>
+                <Container>
           <div className={'flex flex-col items-center gap-4 py-16 text-center'}>
             <VerifiedBadge
               accountType={request.accountType as AccountType}
@@ -136,11 +127,10 @@ export function VerificationPage() {
   if (request?.status === 'pending') {
     return (
       <>
-        <DashboardHeader breadcrumbs={breadcrumbs} />
-        <Container>
+                <Container>
           <div className={'flex flex-col items-center gap-4 py-16 text-center'}>
             <Badge variant={'outline'} className={'text-base px-4 py-1'}>
-              <FontAwesomeIcon icon={faClock} className={'mr-2 size-4'} />
+              <Clock className={'mr-2 size-4'} />
               {'Pending Review'}
             </Badge>
             <div className={'flex flex-col gap-1'}>
@@ -163,11 +153,10 @@ export function VerificationPage() {
   // No request or denied: show form
   return (
     <>
-      <DashboardHeader breadcrumbs={breadcrumbs} />
-      <Container>
+            <Container>
         <div className={'mx-auto flex max-w-lg flex-col gap-6'}>
           <div className={'flex flex-col gap-2'}>
-            <h1 className={'text-2xl font-bold'}>{'Request Verification'}</h1>
+            <Header level={3}>{'Request Verification'}</Header>
             <p className={'text-sm text-muted-foreground'}>
               {'Verified accounts can create games in their own repository with immediate attribution. Tell us who you are and we\'ll review your request.'}
             </p>

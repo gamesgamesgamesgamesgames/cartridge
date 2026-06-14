@@ -463,6 +463,7 @@ export function GameLayoutContent(props: Props) {
 			<GamePageCTA
 				gameName={gameRecord.name}
 				gameUri={gameRecord.uri}
+				ownerDid={gameRecord.verifiedOwner?.did}
 				slug={gameRecord.slug}
 			/>
 

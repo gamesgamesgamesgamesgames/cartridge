@@ -8,6 +8,7 @@ export const INITIAL_STATE: GlobalState = {
 	gamesCatalogCursor: null,
 	gamesCatalogHasNextPage: true,
 	needsReauth: false,
+	needsStudioReauth: false,
 	profileType: null,
 	user: null,
 }

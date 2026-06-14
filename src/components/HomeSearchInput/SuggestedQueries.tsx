@@ -74,7 +74,7 @@ const SUGGESTIONS = [
 	'immersive sims',
 	'jigsaw puzzle games',
 	'kingdom management games',
-	'Lovecraftian horror',
+	'lovecraftian horror',
 	'martial arts fighting games',
 	'nature exploration games',
 	'old school dungeon crawlers',
@@ -85,7 +85,7 @@ const SUGGESTIONS = [
 	'top-down shooters',
 	'turn-based tactics games',
 	'voxel building games',
-	'Western themed games',
+	'western themed games',
 	'yokai themed games',
 	'alchemy crafting games',
 	'board game adaptations',
@@ -96,7 +96,7 @@ const SUGGESTIONS = [
 	'grimdark strategy games',
 	'historical war games',
 	'idle management games',
-	'japenese folklore RPGs',
+	'Japanese folklore RPGs',
 	'lighthearted party games',
 	'music creation games',
 	'ninja action games',
@@ -104,7 +104,7 @@ const SUGGESTIONS = [
 	'racing simulation games',
 	'sports management sims',
 	'text-based adventure games',
-	'Viking themed games',
+	'viking themed games',
 	'whimsical indie games',
 	'graveyard keeper style games',
 ]
@@ -124,7 +124,10 @@ export function SuggestedQueries() {
 	const router = useRouter()
 	const { setQuery } = useSearchContext()
 
-	const suggestions = useMemo(() => shuffle(SUGGESTIONS).slice(0, DISPLAY_COUNT), [])
+	const suggestions = useMemo(
+		() => shuffle(SUGGESTIONS).slice(0, DISPLAY_COUNT),
+		[],
+	)
 
 	const handleClick = (suggestion: string) => {
 		setQuery(suggestion)

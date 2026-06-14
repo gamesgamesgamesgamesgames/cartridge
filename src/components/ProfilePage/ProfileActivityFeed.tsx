@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { Button } from '@/components/ui/button'
+import { ManagementInbox } from '@/components/ProfilePage/ManagementInbox'
 import { ProfileActivityItem } from '@/components/ProfilePage/ProfileActivityItem'
 import { ProfileFeedFilters, type FilterType } from '@/components/ProfilePage/ProfileFeedFilters'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -205,24 +206,27 @@ export function ProfileActivityFeed(props: Props) {
 		}
 
 		return (
-			<div className={'flex flex-col items-center gap-3 py-10'}>
-				<div className={'flex size-10 items-center justify-center rounded-lg bg-muted'}>
-					<Activity className={'size-5 text-muted-foreground'} aria-hidden={'true'} />
+			<>
+				<ManagementInbox profileDid={profileDid} />
+				<div className={'flex flex-col items-center gap-3 py-10'}>
+					<div className={'flex size-10 items-center justify-center rounded-lg bg-muted'}>
+						<Activity className={'size-5 text-muted-foreground'} aria-hidden={'true'} />
+					</div>
+					<div className={'flex flex-col items-center gap-1 text-center'}>
+						<p className={'text-sm font-medium text-foreground'}>
+							{'Your activity feed is waiting'}
+						</p>
+						<p className={'max-w-xs text-sm text-muted-foreground'}>
+							{'Likes, reviews, and list updates show up here as a timeline of your gaming life.'}
+						</p>
+					</div>
+					<Button asChild variant={'outline'} size={'sm'}>
+						<Link href={'/browse'}>
+							{'Find something to play'}
+						</Link>
+					</Button>
 				</div>
-				<div className={'flex flex-col items-center gap-1 text-center'}>
-					<p className={'text-sm font-medium text-foreground'}>
-						{'Your activity feed is waiting'}
-					</p>
-					<p className={'max-w-xs text-sm text-muted-foreground'}>
-						{'Likes, reviews, and list updates show up here as a timeline of your gaming life.'}
-					</p>
-				</div>
-				<Button asChild variant={'outline'} size={'sm'}>
-					<Link href={'/browse'}>
-						{'Find something to play'}
-					</Link>
-				</Button>
-			</div>
+			</>
 		)
 	}
 
@@ -231,6 +235,9 @@ export function ProfileActivityFeed(props: Props) {
 
 	return (
 		<div ref={liveRef} aria-live={'polite'}>
+			{isOwnProfile && (
+				<ManagementInbox profileDid={profileDid} />
+			)}
 			<div className={'mb-4'}>
 				<ProfileFeedFilters active={filter} onChange={setFilter} />
 			</div>

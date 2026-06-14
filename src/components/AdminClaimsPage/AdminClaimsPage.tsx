@@ -10,7 +10,7 @@ import * as API from '@/helpers/API'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Container } from '@/components/Container/Container'
-import { DashboardHeader } from '@/components/DashboardHeader/DashboardHeader'
+import { Header } from '@/components/Header/Header'
 import { Spinner } from '@/components/ui/spinner'
 import { UnderlineTabs } from '@/components/UnderlineTabs/UnderlineTabs'
 import { isAdmin } from '@/helpers/admin'
@@ -33,15 +33,7 @@ export function AdminClaimsPage() {
 	const [isLoading, setIsLoading] = useState(true)
 	const [isLoadingMore, setIsLoadingMore] = useState(false)
 
-	const breadcrumbs = useMemo(
-		() => [
-			{ label: 'Admin', url: '/dashboard/admin' },
-			{ label: 'Claims', url: '/dashboard/admin/claims' },
-		],
-		[],
-	)
-
-	const fetchClaims = useCallback(
+const fetchClaims = useCallback(
 		async (filter: StatusFilter, nextCursor?: string) => {
 			const options: Parameters<typeof API.listClaims>[0] = { limit: 25 }
 			if (filter !== 'all') {
@@ -102,7 +94,7 @@ export function AdminClaimsPage() {
 	const handleClaimClick = useCallback(
 		(uri: AtUriString) => {
 			const { did, rkey } = parseATURI(uri)
-			router.push(`/dashboard/admin/claims/${did}/${rkey}`)
+			router.push(`/admin/claims/${did}/${rkey}`)
 		},
 		[router],
 	)
@@ -171,13 +163,10 @@ export function AdminClaimsPage() {
 	}
 
 	return (
-		<>
-			<DashboardHeader breadcrumbs={breadcrumbs} />
-
-			<Container>
+		<Container>
 				<div className={'flex flex-col gap-6'}>
 					<div className={'flex flex-col gap-2'}>
-						<h1 className={'text-2xl font-bold'}>{'Claims'}</h1>
+						<Header level={3}>{'Claims'}</Header>
 						<p className={'text-muted-foreground text-sm'}>
 							{'Review and manage ownership claims submitted by developers and publishers.'}
 						</p>
@@ -213,8 +202,7 @@ export function AdminClaimsPage() {
 						</Button>
 					)}
 				</div>
-			</Container>
-		</>
+		</Container>
 	)
 }
 
@@ -225,7 +213,7 @@ export function AdminClaimsPage() {
 function StatusBadge({ status }: { status: string }) {
 	if (status === 'approved') {
 		return (
-			<Badge className={'bg-green-600 text-white border-transparent'}>
+			<Badge className={'bg-success text-success-foreground border-transparent'}>
 				{'Approved'}
 			</Badge>
 		)

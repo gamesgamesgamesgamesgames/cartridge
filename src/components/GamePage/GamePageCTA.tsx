@@ -1,20 +1,28 @@
 'use client'
 
-import { ListPlus, Share2 } from 'lucide-react'
+import { ListPlus, Share2, Shield } from 'lucide-react'
+import Link from 'next/link'
 import { useCallback } from 'react'
+import { useStore } from 'statery'
 import { toast } from 'sonner'
 
 import { Button } from '@/components/ui/button'
 import { Container } from '@/components/Container/Container'
+import { store } from '@/store/store'
 
 type Props = Readonly<{
 	gameName: string
 	gameUri: string
+	ownerDid?: string
 	slug?: string
 }>
 
 export function GamePageCTA(props: Props) {
-	const { gameName, gameUri, slug } = props
+	const { gameName, gameUri, ownerDid, slug } = props
+	const { user } = useStore(store)
+
+	const isCatalogOwned = !ownerDid || ownerDid === 'did:web:gamesgamesgamesgames.games'
+	const isSignedIn = Boolean(user?.did)
 
 	const handleShare = useCallback(async () => {
 		const url = `${window.location.origin}/game/${slug ?? gameUri}`
@@ -60,6 +68,18 @@ export function GamePageCTA(props: Props) {
 							<Share2 className={'size-4'} aria-hidden={'true'} />
 							{'Share this game'}
 						</Button>
+
+						{isSignedIn && isCatalogOwned && (
+							<Button
+								asChild
+								variant={'outline'}
+								size={'lg'}>
+								<Link href={`/claim?game=${encodeURIComponent(gameUri)}`}>
+									<Shield className={'size-4'} aria-hidden={'true'} />
+									{'Claim this game'}
+								</Link>
+							</Button>
+						)}
 					</div>
 				</div>
 			</Container>

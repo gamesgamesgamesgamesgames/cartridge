@@ -7,6 +7,7 @@ import { Container } from '@/components/Container/Container'
 import { Header } from '@/components/Header/Header'
 import { OrgGameSections } from '@/components/CompanyPage/OrgGameSections'
 import { EditProfileButton } from '@/components/ProfilePage/EditProfileButton'
+import { OrgClaimCTA } from '@/components/OrgProfilePage/OrgClaimCTA'
 import {
 	detectFromUrl,
 	extractDisplayValue,
@@ -101,7 +102,8 @@ export async function OrgProfileLayoutContent(props: Props) {
 			<section className={'relative overflow-hidden py-12 shadow-xl/30 md:py-20'}>
 				<Container className={'relative z-10'}>
 					<div className={'relative'}>
-						<div className={'absolute right-0 top-0'}>
+						<div className={'absolute right-0 top-0 flex items-center gap-2'}>
+							<OrgClaimCTA orgUri={profile.uri} orgDid={did} />
 							<EditProfileButton profileDid={did} />
 						</div>
 

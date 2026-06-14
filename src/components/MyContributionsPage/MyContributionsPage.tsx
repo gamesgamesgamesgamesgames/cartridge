@@ -11,6 +11,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Container } from '@/components/Container/Container'
 import { DashboardHeader } from '@/components/DashboardHeader/DashboardHeader'
+import { Header } from '@/components/Header/Header'
 import { Spinner } from '@/components/ui/spinner'
 import { UnderlineTabs } from '@/components/UnderlineTabs/UnderlineTabs'
 import { store } from '@/store/store'
@@ -174,7 +175,7 @@ export function MyContributionsPage() {
 			<Container>
 				<div className={'flex flex-col gap-6'}>
 					<div className={'flex flex-col gap-2'}>
-						<h1 className={'text-2xl font-bold'}>{'My Contributions'}</h1>
+						<Header level={3}>{'My Contributions'}</Header>
 						<p className={'text-muted-foreground text-sm'}>
 							{'Track the status of your suggested edits and contributions.'}
 						</p>
@@ -223,7 +224,7 @@ export function MyContributionsPage() {
 function StatusBadge({ status }: { status: string }) {
 	if (status === 'approved') {
 		return (
-			<Badge className={'bg-green-600 text-white border-transparent'}>
+			<Badge className={'bg-success text-success-foreground border-transparent'}>
 				{'Approved'}
 			</Badge>
 		)
@@ -234,7 +235,7 @@ function StatusBadge({ status }: { status: string }) {
 	}
 
 	if (status === 'needsRevision') {
-		return <Badge variant={'outline'} className={'border-yellow-500 text-yellow-600'}>{'Needs Revision'}</Badge>
+		return <Badge variant={'outline'} className={'border-warning text-warning-foreground'}>{'Needs Revision'}</Badge>
 	}
 
 	return <Badge variant={'outline'}>{'Pending'}</Badge>

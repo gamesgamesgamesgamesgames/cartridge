@@ -1,10 +1,17 @@
 // Local imports
-import { handleCallback, hasRequiredScopes, restoreSession } from '@/helpers/oauth'
+import { handleCallback, hasRequiredScopes, hasStudioScopes, restoreSession } from '@/helpers/oauth'
 import { setAuthCookie } from '@/helpers/setAuthCookie'
 import { setProfileTypeCookie } from '@/helpers/setProfileTypeCookie'
 import { getUserProfile } from '@/store/actions/getUserProfile'
 import { store } from '@/store/store'
 import { subscribe } from '@/store/subscribe'
+
+function updateStudioReauth(scopes: string[]) {
+	const { user } = store.state
+	if (user?.verifiedAccountType && !hasStudioScopes(scopes)) {
+		store.set(() => ({ needsStudioReauth: true }))
+	}
+}
 
 export async function loginFromCallback() {
 	const session = await handleCallback()
@@ -17,6 +24,7 @@ export async function loginFromCallback() {
 	}))
 	setAuthCookie()
 	await getUserProfile()
+	updateStudioReauth(scopes)
 
 	const { profileType } = store.state
 	if (profileType) {
@@ -41,6 +49,7 @@ export async function loginFromStorage() {
 	}))
 	setAuthCookie()
 	await getUserProfile()
+	updateStudioReauth(scopes)
 
 	const { profileType } = store.state
 	if (profileType) {

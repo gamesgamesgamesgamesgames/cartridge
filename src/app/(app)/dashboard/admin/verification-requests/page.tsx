@@ -1,7 +1,5 @@
-import { type Metadata } from 'next'
+import { redirect } from 'next/navigation'
 
-import { AdminVerificationRequestsPage } from '@/components/AdminVerificationRequestsPage/AdminVerificationRequestsPage'
-
-export const metadata: Metadata = { title: 'Admin: Verification Requests' }
-
-export default AdminVerificationRequestsPage
+export default function DashboardAdminVerificationRequestsPage() {
+	redirect('/admin/verification-requests')
+}

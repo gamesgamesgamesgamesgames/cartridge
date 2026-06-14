@@ -1,7 +1,7 @@
 'use client'
 
 // Module imports
-import { ChevronDown, LogOut, MessageSquare, Monitor, Moon, Settings, Sun, User } from 'lucide-react'
+import { ChevronDown, LogOut, MessageSquare, Monitor, Moon, Settings, ShieldCheck, Sun, User } from 'lucide-react'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
 import { usePathname, useSearchParams } from 'next/navigation'
@@ -21,6 +21,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
+import { isAdmin } from '@/helpers/admin'
 import { isAuthenticated } from '@/helpers/oauth'
 import { logout } from '@/store/actions/logout'
 import { store } from '@/store/store'
@@ -114,6 +115,14 @@ export function UserMenu() {
 								{'Account Settings'}
 							</Link>
 						</DropdownMenuItem>
+						{isAdmin(user?.did) && (
+							<DropdownMenuItem asChild>
+								<Link href={'/admin/claims'}>
+									<ShieldCheck className={'size-4'} />
+									{'Admin'}
+								</Link>
+							</DropdownMenuItem>
+						)}
 						<DropdownMenuItem asChild>
 							<a
 								href={'https://userinput.app/#/s/cartridge.dev/3mnrrgh5rz622'}
