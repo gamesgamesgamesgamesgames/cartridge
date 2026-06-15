@@ -272,6 +272,21 @@ export async function getProfile(): Promise<PentaractAPIGetProfileResult> {
 	return response.json()
 }
 
+export async function getVerificationStatus(
+	handle: string,
+): Promise<{ isVerified: boolean; accountType?: string }> {
+	const params = new URLSearchParams({ handle })
+	const response = await queryAPI(
+		`/xrpc/dev.cartridge.getVerificationStatus?${params}`,
+	)
+
+	if (!response.ok) {
+		return { isVerified: false }
+	}
+
+	return response.json()
+}
+
 export async function getProfileByHandle(
 	handle: string,
 ): Promise<PentaractAPIGetProfileResult> {
@@ -904,8 +919,17 @@ export async function createClaim(input: {
 	)
 
 	if (!response.ok) {
-		const errorBody = await response.text()
-		throw new Error(`createClaim failed (${response.status}): ${errorBody}`)
+		const status = response.status
+		if (status === 401 || status === 403) {
+			throw new Error('Your session has expired. Please sign in again and retry.')
+		}
+		if (status === 409) {
+			throw new Error('A claim for this already exists. Check your existing claims or contact us if this seems wrong.')
+		}
+		if (status === 429) {
+			throw new Error('Too many requests. Please wait a moment and try again.')
+		}
+		throw new Error('Something went wrong while submitting your claim. Please try again.')
 	}
 
 	const data = await response.json()

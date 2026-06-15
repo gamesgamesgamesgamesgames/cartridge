@@ -8,7 +8,7 @@ import { subscribe } from '@/store/subscribe'
 
 function updateStudioReauth(scopes: string[]) {
 	const { user } = store.state
-	if (user?.verifiedAccountType && !hasStudioScopes(scopes)) {
+	if (user?.verifiedAccountType && scopes.length > 0 && !hasStudioScopes(scopes)) {
 		store.set(() => ({ needsStudioReauth: true }))
 	}
 }
@@ -24,7 +24,6 @@ export async function loginFromCallback() {
 	}))
 	setAuthCookie()
 	await getUserProfile()
-	updateStudioReauth(scopes)
 
 	const { profileType } = store.state
 	if (profileType) {

@@ -3,6 +3,7 @@ import { HappyViewBrowserClient } from '@happyview/oauth-client-browser'
 import type { HappyViewSession } from '@happyview/oauth-client-browser'
 
 // Local imports
+import { getVerificationStatus } from '@/helpers/API'
 import { REQUIRED_SCOPES, STUDIO_SCOPES } from '@/constants/REQUIRED_SCOPES'
 import { store } from '@/store/store'
 
@@ -24,8 +25,8 @@ const BASE_SCOPES = [
 ]
 
 const STUDIO_SCOPE_BUNDLES = [
-	'include:games.gamesgamesgamesgames.authStudioCatalog',
-	'include:games.gamesgamesgamesgames.authStudioOrgs',
+	'include:games.gamesgamesgamesgames.authGamesCatalog',
+	'include:games.gamesgamesgamesgames.authGamesOrg',
 ]
 
 // Types
@@ -97,13 +98,8 @@ export function setSession(session: HappyViewSession | null) {
 // Public API
 async function isHandleVerified(handle: string): Promise<boolean> {
 	try {
-		const params = new URLSearchParams({ handle })
-		const response = await fetch(
-			`${INSTANCE_URL}/xrpc/games.gamesgamesgamesgames.getProfile?${params}`,
-		)
-		if (!response.ok) return false
-		const data = await response.json()
-		return Boolean(data.profile?.verifiedAccountType)
+		const { isVerified } = await getVerificationStatus(handle)
+		return isVerified
 	} catch {
 		return false
 	}

@@ -5,9 +5,9 @@ export const REQUIRED_SCOPES = [
 ]
 
 export const STUDIO_SCOPES = [
-	// authStudioCatalog — verified users need these for claims and game management
+	// authGamesCatalog — verified users need these for claims and game management
 	'repo:games.gamesgamesgamesgames.claim',
 	'repo:games.gamesgamesgamesgames.game',
-	// authStudioOrgs — verified users need these for org management
+	// authGamesOrg — verified users need these for org management
 	'repo:games.gamesgamesgamesgames.org.profile',
 ]
