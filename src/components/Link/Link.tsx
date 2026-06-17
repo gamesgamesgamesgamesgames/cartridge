@@ -13,7 +13,7 @@ export function Link(props: Props) {
 		<NextLink
 			{...props}
 			className={twMerge(
-				'no-underline text-blue-400 hover:underline',
+				'no-underline text-primary hover:underline',
 				className,
 			)}>
 			{children}

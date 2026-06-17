@@ -12,6 +12,7 @@ const PUBLIC_URL = process.env.NEXT_PUBLIC_URL!
 const INSTANCE_URL = process.env.NEXT_PUBLIC_HAPPYVIEW_URL!
 const CLIENT_KEY = process.env.NEXT_PUBLIC_HAPPYVIEW_CLIENT_KEY!
 const RETURN_URL_KEY = 'pentaract_return_url'
+const PENDING_HANDLE_KEY = 'pending_login_handle'
 const PENDING_LIKE_KEY = 'pentaract_pending_like'
 const PENDING_LIST_ADD_KEY = 'pentaract_pending_list_add'
 
@@ -105,16 +106,18 @@ async function isHandleVerified(handle: string): Promise<boolean> {
 	}
 }
 
+export function consumePendingHandle(): string | null {
+	const handle = sessionStorage.getItem(PENDING_HANDLE_KEY)
+	if (handle) sessionStorage.removeItem(PENDING_HANDLE_KEY)
+	return handle
+}
+
 export async function loginWithRedirect(handle?: string, returnUrl?: string) {
 	if (window.location.hostname === 'localhost') {
+		if (handle) sessionStorage.setItem(PENDING_HANDLE_KEY, handle)
+		if (returnUrl) sessionStorage.setItem(RETURN_URL_KEY, returnUrl)
 		const url = new URL(window.location.href)
 		url.hostname = '127.0.0.1'
-		if (!url.searchParams.has('handle') && handle) {
-			url.searchParams.set('handle', handle)
-		}
-		if (!url.searchParams.has('returnTo') && returnUrl) {
-			url.searchParams.set('returnTo', returnUrl)
-		}
 		window.location.href = url.toString()
 		return
 	}
