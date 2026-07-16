@@ -21,6 +21,7 @@ import { type ActorProfileDetailView } from '@/helpers/lexicons/games/gamesgames
 import { type OrgProfileDetailView } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 import { VerifiedBadge } from '@/components/VerifiedBadge/VerifiedBadge'
 import { type GameFeedGame, type GenrePreference } from '@/helpers/API'
+import { type AccountType } from '@/constants/ACCOUNT_TYPES'
 
 type Props = Readonly<{
 	avatarUrl?: string
@@ -33,7 +34,7 @@ type Props = Readonly<{
 	isFollowing: boolean
 	isOwnProfile: boolean
 	profile: ActorProfileDetailView | OrgProfileDetailView
-	verifiedAccountType?: 'studio' | 'developer' | 'publisher'
+	verifiedAccountType?: AccountType
 }>
 
 function isActorProfile(

@@ -13,16 +13,18 @@ import { GAME_PLAYER_PERSPECTIVES } from '@/constants/GAME_PLAYER_PERSPECTIVES'
 import { GAME_GENRES } from '@/constants/GAME_GENRES'
 import { GAME_THEMES } from '@/constants/GAME_THEMES'
 import { Scroller } from '@/components/ui/scroller'
+import { GAME_PLATFORMS } from '@/constants/GAME_PLATFORMS'
 import { useDashboardCatalogEditGameContext } from '@/context/DashboardCatalogEditGameContext/DashboardCatalogEditGameContext'
-import { Link } from '../Link/Link'
 
 export function ReviewContent() {
 	const {
 		applicationType,
 		genres,
+		media,
 		modes,
 		name,
 		playerPerspectives,
+		releases,
 		summary,
 		themes,
 	} = useDashboardCatalogEditGameContext()
@@ -55,9 +57,7 @@ export function ReviewContent() {
 					{genres?.size ? (
 						<CommaSeparatedList
 							items={Array.from(genres).map((genre) => (
-								<Link href={`/theme/${GAME_GENRES[genre]?.name ?? genre}`}>
-									{GAME_GENRES[genre]?.name ?? genre}
-								</Link>
+								<span key={genre}>{GAME_GENRES[genre]?.name ?? genre}</span>
 							))}
 						/>
 					) : (
@@ -71,9 +71,7 @@ export function ReviewContent() {
 					{themes?.size ? (
 						<CommaSeparatedList
 							items={Array.from(themes).map((theme) => (
-								<Link href={`/theme/${GAME_THEMES[theme]?.name ?? theme}`}>
-									{GAME_THEMES[theme]?.name ?? theme}
-								</Link>
+								<span key={theme}>{GAME_THEMES[theme]?.name ?? theme}</span>
 							))}
 						/>
 					) : (
@@ -87,11 +85,9 @@ export function ReviewContent() {
 					{playerPerspectives?.size ? (
 						<CommaSeparatedList
 							items={Array.from(playerPerspectives).map((playerPerspective) => (
-								<Link
-									href={`/theme/${GAME_PLAYER_PERSPECTIVES[playerPerspective]?.name ?? playerPerspective}`}>
-									{GAME_PLAYER_PERSPECTIVES[playerPerspective]?.name ??
-										playerPerspective}
-								</Link>
+								<span key={playerPerspective}>
+									{GAME_PLAYER_PERSPECTIVES[playerPerspective]?.name ?? playerPerspective}
+								</span>
 							))}
 						/>
 					) : (
@@ -105,14 +101,38 @@ export function ReviewContent() {
 					{modes?.size ? (
 						<CommaSeparatedList
 							items={Array.from(modes).map((mode) => (
-								<Link href={`/theme/${GAME_MODES[mode]?.id ?? mode}`}>
-									{GAME_MODES[mode]?.name ?? mode}
-								</Link>
+								<span key={mode}>{GAME_MODES[mode]?.name ?? mode}</span>
 							))}
 						/>
 					) : (
 						<span className={'italic text-muted-foreground'}>
 							{'No modes provided'}
+						</span>
+					)}
+				</DataListValue>
+				<DataListLabel>{'Media'}</DataListLabel>
+				<DataListValue>
+					{media.length > 0 ? (
+						<span>{`${media.length} ${media.length === 1 ? 'item' : 'items'}`}</span>
+					) : (
+						<span className={'italic text-muted-foreground'}>
+							{'No media uploaded'}
+						</span>
+					)}
+				</DataListValue>
+				<DataListLabel>{'Releases'}</DataListLabel>
+				<DataListValue>
+					{releases.length > 0 ? (
+						<CommaSeparatedList
+							items={releases
+								.filter((r) => r.platform)
+								.map((r) => (
+									<span key={r.platform}>{GAME_PLATFORMS.find((p) => p.id === r.platform)?.label ?? r.platform}</span>
+								))}
+						/>
+					) : (
+						<span className={'italic text-muted-foreground'}>
+							{'No releases added'}
 						</span>
 					)}
 				</DataListValue>

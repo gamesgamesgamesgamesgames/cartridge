@@ -15,12 +15,7 @@ import { Spinner } from '@/components/ui/spinner'
 import { Textarea } from '@/components/ui/textarea'
 import { isAdmin } from '@/helpers/admin'
 import { store } from '@/store/store'
-
-const ACCOUNT_TYPE_LABELS: Record<string, string> = {
-  studio: 'Studio',
-  developer: 'Developer',
-  publisher: 'Publisher',
-}
+import { ACCOUNT_TYPE_LABELS } from '@/constants/ACCOUNT_TYPES'
 
 export function AdminVerificationRequestDetailPage() {
   const { user } = useStore(store)
@@ -28,6 +23,7 @@ export function AdminVerificationRequestDetailPage() {
   const params = useParams<{ id: string }>()
 
   const [request, setRequest] = useState<VerificationRequestView | null>(null)
+  const [profile, setProfile] = useState<{ handle?: string; displayName?: string }>({})
   const [isLoading, setIsLoading] = useState(true)
   const [isReviewing, setIsReviewing] = useState(false)
   const [reviewError, setReviewError] = useState<string | null>(null)
@@ -39,6 +35,14 @@ const fetchRequest = useCallback(async () => {
     try {
       const result = await API.getVerificationRequest({ id: params.id })
       setRequest(result)
+      if (result?.requesterDid) {
+        API.getProfileByHandle(result.requesterDid).then((profileResult) => {
+          setProfile({
+            handle: profileResult.handle,
+            displayName: profileResult.profile?.displayName,
+          })
+        }).catch(() => {})
+      }
     } finally {
       setIsLoading(false)
     }
@@ -132,12 +136,20 @@ const fetchRequest = useCallback(async () => {
             <div className={'grid grid-cols-2 gap-4'}>
               <div className={'flex flex-col gap-1'}>
                 <span className={'text-xs text-muted-foreground'}>{'Requester'}</span>
-                <span className={'text-sm font-mono truncate'}>{request.requesterDid}</span>
+                <span className={'text-sm font-medium truncate'}>
+                  {profile.displayName ?? profile.handle ?? request.requesterDid}
+                </span>
+                {profile.handle && (
+                  <span className={'text-xs text-muted-foreground truncate'}>
+                    {`@${profile.handle}`}
+                  </span>
+                )}
+                <span className={'text-xs text-muted-foreground font-mono truncate'}>{request.requesterDid}</span>
               </div>
 
               <div className={'flex flex-col gap-1'}>
                 <span className={'text-xs text-muted-foreground'}>{'Account Type'}</span>
-                <span className={'text-sm'}>{ACCOUNT_TYPE_LABELS[request.accountType] ?? request.accountType}</span>
+                <span className={'text-sm'}>{ACCOUNT_TYPE_LABELS[request.accountType]}</span>
               </div>
 
               <div className={'flex flex-col gap-1'}>

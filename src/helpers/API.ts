@@ -2,6 +2,7 @@
 import { type AtUriString } from '@atproto/lex'
 
 // Local imports
+import { type AccountType } from '@/constants/ACCOUNT_TYPES'
 import { type DID } from '@/typedefs/DID'
 import { type GameRecord } from '@/typedefs/GameRecord'
 import { type $InputBody as ActorProfileInput } from '@/helpers/lexicons/games/gamesgamesgamesgames/actor/putProfile.defs'
@@ -11,9 +12,8 @@ import { type PopfeedReview } from '@/helpers/lexicons/games/gamesgamesgamesgame
 import {
 	type ClaimView,
 	type ReviewView,
-} from '@/helpers/lexicons/games/gamesgamesgamesgames/getClaim.defs'
+} from '@/helpers/lexicons/dev/cartridge/getClaim.defs'
 import { type GameSummaryView } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
-import { type MigrationResult } from '@/helpers/lexicons/games/gamesgamesgamesgames/migrateClaim.defs'
 import { type ContributionView } from '@/helpers/lexicons/games/gamesgamesgamesgames/getContribution.defs'
 import {
 	type ContributionStats,
@@ -491,9 +491,8 @@ export async function toggleLike(
 export async function getLikes(
 	uri: string,
 ): Promise<{ count: number; liked: boolean }> {
-	const params = new URLSearchParams({ uri })
 	const resp = await queryAPI(
-		`/xrpc/games.gamesgamesgamesgames.graph.getLikes?${params}`,
+		`/xrpc/games.gamesgamesgamesgames.graph.getLikes?uri=${encodeURI(uri)}`,
 	)
 
 	if (!resp.ok) {
@@ -900,7 +899,7 @@ export async function uploadBlob(
 // Claims
 // ---------------------------------------------------------------------------
 
-export type { ClaimView, ReviewView, GameSummaryView, MigrationResult }
+export type { ClaimView, ReviewView, GameSummaryView }
 
 export async function createClaim(input: {
 	type: 'game' | 'org'
@@ -910,7 +909,7 @@ export async function createClaim(input: {
 	contact: string
 }): Promise<string> {
 	const response = await queryAPI(
-		'/xrpc/games.gamesgamesgamesgames.createClaim',
+		'/xrpc/dev.cartridge.createClaim',
 		{
 			isAuthenticated: true,
 			method: 'POST',
@@ -943,7 +942,7 @@ export async function reviewClaim(input: {
 	reason?: string
 }): Promise<string> {
 	const response = await queryAPI(
-		'/xrpc/games.gamesgamesgamesgames.reviewClaim',
+		'/xrpc/dev.cartridge.reviewClaim',
 		{
 			isAuthenticated: true,
 			method: 'POST',
@@ -963,9 +962,9 @@ export async function reviewClaim(input: {
 export async function migrateClaim(input: {
 	claim: string
 	claimReview: string
-}): Promise<MigrationResult[]> {
+}): Promise<{ jobId: string; status: string; gamesCount: number }> {
 	const response = await queryAPI(
-		'/xrpc/games.gamesgamesgamesgames.migrateClaim',
+		'/xrpc/dev.cartridge.migrateClaim',
 		{
 			isAuthenticated: true,
 			method: 'POST',
@@ -978,14 +977,43 @@ export async function migrateClaim(input: {
 		throw new Error(`migrateClaim failed (${response.status}): ${errorBody}`)
 	}
 
-	const data = await response.json()
-	return data.results as MigrationResult[]
+	return response.json()
+}
+
+export interface MigrationJobStatus {
+	jobId: string
+	status: 'pending' | 'running' | 'completed' | 'failed' | 'paused' | 'cancelled'
+	progress?: {
+		total?: number
+		processed?: number
+		orgProfileDone?: boolean
+	}
+	results?: Array<{
+		gameUri: string
+		status: 'success' | 'failed' | 'skipped'
+		newUri?: string
+		error?: string
+	}>
+	error?: string
+}
+
+export async function getMigrationJobStatus(jobId: string): Promise<MigrationJobStatus> {
+	const response = await queryAPI(
+		`/xrpc/dev.cartridge.getMigrationJobStatus?jobId=${encodeURIComponent(jobId)}`,
+		{ isAuthenticated: true },
+	)
+
+	if (!response.ok) {
+		const errorBody = await response.text()
+		throw new Error(`getMigrationJobStatus failed (${response.status}): ${errorBody}`)
+	}
+
+	return response.json()
 }
 
 export async function getClaim(uri: string): Promise<ClaimView | null> {
-	const params = new URLSearchParams({ uri })
 	const response = await queryAPI(
-		`/xrpc/games.gamesgamesgamesgames.getClaim?${params}`,
+		`/xrpc/dev.cartridge.getClaim?uri=${encodeURI(uri)}`,
 		{ isAuthenticated: true },
 	)
 
@@ -1008,7 +1036,7 @@ export async function listClaims(options?: {
 	if (options?.cursor) params.set('cursor', options.cursor)
 
 	const response = await queryAPI(
-		`/xrpc/games.gamesgamesgamesgames.listClaims?${params}`,
+		`/xrpc/dev.cartridge.listClaims?${params}`,
 		{ isAuthenticated: true },
 	)
 
@@ -1270,10 +1298,8 @@ export type ListItemView = {
 export async function getList(
 	uri: string,
 ): Promise<{ list: ListDetailView } | null> {
-	const params = new URLSearchParams({ uri })
-
 	const resp = await queryAPI(
-		`/xrpc/games.gamesgamesgamesgames.feed.getList?${params}`,
+		`/xrpc/games.gamesgamesgamesgames.feed.getList?uri=${encodeURI(uri)}`,
 	)
 
 	if (!resp.ok) {
@@ -1385,10 +1411,8 @@ export async function acceptContribution(input: {
 export async function getContribution(
 	uri: string,
 ): Promise<ContributionView | null> {
-	const params = new URLSearchParams({ uri })
 	const response = await queryAPI(
-		`/xrpc/games.gamesgamesgamesgames.getContribution?${params}`,
-		{ isAuthenticated: true },
+		`/xrpc/games.gamesgamesgamesgames.getContribution?uri=${encodeURI(uri)}`,
 	)
 
 	if (!response.ok) {
@@ -1617,7 +1641,7 @@ export async function getTasteProfile(
 export interface VerificationRequestView {
 	id: string
 	requesterDid: string
-	accountType: 'studio' | 'developer' | 'publisher'
+	accountType: AccountType
 	message: string
 	contact?: string
 	status: 'pending' | 'approved' | 'denied'
@@ -1628,7 +1652,7 @@ export interface VerificationRequestView {
 }
 
 export async function createVerificationRequest(input: {
-	accountType: 'studio' | 'developer' | 'publisher'
+	accountType: AccountType
 	message: string
 	contact: string
 }): Promise<string> {

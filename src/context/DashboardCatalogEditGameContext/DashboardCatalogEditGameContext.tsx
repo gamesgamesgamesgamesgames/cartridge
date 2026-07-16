@@ -8,9 +8,11 @@ import {
 	useContext,
 	useEffect,
 	useMemo,
+	useRef,
 	useState,
 	type PropsWithChildren,
 } from 'react'
+import { toast } from 'sonner'
 import { type AtUriString } from '@atproto/lex'
 import { useParams, useRouter } from 'next/navigation'
 
@@ -202,6 +204,8 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 		Set<PlayerPerspective>
 	>(new Set())
 
+	const isDirtyRef = useRef(false)
+
 	// Fetch existing game data when in edit mode
 	useEffect(() => {
 		if (!gameURI) return
@@ -251,7 +255,19 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 		})
 	}, [gameURI])
 
+	// Warn users about unsaved changes when closing the tab or navigating away
+	useEffect(() => {
+		const handler = (event: BeforeUnloadEvent) => {
+			if (isDirtyRef.current && state === 'idle') {
+				event.preventDefault()
+			}
+		}
+		window.addEventListener('beforeunload', handler)
+		return () => window.removeEventListener('beforeunload', handler)
+	}, [state])
+
 	const addGenre = useCallback((genre: Genre) => {
+		isDirtyRef.current = true
 		setGenres((previousState) => {
 			const newState = new Set(previousState)
 			newState.add(genre)
@@ -260,6 +276,7 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 	}, [])
 
 	const removeGenre = useCallback((genre: Genre) => {
+		isDirtyRef.current = true
 		setGenres((previousState) => {
 			const newState = new Set(previousState)
 			newState.delete(genre)
@@ -268,6 +285,7 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 	}, [])
 
 	const addMode = useCallback((mode: Mode) => {
+		isDirtyRef.current = true
 		setModes((previousState) => {
 			const newState = new Set(previousState)
 			newState.add(mode)
@@ -276,6 +294,7 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 	}, [])
 
 	const removeMode = useCallback((mode: Mode) => {
+		isDirtyRef.current = true
 		setModes((previousState) => {
 			const newState = new Set(previousState)
 			newState.delete(mode)
@@ -285,6 +304,7 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 
 	const addPlayerPerspective = useCallback(
 		(playerPerspective: PlayerPerspective) => {
+			isDirtyRef.current = true
 			setPlayerPerspectives((previousState) => {
 				const newState = new Set(previousState)
 				newState.add(playerPerspective)
@@ -296,6 +316,7 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 
 	const removePlayerPerspective = useCallback(
 		(playerPerspective: PlayerPerspective) => {
+			isDirtyRef.current = true
 			setPlayerPerspectives((previousState) => {
 				const newState = new Set(previousState)
 				newState.delete(playerPerspective)
@@ -306,6 +327,7 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 	)
 
 	const addTheme = useCallback((theme: Theme) => {
+		isDirtyRef.current = true
 		setThemes((previousState) => {
 			const newState = new Set(previousState)
 			newState.add(theme)
@@ -314,6 +336,7 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 	}, [])
 
 	const removeTheme = useCallback((theme: Theme) => {
+		isDirtyRef.current = true
 		setThemes((previousState) => {
 			const newState = new Set(previousState)
 			newState.delete(theme)
@@ -348,39 +371,50 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 			if (state === 'idle') {
 				setState('active')
 
-				await uploadMedia()
+				try {
+					await uploadMedia()
 
-				const gameData = {
-					applicationType,
-					createdAt: createdAt ?? undefined,
-					genres: Array.from(genres || []),
-					media,
-					modes: Array.from(modes || []),
-					name,
-					playerPerspectives: Array.from(playerPerspectives || []),
-					releases,
-					summary,
-					themes: Array.from(themes || []),
-				}
+					const gameData = {
+						applicationType,
+						createdAt: createdAt ?? undefined,
+						genres: Array.from(genres || []),
+						media,
+						modes: Array.from(modes || []),
+						name,
+						playerPerspectives: Array.from(playerPerspectives || []),
+						releases,
+						summary,
+						themes: Array.from(themes || []),
+					}
 
-				if (gameURI) {
-					// Edit mode
-					await putGame(gameURI, gameData, { shouldPublish })
-					const updatedGame = await getGame({ uri: gameURI })
-					if (updatedGame?.record.slug) {
-						router.push(`/game/${updatedGame.record.slug}`)
+					isDirtyRef.current = false
+
+					if (gameURI) {
+						await putGame(gameURI, gameData, { shouldPublish })
+						const updatedGame = await getGame({ uri: gameURI })
+						if (updatedGame?.record.slug) {
+							router.push(`/game/${updatedGame.record.slug}`)
+						} else {
+							router.push('/dashboard/catalog')
+						}
 					} else {
-						router.push('/dashboard/catalog')
+						const recordURI = await createGame(gameData, { shouldPublish })
+						const createdGame = await getGame({ uri: recordURI })
+						if (createdGame?.record.slug) {
+							router.push(`/game/${createdGame.record.slug}`)
+						} else {
+							router.push('/dashboard/catalog')
+						}
 					}
-				} else {
-					// Create mode
-					const recordURI = await createGame(gameData, { shouldPublish })
-					const createdGame = await getGame({ uri: recordURI })
-					if (createdGame?.record.slug) {
-						router.push(`/game/${createdGame.record.slug}`)
-					} else {
-						router.push('/dashboard/catalog')
-					}
+				} catch (error) {
+					isDirtyRef.current = true
+					toast.error(shouldPublish ? 'Failed to publish game' : 'Failed to save draft', {
+						description: error instanceof Error ? error.message : 'An unexpected error occurred.',
+					})
+				} finally {
+					setState('idle')
+					setUploadProgress(null)
+					setUploadTotal(null)
 				}
 			}
 		},
@@ -404,6 +438,7 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 	)
 
 	const updateAllMedia = useCallback((files: File[]) => {
+		isDirtyRef.current = true
 		setMedia((previousState) => {
 			const existingFiles = new Set(
 				previousState
@@ -430,6 +465,7 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 	}, [])
 
 	const updateMedia = useCallback((mediaItem: MediaItem) => {
+		isDirtyRef.current = true
 		setMedia((previousState) =>
 			previousState.map((item) =>
 				item.id === mediaItem.id ? mediaItem : item,
@@ -438,6 +474,7 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 	}, [])
 
 	const removeMedia = useCallback((mediaItem: MediaItem) => {
+		isDirtyRef.current = true
 		setMedia((previousState) =>
 			previousState.filter((item) => item.id !== mediaItem.id),
 		)
@@ -461,6 +498,26 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 		},
 		[steps],
 	)
+
+	const handleSetName = useCallback((value: GameRecord['name']) => {
+		isDirtyRef.current = true
+		setName(value)
+	}, [])
+
+	const handleSetSummary = useCallback((value: GameRecord['summary']) => {
+		isDirtyRef.current = true
+		setSummary(value)
+	}, [])
+
+	const handleSetApplicationType = useCallback((value: GameRecord['applicationType']) => {
+		isDirtyRef.current = true
+		setApplicationType(value)
+	}, [])
+
+	const handleSetReleases = useCallback((value: Release[]) => {
+		isDirtyRef.current = true
+		setReleases(value)
+	}, [])
 
 	const publishGame = useCallback(() => saveGame(true), [saveGame])
 	const saveGameDraft = useCallback(() => saveGame(false), [saveGame])
@@ -518,11 +575,11 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 			removePlayerPerspective,
 			removeTheme,
 			saveGameDraft,
-			setApplicationType,
+			setApplicationType: handleSetApplicationType,
 			setCurrentStepIndex,
-			setName,
-			setReleases,
-			setSummary,
+			setName: handleSetName,
+			setReleases: handleSetReleases,
+			setSummary: handleSetSummary,
 			updateAllMedia,
 			updateMedia,
 		}),
@@ -558,7 +615,11 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 			removePlayerPerspective,
 			removeTheme,
 			saveGameDraft,
+			handleSetApplicationType,
 			setCurrentStepIndex,
+			handleSetName,
+			handleSetReleases,
+			handleSetSummary,
 			updateAllMedia,
 			updateMedia,
 		],

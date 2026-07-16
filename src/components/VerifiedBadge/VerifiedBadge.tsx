@@ -6,21 +6,19 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-
-const ACCOUNT_TYPE_LABELS: Record<string, string> = {
-  studio: 'Verified Studio',
-  developer: 'Verified Developer',
-  publisher: 'Verified Publisher',
-}
+import {
+  type AccountType,
+  VERIFIED_ACCOUNT_TYPE_LABELS,
+} from '@/constants/ACCOUNT_TYPES'
 
 export function VerifiedBadge({
   accountType,
   className,
 }: {
-  accountType: 'studio' | 'developer' | 'publisher'
+  accountType: AccountType
   className?: string
 }) {
-  const label = ACCOUNT_TYPE_LABELS[accountType] ?? 'Verified'
+  const label = VERIFIED_ACCOUNT_TYPE_LABELS[accountType]
 
   return (
     <Tooltip>

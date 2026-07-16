@@ -23,7 +23,8 @@ export function AdminContributionDetailPage() {
 	const router = useRouter()
 	const params = useParams<{ did: string; rkey: string }>()
 
-	const { did, rkey } = params
+	const did = decodeURIComponent(params.did)
+	const rkey = decodeURIComponent(params.rkey)
 	const contributionUri = `at://${did}/games.gamesgamesgamesgames.contribution/${rkey}`
 
 	const [contribution, setContribution] = useState<ContributionView | null>(null)

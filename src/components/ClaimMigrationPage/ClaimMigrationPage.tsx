@@ -1,7 +1,7 @@
 'use client'
 
 // Module imports
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useParams } from 'next/navigation'
 import { useStore } from 'statery'
 
@@ -11,14 +11,16 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Container } from '@/components/Container/Container'
 import { Spinner } from '@/components/ui/spinner'
-import { type ClaimView, type GameSummaryView, type MigrationResult } from '@/helpers/API'
+import { type ClaimView, type GameSummaryView, type MigrationJobStatus } from '@/helpers/API'
 import { store } from '@/store/store'
+
+const POLL_INTERVAL = 3000
 
 export function ClaimMigrationPage() {
 	const { did, rkey } = useParams<{ did: string; rkey: string }>()
 	const { user } = useStore(store)
 
-	const claimUri = `at://${did}/games.gamesgamesgamesgames.claim/${rkey}`
+	const claimUri = `at://${decodeURIComponent(did)}/dev.cartridge.claim/${rkey}`
 
 	const [isLoading, setIsLoading] = useState(true)
 	const [claim, setClaim] = useState<ClaimView | null>(null)
@@ -26,8 +28,10 @@ export function ClaimMigrationPage() {
 	const [loadError, setLoadError] = useState<string | null>(null)
 
 	const [isMigrating, setIsMigrating] = useState(false)
-	const [migrationResults, setMigrationResults] = useState<MigrationResult[] | null>(null)
+	const [jobStatus, setJobStatus] = useState<MigrationJobStatus | null>(null)
 	const [migrationError, setMigrationError] = useState<string | null>(null)
+
+	const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
 	// Load claim (and org games if org type)
 	useEffect(() => {
@@ -77,6 +81,35 @@ export function ClaimMigrationPage() {
 		}
 	}, [claimUri])
 
+	// Poll for job status
+	useEffect(() => {
+		if (!jobStatus?.jobId) return
+		if (jobStatus.status === 'completed' || jobStatus.status === 'failed' || jobStatus.status === 'cancelled') return
+
+		pollRef.current = setInterval(async () => {
+			try {
+				const updated = await API.getMigrationJobStatus(jobStatus.jobId)
+				setJobStatus(updated)
+
+				if (updated.status === 'completed' || updated.status === 'failed' || updated.status === 'cancelled') {
+					if (pollRef.current) {
+						clearInterval(pollRef.current)
+						pollRef.current = null
+					}
+				}
+			} catch {
+				// Keep polling on transient errors
+			}
+		}, POLL_INTERVAL)
+
+		return () => {
+			if (pollRef.current) {
+				clearInterval(pollRef.current)
+				pollRef.current = null
+			}
+		}
+	}, [jobStatus?.jobId, jobStatus?.status])
+
 	const handleMigrate = useCallback(async () => {
 		if (!claim?.review?.uri) return
 
@@ -84,11 +117,18 @@ export function ClaimMigrationPage() {
 		setMigrationError(null)
 
 		try {
-			const results = await API.migrateClaim({
+			const result = await API.migrateClaim({
 				claim: claimUri,
 				claimReview: claim.review.uri,
 			})
-			setMigrationResults(results)
+			setJobStatus({
+				jobId: result.jobId,
+				status: result.status as MigrationJobStatus['status'],
+				progress: {
+					total: result.gamesCount,
+					processed: 0,
+				},
+			})
 		} catch (error) {
 			setMigrationError(
 				error instanceof Error ? error.message : 'Migration failed. Please try again.',
@@ -97,27 +137,6 @@ export function ClaimMigrationPage() {
 			setIsMigrating(false)
 		}
 	}, [claim, claimUri])
-
-	const handleRetryFailed = useCallback(async () => {
-		if (!claim?.review?.uri || !migrationResults) return
-
-		setIsMigrating(true)
-		setMigrationError(null)
-
-		try {
-			const results = await API.migrateClaim({
-				claim: claimUri,
-				claimReview: claim.review.uri,
-			})
-			setMigrationResults(results)
-		} catch (error) {
-			setMigrationError(
-				error instanceof Error ? error.message : 'Migration failed. Please try again.',
-			)
-		} finally {
-			setIsMigrating(false)
-		}
-	}, [claim, claimUri, migrationResults])
 
 	// Loading state
 	if (isLoading) {
@@ -165,12 +184,9 @@ export function ClaimMigrationPage() {
 	const approvedGames = allGames.filter((game) => approvedGameUris.has(game.uri))
 	const deniedGames = allGames.filter((game) => !approvedGameUris.has(game.uri))
 
-	const hasFailed = migrationResults?.some((r) => r.status === 'failed') ?? false
-
-	// Helper to get migration result for a game URI
-	function getMigrationResult(gameUri: string): MigrationResult | undefined {
-		return migrationResults?.find((r) => r.gameUri === gameUri)
-	}
+	const isJobActive = jobStatus && (jobStatus.status === 'pending' || jobStatus.status === 'running')
+	const isJobDone = jobStatus?.status === 'completed'
+	const isJobFailed = jobStatus?.status === 'failed' || jobStatus?.status === 'cancelled'
 
 	return (
 		<Container>
@@ -219,48 +235,73 @@ export function ClaimMigrationPage() {
 				{/* Approved state */}
 				{review?.status === 'approved' && (
 					<div className={'flex flex-col gap-6'}>
+						{/* Migration in progress */}
+						{isJobActive && jobStatus.progress && (
+							<div className={'rounded-lg border border-amber-500/40 bg-amber-500/10 p-6 flex flex-col gap-3'}>
+								<div className={'flex items-center gap-3'}>
+									<Spinner className={'size-5'} />
+									<p className={'text-base font-medium text-amber-700 dark:text-amber-400'}>
+										{'Migrating…'}
+									</p>
+								</div>
+								<p className={'text-sm text-muted-foreground'}>
+									{`${jobStatus.progress.processed ?? 0} of ${jobStatus.progress.total ?? 0} game${(jobStatus.progress.total ?? 0) === 1 ? '' : 's'} migrated.`}
+								</p>
+							</div>
+						)}
+
+						{/* Migration completed */}
+						{isJobDone && (
+							<div className={'rounded-lg border border-green-500/40 bg-green-500/10 p-6 flex flex-col gap-3'}>
+								<p className={'text-base font-medium text-green-700 dark:text-green-400'}>
+									{'Migration complete'}
+								</p>
+								{jobStatus.results && (
+									<div className={'flex flex-col gap-1'}>
+										{jobStatus.results.map((result) => (
+											<div
+												key={result.gameUri}
+												className={'flex items-center gap-2 text-sm'}>
+												{result.status === 'success' && (
+													<span className={'text-green-600'}>{'migrated'}</span>
+												)}
+												{result.status === 'skipped' && (
+													<span className={'text-muted-foreground'}>{'already migrated'}</span>
+												)}
+												{result.status === 'failed' && (
+													<span className={'text-destructive'}>{'failed'}</span>
+												)}
+												<span className={'font-mono text-xs text-muted-foreground truncate'}>{result.newUri ?? result.gameUri}</span>
+											</div>
+										))}
+									</div>
+								)}
+							</div>
+						)}
+
+						{/* Migration failed */}
+						{isJobFailed && (
+							<div className={'rounded-lg border border-destructive/50 bg-destructive/10 p-6 flex flex-col gap-3'}>
+								<p className={'text-base font-medium text-destructive'}>{'Migration failed'}</p>
+								{jobStatus?.error && (
+									<p className={'text-sm text-muted-foreground'}>{jobStatus.error}</p>
+								)}
+							</div>
+						)}
+
 						{/* Approved games */}
 						{approvedGames.length > 0 && (
 							<div className={'flex flex-col gap-3'}>
 								<h2 className={'text-lg font-semibold'}>{'Approved Games'}</h2>
 
 								<div className={'flex flex-col gap-2'}>
-									{approvedGames.map((game) => {
-										const result = getMigrationResult(game.uri)
-										return (
-											<div
-												key={game.uri}
-												className={'rounded-md border border-green-500/40 bg-green-500/10 px-4 py-3 flex flex-col gap-1'}>
-												<div className={'flex items-center justify-between gap-3'}>
-													<span className={'text-sm font-medium'}>{game.name}</span>
-
-													{result && (
-														<>
-															{result.status === 'success' && (
-																<Badge className={'border-green-600 bg-green-600 text-white shrink-0'}>
-																	{'Migrated'}
-																</Badge>
-															)}
-															{result.status === 'failed' && (
-																<Badge variant={'destructive'} className={'shrink-0'}>
-																	{'Failed'}
-																</Badge>
-															)}
-															{result.status === 'skipped' && (
-																<Badge variant={'outline'} className={'shrink-0'}>
-																	{'Skipped'}
-																</Badge>
-															)}
-														</>
-													)}
-												</div>
-
-												{result?.status === 'failed' && result.error && (
-													<p className={'text-xs text-destructive'}>{result.error}</p>
-												)}
-											</div>
-										)
-									})}
+									{approvedGames.map((game) => (
+										<div
+											key={game.uri}
+											className={'rounded-md border border-green-500/40 bg-green-500/10 px-4 py-3'}>
+											<span className={'text-sm font-medium'}>{game.name}</span>
+										</div>
+									))}
 								</div>
 							</div>
 						)}
@@ -282,7 +323,7 @@ export function ClaimMigrationPage() {
 							</div>
 						)}
 
-						{/* Migration error */}
+						{/* Migration error (from the initial enqueue call) */}
 						{migrationError && (
 							<div className={'rounded-md border border-destructive/50 bg-destructive/10 px-4 py-3'}>
 								<p className={'text-sm text-destructive'}>{migrationError}</p>
@@ -290,38 +331,22 @@ export function ClaimMigrationPage() {
 						)}
 
 						{/* Action buttons */}
-						<div className={'flex gap-3 flex-wrap'}>
-							{!migrationResults && (
+						{!jobStatus && (
+							<div className={'flex gap-3 flex-wrap'}>
 								<Button
 									disabled={isMigrating}
 									onClick={handleMigrate}>
 									{isMigrating ? (
 										<>
 											<Spinner className={'size-4'} />
-											{'Migrating…'}
+											{'Starting migration…'}
 										</>
 									) : (
 										'Start Migration'
 									)}
 								</Button>
-							)}
-
-							{migrationResults && hasFailed && (
-								<Button
-									disabled={isMigrating}
-									onClick={handleRetryFailed}
-									variant={'outline'}>
-									{isMigrating ? (
-										<>
-											<Spinner className={'size-4'} />
-											{'Retrying…'}
-										</>
-									) : (
-										'Retry Failed'
-									)}
-								</Button>
-							)}
-						</div>
+							</div>
+						)}
 					</div>
 				)}
 			</div>

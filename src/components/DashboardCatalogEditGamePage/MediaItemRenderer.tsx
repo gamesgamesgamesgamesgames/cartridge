@@ -1,6 +1,5 @@
 // Module imports
-import { faTimes } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { X } from 'lucide-react'
 import {
 	type ChangeEventHandler,
 	useCallback,
@@ -265,7 +264,7 @@ export function MediaItemRenderer(props: ItemRendererProps) {
 						</Field>
 
 						<Field>
-							<FieldLabel htmlFor={`${keyPrefix}-description`}>
+							<FieldLabel htmlFor={`${keyPrefix}-mediaType`}>
 								{'Media Type'}
 							</FieldLabel>
 							<Select
@@ -331,11 +330,11 @@ export function MediaItemRenderer(props: ItemRendererProps) {
 												<SelectItem value={'coverAlt'}>
 													{'Alternative Cover'}
 												</SelectItem>
-												<SelectItem value={'logoWhite'}>
+												<SelectItem value={'historicalCover'}>
 													{'Historical Cover'}
 												</SelectItem>
 												{mediaItem.width === mediaItem.height && (
-													<SelectItem value={'logoWhite'}>
+													<SelectItem value={'squareCover'}>
 														{'Square Cover'}
 													</SelectItem>
 												)}
@@ -398,7 +397,7 @@ export function MediaItemRenderer(props: ItemRendererProps) {
 							<Button
 								onClick={handleMediaItemRemove}
 								variant={'destructive'}>
-								<FontAwesomeIcon icon={faTimes} />
+								<X className={'size-4'} />
 								{'Remove'}
 							</Button>
 						</div>

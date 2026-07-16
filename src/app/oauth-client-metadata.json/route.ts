@@ -22,6 +22,7 @@ export function GET() {
 			'include:games.gamesgamesgamesgames.authGameBrowsing',
 			'include:games.gamesgamesgamesgames.authGamesCatalog',
 			'include:games.gamesgamesgamesgames.authGamesOrg',
+			'include:dev.cartridge.authMigration',
 		].join(' '),
 		application_type: 'web',
 		dpop_bound_access_tokens: true,

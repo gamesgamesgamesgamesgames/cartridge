@@ -28,6 +28,7 @@ const BASE_SCOPES = [
 const STUDIO_SCOPE_BUNDLES = [
 	'include:games.gamesgamesgamesgames.authGamesCatalog',
 	'include:games.gamesgamesgamesgames.authGamesOrg',
+	'include:dev.cartridge.authMigration',
 ]
 
 // Types

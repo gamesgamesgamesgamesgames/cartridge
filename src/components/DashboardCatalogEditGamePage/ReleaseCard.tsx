@@ -1,8 +1,7 @@
 'use client'
 
 // Module imports
-import { faCopy, faPlus, faTimes } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Copy, Plus, X } from 'lucide-react'
 
 // Local imports
 import { Button } from '@/components/ui/button'
@@ -13,8 +12,16 @@ import {
 	CardHeader,
 	CardTitle,
 } from '@/components/ui/card'
+import {
+	Combobox,
+	ComboboxContent,
+	ComboboxEmpty,
+	ComboboxInput,
+	ComboboxItem,
+	ComboboxList,
+} from '@/components/ui/combobox'
 import { Field, FieldLabel } from '@/components/ui/field'
-import { Input } from '@/components/ui/input'
+import { GAME_PLATFORMS, type GamePlatform } from '@/constants/GAME_PLATFORMS'
 import { type ReleaseDate } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 import { ReleaseDateRow } from '@/components/DashboardCatalogEditGamePage/ReleaseDateRow'
 import { type ReleaseDateWithID } from '@/typedefs/ReleaseDateWithID'
@@ -57,18 +64,29 @@ export function ReleaseCard(props: Props) {
 
 			<CardContent className={'flex flex-col gap-4'}>
 				<Field>
-					<FieldLabel htmlFor={`${keyPrefix}-platform`}>
-						{'Platform'}
-					</FieldLabel>
-					<Input
-						autoComplete={'off'}
+					<FieldLabel>{'Platform'}</FieldLabel>
+					<Combobox
 						disabled={isDisabled}
-						id={`${keyPrefix}-platform`}
-						onChange={(e) => onUpdatePlatform(e.target.value)}
-						placeholder={'PlayStation 5, Xbox Series X, PC, etc.'}
-						type={'text'}
-						value={release.platform ?? ''}
-					/>
+						items={GAME_PLATFORMS}
+						itemToStringLabel={(item) => item.label}
+						onValueChange={(value) => onUpdatePlatform(value?.id ?? '')}
+						value={GAME_PLATFORMS.find((p) => p.id === release.platform) ?? null}>
+						<ComboboxInput placeholder={'Select a platform'} />
+
+						<ComboboxContent>
+							<ComboboxEmpty>{'No platform found'}</ComboboxEmpty>
+
+							<ComboboxList>
+								{(platform: GamePlatform) => (
+									<ComboboxItem
+										key={platform.id}
+										value={platform}>
+										{platform.label}
+									</ComboboxItem>
+								)}
+							</ComboboxList>
+						</ComboboxContent>
+					</Combobox>
 				</Field>
 
 				<div className={'flex flex-col gap-4'}>
@@ -79,7 +97,7 @@ export function ReleaseCard(props: Props) {
 							onClick={onAddReleaseDate}
 							size={'sm'}
 							variant={'outline'}>
-							<FontAwesomeIcon icon={faPlus} />
+							<Plus className={'size-4'} />
 							{'Add Date'}
 						</Button>
 					</div>
@@ -116,7 +134,7 @@ export function ReleaseCard(props: Props) {
 					onClick={onDuplicate}
 					size={'sm'}
 					variant={'outline'}>
-					<FontAwesomeIcon icon={faCopy} />
+					<Copy className={'size-4'} />
 					{'Duplicate'}
 				</Button>
 
@@ -125,7 +143,7 @@ export function ReleaseCard(props: Props) {
 					onClick={onRemove}
 					size={'sm'}
 					variant={'destructive'}>
-					<FontAwesomeIcon icon={faTimes} />
+					<X className={'size-4'} />
 					{'Remove'}
 				</Button>
 			</CardFooter>

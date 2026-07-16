@@ -44,10 +44,10 @@ function DashboardCatalogEditGamePageInner() {
 			<DashboardHeader breadcrumbs={breadcrumbs} />
 
 			<Container isScrollable={false}>
-				<div className={'items-stretch flex gap-4 h-full overflow-hidden'}>
+				<div className={'flex flex-col gap-4 h-full overflow-hidden md:flex-row md:items-stretch'}>
 					<Stepper />
 
-					<div className={'flex flex-col grow justify-stretch w-full'}>
+					<div className={'flex flex-col grow justify-stretch w-full min-h-0'}>
 						<ContentWrapper />
 
 						<Footer />

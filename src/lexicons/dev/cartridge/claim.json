@@ -1,7 +1,7 @@
 {
 	"$type": "com.atproto.lexicon.schema",
 	"lexicon": 1,
-	"id": "games.gamesgamesgamesgames.claim",
+	"id": "dev.cartridge.claim",
 	"defs": {
 		"main": {
 			"description": "A claim for ownership of game or organization records.",
@@ -27,6 +27,11 @@
 					"message": {
 						"type": "string",
 						"maxGraphemes": 3000
+					},
+					"contact": {
+						"type": "string",
+						"maxGraphemes": 500,
+						"description": "Contact information for the claimant (filtered from responses unless caller is admin)"
 					}
 				}
 			}

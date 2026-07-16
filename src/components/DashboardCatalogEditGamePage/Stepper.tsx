@@ -1,10 +1,5 @@
 // Module imports
-import {
-	faCheckCircle,
-	faCircle,
-	faDotCircle,
-} from '@fortawesome/free-regular-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { CheckCircle2, Circle, CircleDot } from 'lucide-react'
 import { useMemo } from 'react'
 
 // Local imports
@@ -20,7 +15,7 @@ import {
 import { useDashboardCatalogEditGameContext } from '@/context/DashboardCatalogEditGameContext/DashboardCatalogEditGameContext'
 
 export function Stepper() {
-	const { currentStepIndex, goToStepIndex, steps } =
+	const { currentStepIndex, goToStepIndex, state, steps } =
 		useDashboardCatalogEditGameContext()
 
 	const stepElements = useMemo(() => {
@@ -28,7 +23,8 @@ export function Stepper() {
 			<Button
 				key={index}
 				asChild
-				className={'cursor-default flex-nowrap'}
+				className={'cursor-pointer flex-nowrap'}
+				disabled={state === 'active'}
 				onClick={() => goToStepIndex(index)}
 				variant={'ghost'}>
 				<Item
@@ -36,18 +32,15 @@ export function Stepper() {
 					variant={'default'}>
 					<ItemMedia variant={'icon'}>
 						{index > currentStepIndex && (
-							<FontAwesomeIcon
-								className={'text-muted-foreground'}
-								icon={faCircle}
-							/>
+							<Circle className={'size-4 text-muted-foreground'} />
 						)}
 
 						{index === currentStepIndex && (
-							<FontAwesomeIcon icon={faDotCircle} />
+							<CircleDot className={'size-4'} />
 						)}
 
 						{index < currentStepIndex && (
-							<FontAwesomeIcon icon={faCheckCircle} />
+							<CheckCircle2 className={'size-4'} />
 						)}
 					</ItemMedia>
 
@@ -64,8 +57,8 @@ export function Stepper() {
 	}, [currentStepIndex, steps])
 
 	return (
-		<Card className={'h-min p-4 w-min'}>
-			<div className={'flex flex-col'}>{stepElements}</div>
+		<Card className={'h-min p-4 w-full md:w-min'}>
+			<div className={'flex flex-row gap-1 overflow-x-auto md:flex-col md:gap-0'}>{stepElements}</div>
 		</Card>
 	)
 }

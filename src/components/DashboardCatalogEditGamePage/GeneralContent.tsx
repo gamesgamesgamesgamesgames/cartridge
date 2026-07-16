@@ -140,6 +140,9 @@ export function GeneralContent() {
 								'game'
 							}
 						/>
+						<p className={'text-xs text-muted-foreground mt-1'}>
+							{'What kind of software is this? Most entries are games, but DLC, mods, and other types are supported.'}
+						</p>
 
 						{/* parent */}
 					</CardContent>

@@ -1,8 +1,7 @@
 'use client'
 
 // Module imports
-import { faTimes } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { X } from 'lucide-react'
 
 // Local imports
 import { Button } from '@/components/ui/button'
@@ -120,7 +119,7 @@ export function ReleaseDateRow(props: Props) {
 						onClick={onRemove}
 						size={'sm'}
 						variant={'ghost'}>
-						<FontAwesomeIcon icon={faTimes} />
+						<X className={'size-4'} />
 						{'Remove'}
 					</Button>
 				)}

@@ -1,6 +1,5 @@
 // Module import
-import { faUpload } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Upload } from 'lucide-react'
 
 // Local import
 import { Button } from '@/components/ui/button'
@@ -16,7 +15,7 @@ import { useCallback, useMemo } from 'react'
 import { useDashboardCatalogEditGameContext } from '@/context/DashboardCatalogEditGameContext/DashboardCatalogEditGameContext'
 
 export function MediaContent() {
-	const { media, updateAllMedia } = useDashboardCatalogEditGameContext()
+	const { media, state, updateAllMedia } = useDashboardCatalogEditGameContext()
 
 	const onFileReject = useCallback((file: File, message: string) => {
 		toast(message, {
@@ -38,6 +37,7 @@ export function MediaContent() {
 			className={
 				'flex flex-col gap-4 grow justify-stretch overflow-hidden shrink w-full'
 			}
+			disabled={state === 'active'}
 			maxSize={5 * 1024 * 1024}
 			multiple
 			onFileReject={onFileReject}
@@ -49,11 +49,7 @@ export function MediaContent() {
 						className={
 							'flex items-center justify-center rounded-full border p-2.5'
 						}>
-						<FontAwesomeIcon
-							className={'text-muted-foreground'}
-							icon={faUpload}
-							size={'lg'}
-						/>
+						<Upload className={'size-5 text-muted-foreground'} />
 					</div>
 					<p className={'font-medium text-sm'}>{'Drag & drop files here'}</p>
 					<p className={'text-muted-foreground text-xs'}>

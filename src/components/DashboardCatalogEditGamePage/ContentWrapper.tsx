@@ -14,7 +14,7 @@ export function ContentWrapper() {
 					return null
 				}
 
-				return <step.component key={JSON.stringify(step)} />
+				return <step.component key={index} />
 			}),
 		[currentStepIndex],
 	)

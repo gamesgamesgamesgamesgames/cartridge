@@ -1,27 +1,12 @@
 // Module imports
-import {
-	faSave,
-	faTriangleExclamation,
-	faUpload,
-} from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Save, TriangleAlert, Upload } from 'lucide-react'
+import { toast } from 'sonner'
 
 // Local imports
 import { Button } from '@/components/ui/button'
-import {
-	HoverCard,
-	HoverCardContent,
-	HoverCardTrigger,
-} from '@/components/ui/hover-card'
-import {
-	Item,
-	ItemContent,
-	ItemDescription,
-	ItemMedia,
-} from '@/components/ui/item'
 import { Spinner } from '@/components/ui/spinner'
 import { useDashboardCatalogEditGameContext } from '@/context/DashboardCatalogEditGameContext/DashboardCatalogEditGameContext'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 
 export function Footer() {
 	const [isPublishing, setIsPublishing] = useState(false)
@@ -39,23 +24,35 @@ export function Footer() {
 		saveGameDraft,
 		state,
 		steps,
+		uploadProgress,
+		uploadTotal,
 	} = useDashboardCatalogEditGameContext()
 
 	const isDisabled = state === 'active'
+
+	useEffect(() => {
+		if (state === 'idle') {
+			setIsPublishing(false)
+			setIsSaving(false)
+		}
+	}, [state])
 
 	const handleNextClick = useCallback(() => nextStep(), [nextStep])
 	const handlePreviousClick = useCallback(() => previousStep(), [previousStep])
 
 	const handlePublishClick = useCallback(() => {
 		if (publishErrors.length) {
-			throw new Error('Cannot publish game')
+			toast.error('Cannot publish game', {
+				description: 'Please fix all errors before publishing.',
+			})
+			return
 		}
 
 		if (!isPublishing) {
 			setIsPublishing(true)
 			publishGame()
 		}
-	}, [isPublishing, publishErrors])
+	}, [isPublishing, publishErrors, publishGame])
 
 	const nextButton = useMemo(() => {
 		if (hasNext) {
@@ -69,112 +66,95 @@ export function Footer() {
 		}
 
 		return (
-			<HoverCard
-				closeDelay={100}
-				openDelay={10}>
-				<HoverCardTrigger>
-					<Button
-						color={'green'}
-						disabled={Boolean(publishErrors.length) || isDisabled}
-						onClick={handlePublishClick}>
-						{isPublishing && <Spinner data-icon={'inline-start'} />}
-						{!isPublishing && <FontAwesomeIcon icon={faUpload} />}
-						{'Publish'}
-					</Button>
-				</HoverCardTrigger>
-
-				{Boolean(publishErrors.length) && (
-					<HoverCardContent
-						className={'flex flex-col gap-0.5 w-md'}
-						side={'top'}>
-						{publishErrors.map((error, index) => (
-							<Item key={index}>
-								<ItemMedia variant={'icon'}>
-									<FontAwesomeIcon icon={faTriangleExclamation} />
-								</ItemMedia>
-
-								<ItemContent>
-									<ItemDescription>{error}</ItemDescription>
-								</ItemContent>
-							</Item>
-						))}
-					</HoverCardContent>
-				)}
-			</HoverCard>
+			<Button
+				color={'green'}
+				disabled={Boolean(publishErrors.length) || isDisabled}
+				onClick={handlePublishClick}>
+				{isPublishing && <Spinner data-icon={'inline-start'} />}
+				{!isPublishing && <Upload className={'size-4'} />}
+				{'Publish'}
+			</Button>
 		)
 	}, [handleNextClick, handlePublishClick, isDisabled, publishErrors])
 
 	const handleSaveClick = useCallback(() => {
 		if (saveErrors.length) {
-			throw new Error('Cannot publish game')
+			toast.error('Cannot save draft', {
+				description: 'Please fix all errors before saving.',
+			})
+			return
 		}
 
 		if (!isSaving) {
 			setIsSaving(true)
 			saveGameDraft()
 		}
-	}, [isSaving, saveErrors])
+	}, [isSaving, saveErrors, saveGameDraft])
 
 	const saveButton = useMemo(
 		() => (
-			<HoverCard
-				closeDelay={100}
-				openDelay={10}>
-				<HoverCardTrigger>
-					<Button
-						disabled={Boolean(saveErrors.length) || isDisabled}
-						onClick={handleSaveClick}
-						variant={'outline'}>
-						{isSaving && <Spinner data-icon={'inline-start'} />}
-						{!isSaving && <FontAwesomeIcon icon={faSave} />}
-						{'Save Draft'}
-					</Button>
-				</HoverCardTrigger>
-
-				{Boolean(saveErrors.length) && (
-					<HoverCardContent
-						className={'flex w-64 flex-col gap-0.5'}
-						side={'top'}>
-						{saveErrors.map((error, index) => (
-							<Item key={index}>
-								<ItemMedia variant={'icon'}>
-									<FontAwesomeIcon icon={faTriangleExclamation} />
-								</ItemMedia>
-
-								<ItemContent>
-									<ItemDescription>{error}</ItemDescription>
-								</ItemContent>
-							</Item>
-						))}
-					</HoverCardContent>
-				)}
-			</HoverCard>
+			<Button
+				disabled={Boolean(saveErrors.length) || isDisabled}
+				onClick={handleSaveClick}
+				variant={'outline'}>
+				{isSaving && <Spinner data-icon={'inline-start'} />}
+				{!isSaving && <Save className={'size-4'} />}
+				{'Save Draft'}
+			</Button>
 		),
-		[handleSaveClick, isDisabled, saveErrors],
+		[handleSaveClick, isDisabled, isSaving, saveErrors],
 	)
 
 	return (
-		<div className={'items-center gap-4 grid grid-cols-3 mt-4'}>
-			<div className={'items-center flex gap-4'}>
-				{hasPrevious && (
-					<Button
-						disabled={isDisabled}
-						onClick={handlePreviousClick}
-						variant={'outline'}>
-						{'Back'}
-					</Button>
-				)}
+		<>
+			<div className={'items-center gap-2 grid grid-cols-2 mt-4 sm:gap-4 sm:grid-cols-3'}>
+				<div className={'items-center flex gap-4'}>
+					{hasPrevious && (
+						<Button
+							disabled={isDisabled}
+							onClick={handlePreviousClick}
+							variant={'outline'}>
+							{'Back'}
+						</Button>
+					)}
+				</div>
+
+				<div className={'hidden justify-center text-muted-foreground text-sm sm:flex'}>
+					<span>{`Step ${currentStepIndex + 1} of ${steps.length}`}</span>
+				</div>
+
+				<div className={'items-center flex gap-4 justify-end'}>
+					{saveButton}
+
+					{nextButton}
+				</div>
 			</div>
 
-			<div className={'flex justify-center text-muted-foreground text-sm'}>
-				<span>{`Step ${currentStepIndex + 1} of ${steps.length}`}</span>
-			</div>
+			{uploadProgress !== null && uploadTotal !== null && uploadTotal > 0 && (
+				<div className={'mt-2 flex flex-col gap-1'}>
+					<div className={'flex justify-between text-xs text-muted-foreground'}>
+						<span>{'Uploading media...'}</span>
+						<span>{`${Math.round((uploadProgress / uploadTotal) * 100)}%`}</span>
+					</div>
+					<div className={'h-1.5 w-full overflow-hidden rounded-full bg-muted'}>
+						<div
+							className={'h-full rounded-full bg-primary transition-all duration-300'}
+							style={{ width: `${(uploadProgress / uploadTotal) * 100}%` }}
+						/>
+					</div>
+				</div>
+			)}
 
-			<div className={'items-center flex gap-4 justify-end'}>
-				{saveButton}
-
-				{nextButton}
-			</div>
-		</div>
+			{publishErrors.length > 0 && (
+				<div className={'mt-2 flex flex-col gap-1'}>
+					{publishErrors.map((error, index) => (
+						<div key={index} className={'flex items-center gap-2 text-sm text-destructive'}>
+							<TriangleAlert className={'size-3.5 shrink-0'} />
+							{error}
+						</div>
+					))}
+				</div>
+			)}
+		</>
 	)
 }

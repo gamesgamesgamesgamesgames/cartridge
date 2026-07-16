@@ -1,8 +1,7 @@
 'use client'
 
 // Module imports
-import { faPlus } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Plus } from 'lucide-react'
 import { useCallback, useMemo } from 'react'
 
 // Local imports
@@ -164,7 +163,7 @@ export function ReleasesContent() {
 				{releasesWithIds.length === 0 && (
 					<div className={'flex flex-col items-center gap-4 py-8 text-center'}>
 						<p className={'text-muted-foreground'}>
-							{'No releases added yet. Add a platform release to get started.'}
+							{'Add a platform release for each platform your game is available on (e.g. PC, PlayStation 5, Nintendo Switch).'}
 						</p>
 					</div>
 				)}
@@ -194,7 +193,7 @@ export function ReleasesContent() {
 					disabled={isDisabled}
 					onClick={handleAddRelease}
 					variant={'outline'}>
-					<FontAwesomeIcon icon={faPlus} />
+					<Plus className={'size-4'} />
 					{'Add Platform Release'}
 				</Button>
 			</div>

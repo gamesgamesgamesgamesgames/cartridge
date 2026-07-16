@@ -83,29 +83,49 @@ export function CategorizationContent() {
 	return (
 		<Scroller className={'h-full'}>
 			<div className={'flex flex-col gap-4'}>
-				<GenresField
-					disabled={isDisabled}
-					onChange={handleGenresChange}
-					value={genres ?? new Set()}
-				/>
+				<div className={'flex flex-col gap-1'}>
+					<GenresField
+						disabled={isDisabled}
+						onChange={handleGenresChange}
+						value={genres ?? new Set()}
+					/>
+					<p className={'text-xs text-muted-foreground px-1'}>
+						{'The primary gameplay categories, like RPG, Platformer, or Strategy.'}
+					</p>
+				</div>
 
-				<ThemesField
-					disabled={isDisabled}
-					onChange={handleThemesChange}
-					value={themes ?? new Set()}
-				/>
+				<div className={'flex flex-col gap-1'}>
+					<ThemesField
+						disabled={isDisabled}
+						onChange={handleThemesChange}
+						value={themes ?? new Set()}
+					/>
+					<p className={'text-xs text-muted-foreground px-1'}>
+						{'The setting or subject matter, like Sci-Fi, Fantasy, or Historical.'}
+					</p>
+				</div>
 
-				<PlayerPerspectivesField
-					disabled={isDisabled}
-					onChange={handlePlayerPerspectivesChange}
-					value={playerPerspectives ?? new Set()}
-				/>
+				<div className={'flex flex-col gap-1'}>
+					<PlayerPerspectivesField
+						disabled={isDisabled}
+						onChange={handlePlayerPerspectivesChange}
+						value={playerPerspectives ?? new Set()}
+					/>
+					<p className={'text-xs text-muted-foreground px-1'}>
+						{'How the player views the game world, like First Person, Third Person, or Top-Down.'}
+					</p>
+				</div>
 
-				<ModesField
-					disabled={isDisabled}
-					onChange={handleModesChange}
-					value={modes ?? new Set()}
-				/>
+				<div className={'flex flex-col gap-1'}>
+					<ModesField
+						disabled={isDisabled}
+						onChange={handleModesChange}
+						value={modes ?? new Set()}
+					/>
+					<p className={'text-xs text-muted-foreground px-1'}>
+						{'How the game is played, like Single Player, Co-op, or MMO.'}
+					</p>
+				</div>
 
 				{/* releaseDates */}
 			</div>

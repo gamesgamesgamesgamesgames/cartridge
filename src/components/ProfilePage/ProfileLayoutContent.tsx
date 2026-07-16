@@ -20,6 +20,7 @@ import { type OrgProfileDetailView } from '@/helpers/lexicons/games/gamesgamesga
 import { type ClaimView, type GameFeedGame, type GenrePreference, type UserListView } from '@/helpers/API'
 import { type PopfeedReview } from '@/helpers/lexicons/games/gamesgamesgamesgames/getReviews.defs'
 import { type GameRecord } from '@/typedefs/GameRecord'
+import { type AccountType } from '@/constants/ACCOUNT_TYPES'
 import { store } from '@/store/store'
 import Link from 'next/link'
 
@@ -48,7 +49,7 @@ type Props = Readonly<{
 	profile: ActorProfileDetailView | OrgProfileDetailView
 	reviewCount: number
 	reviews: PopfeedReview[]
-	verifiedAccountType?: 'studio' | 'developer' | 'publisher'
+	verifiedAccountType?: AccountType
 }>
 
 export function ProfileLayoutContent(props: Props) {

@@ -1,8 +1,7 @@
 'use client'
 
 // Module imports
-import { faCalendar } from '@fortawesome/free-solid-svg-icons'
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { Calendar as CalendarIcon } from 'lucide-react'
 import { TZDate } from '@date-fns/tz'
 import { format } from 'date-fns'
 import { useCallback, useMemo, useState } from 'react'
@@ -153,19 +152,16 @@ export function ReleaseDatePicker(props: Props) {
 					}
 					disabled={isDisabled}
 					variant={'outline'}>
-					<FontAwesomeIcon
-						className={'mr-2'}
-						icon={faCalendar}
-					/>
+					<CalendarIcon className={'mr-2 size-4'} />
 					{displayValue}
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent
 				className={'w-auto p-0'}
 				align={'start'}>
-				<div className={'flex'}>
+				<div className={'flex flex-col sm:flex-row'}>
 					{/* Left side - Date/Time picker */}
-					<div className={'p-4 border-r'}>
+					<div className={'p-4 sm:border-r border-b sm:border-b-0'}>
 						<div className={'text-sm font-medium mb-2'}>
 							{'Select Date & Time'}
 						</div>

@@ -26,7 +26,7 @@ export function AdminClaimDetailPage() {
 
 	const { did, rkey } = params
 
-	const claimUri = `at://${did}/games.gamesgamesgamesgames.claim/${rkey}`
+	const claimUri = `at://${decodeURIComponent(did)}/dev.cartridge.claim/${rkey}`
 
 	const [claim, setClaim] = useState<ClaimView | null>(null)
 	const [orgGames, setOrgGames] = useState<GameSummaryView[]>([])

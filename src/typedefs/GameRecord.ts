@@ -8,10 +8,11 @@ import {
 	type MediaItem,
 	type OrgCreditView,
 } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
+import { type AccountType } from '@/constants/ACCOUNT_TYPES'
 
 export type VerifiedOwner = {
 	did: string
-	accountType: 'studio' | 'developer' | 'publisher'
+	accountType: AccountType
 }
 
 export type GameRecord = Omit<GameLexicon, 'media'> & {
