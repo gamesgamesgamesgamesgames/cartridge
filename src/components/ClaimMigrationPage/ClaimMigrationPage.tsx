@@ -2,13 +2,19 @@
 
 // Module imports
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { ChevronDownIcon } from 'lucide-react'
 import { useStore } from 'statery'
 
 // Local imports
 import * as API from '@/helpers/API'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
+import {
+	Collapsible,
+	CollapsibleContent,
+	CollapsibleTrigger,
+} from '@/components/ui/collapsible'
 import { Container } from '@/components/Container/Container'
 import { Spinner } from '@/components/ui/spinner'
 import { type ClaimView, type GameSummaryView, type MigrationJobStatus } from '@/helpers/API'
@@ -16,11 +22,57 @@ import { store } from '@/store/store'
 
 const POLL_INTERVAL = 3000
 
+function getFriendlyError(status: MigrationJobStatus['status'], rawError?: string): {
+	title: string
+	message: string
+	retryLabel: string
+} {
+	if (status === 'cancelled') {
+		return {
+			title: 'Migration cancelled',
+			message: 'This migration was cancelled before it could finish. You can restart it — any games that were already migrated will be skipped.',
+			retryLabel: 'Restart Migration',
+		}
+	}
+
+	if (status === 'paused') {
+		return {
+			title: 'Migration paused',
+			message: 'This migration was paused. You can resume it to continue where it left off.',
+			retryLabel: 'Resume Migration',
+		}
+	}
+
+	if (rawError && /rate.limit/i.test(rawError)) {
+		return {
+			title: 'Migration interrupted',
+			message: 'The migration was interrupted while waiting for a rate limit to reset. This is temporary — you can restart, and any games that were already migrated will be skipped.',
+			retryLabel: 'Restart Migration',
+		}
+	}
+
+	if (rawError && /job.stopped/i.test(rawError)) {
+		return {
+			title: 'Migration interrupted',
+			message: 'The migration was stopped before it could finish. You can restart it — any games that were already migrated will be skipped.',
+			retryLabel: 'Restart Migration',
+		}
+	}
+
+	return {
+		title: 'Migration failed',
+		message: 'Something went wrong during migration. You can try again — any games that were already migrated will be skipped.',
+		retryLabel: 'Retry Migration',
+	}
+}
+
 export function ClaimMigrationPage() {
-	const { did, rkey } = useParams<{ did: string; rkey: string }>()
+	const router = useRouter()
+	const searchParams = useSearchParams()
 	const { user } = useStore(store)
 
-	const claimUri = `at://${decodeURIComponent(did)}/dev.cartridge.claim/${rkey}`
+	const claimUri = searchParams.get('uri') ?? ''
+	const restoredJobId = searchParams.get('jobId')
 
 	const [isLoading, setIsLoading] = useState(true)
 	const [claim, setClaim] = useState<ClaimView | null>(null)
@@ -81,17 +133,41 @@ export function ClaimMigrationPage() {
 		}
 	}, [claimUri])
 
+	// Restore job status from URL on page load
+	useEffect(() => {
+		if (!restoredJobId || jobStatus) return
+
+		let cancelled = false
+
+		async function restore() {
+			try {
+				const status = await API.getMigrationStatus(restoredJobId!)
+				if (!cancelled) {
+					setJobStatus(status)
+				}
+			} catch {
+				// Job may have been cleaned up — ignore
+			}
+		}
+
+		restore()
+
+		return () => {
+			cancelled = true
+		}
+	}, [restoredJobId, jobStatus])
+
 	// Poll for job status
 	useEffect(() => {
 		if (!jobStatus?.jobId) return
-		if (jobStatus.status === 'completed' || jobStatus.status === 'failed' || jobStatus.status === 'cancelled') return
+		if (jobStatus.status === 'completed' || jobStatus.status === 'failed' || jobStatus.status === 'cancelled' || jobStatus.status === 'paused') return
 
 		pollRef.current = setInterval(async () => {
 			try {
-				const updated = await API.getMigrationJobStatus(jobStatus.jobId)
+				const updated = await API.getMigrationStatus(jobStatus.jobId)
 				setJobStatus(updated)
 
-				if (updated.status === 'completed' || updated.status === 'failed' || updated.status === 'cancelled') {
+				if (updated.status === 'completed' || updated.status === 'failed' || updated.status === 'cancelled' || updated.status === 'paused') {
 					if (pollRef.current) {
 						clearInterval(pollRef.current)
 						pollRef.current = null
@@ -110,6 +186,14 @@ export function ClaimMigrationPage() {
 		}
 	}, [jobStatus?.jobId, jobStatus?.status])
 
+	const handleRetry = useCallback(() => {
+		setJobStatus(null)
+		setMigrationError(null)
+		const params = new URLSearchParams(searchParams.toString())
+		params.delete('jobId')
+		router.replace(`?${params.toString()}`, { scroll: false })
+	}, [router, searchParams])
+
 	const handleMigrate = useCallback(async () => {
 		if (!claim?.review?.uri) return
 
@@ -121,6 +205,11 @@ export function ClaimMigrationPage() {
 				claim: claimUri,
 				claimReview: claim.review.uri,
 			})
+
+			const params = new URLSearchParams(searchParams.toString())
+			params.set('jobId', result.jobId)
+			router.replace(`?${params.toString()}`, { scroll: false })
+
 			setJobStatus({
 				jobId: result.jobId,
 				status: result.status as MigrationJobStatus['status'],
@@ -136,7 +225,7 @@ export function ClaimMigrationPage() {
 		} finally {
 			setIsMigrating(false)
 		}
-	}, [claim, claimUri])
+	}, [claim, claimUri, router, searchParams])
 
 	// Loading state
 	if (isLoading) {
@@ -186,7 +275,7 @@ export function ClaimMigrationPage() {
 
 	const isJobActive = jobStatus && (jobStatus.status === 'pending' || jobStatus.status === 'running')
 	const isJobDone = jobStatus?.status === 'completed'
-	const isJobFailed = jobStatus?.status === 'failed' || jobStatus?.status === 'cancelled'
+	const isJobStopped = jobStatus?.status === 'failed' || jobStatus?.status === 'cancelled' || jobStatus?.status === 'paused'
 
 	return (
 		<Container>
@@ -279,15 +368,53 @@ export function ClaimMigrationPage() {
 							</div>
 						)}
 
-						{/* Migration failed */}
-						{isJobFailed && (
-							<div className={'rounded-lg border border-destructive/50 bg-destructive/10 p-6 flex flex-col gap-3'}>
-								<p className={'text-base font-medium text-destructive'}>{'Migration failed'}</p>
-								{jobStatus?.error && (
-									<p className={'text-sm text-muted-foreground'}>{jobStatus.error}</p>
-								)}
-							</div>
-						)}
+						{/* Migration stopped (failed / cancelled / paused) */}
+						{isJobStopped && jobStatus && (() => {
+							const friendly = getFriendlyError(jobStatus.status, jobStatus.error)
+							const isWarning = jobStatus.status === 'paused' || jobStatus.status === 'cancelled'
+
+							return (
+								<div className={`rounded-lg border p-6 flex flex-col gap-4 ${
+									isWarning
+										? 'border-amber-500/40 bg-amber-500/10'
+										: 'border-destructive/50 bg-destructive/10'
+								}`}>
+									<div className={'flex flex-col gap-2'}>
+										<p className={`text-base font-medium ${
+											isWarning ? 'text-amber-700 dark:text-amber-400' : 'text-destructive'
+										}`}>
+											{friendly.title}
+										</p>
+										<p className={'text-sm text-muted-foreground'}>
+											{friendly.message}
+										</p>
+									</div>
+
+									<div className={'flex items-center gap-3'}>
+										<Button
+											onClick={handleRetry}
+											size={'sm'}
+											variant={isWarning ? 'default' : 'destructive'}>
+											{friendly.retryLabel}
+										</Button>
+									</div>
+
+									{jobStatus.error && (
+										<Collapsible>
+											<CollapsibleTrigger className={'group flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors cursor-pointer'}>
+												<ChevronDownIcon className={'size-3.5 transition-transform group-data-[state=open]:rotate-180'} />
+												{'Technical details'}
+											</CollapsibleTrigger>
+											<CollapsibleContent>
+												<pre className={'mt-2 rounded-md bg-black/20 p-3 text-xs text-muted-foreground font-mono whitespace-pre-wrap break-all overflow-x-auto max-h-40 overflow-y-auto'}>
+													{jobStatus.error}
+												</pre>
+											</CollapsibleContent>
+										</Collapsible>
+									)}
+								</div>
+							)
+						})()}
 
 						{/* Approved games */}
 						{approvedGames.length > 0 && (

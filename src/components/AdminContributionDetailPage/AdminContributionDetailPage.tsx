@@ -112,7 +112,7 @@ useEffect(() => {
 	}, [contribution, reason, router])
 
 	// Auth guard — after all hooks
-	if (user !== null && !isAdmin(user?.did)) {
+	if (user !== null && !isAdmin(user)) {
 		router.replace('/')
 		return null
 	}

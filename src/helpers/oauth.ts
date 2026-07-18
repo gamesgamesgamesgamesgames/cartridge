@@ -23,12 +23,14 @@ const BASE_SCOPES = [
 	'include:games.gamesgamesgamesgames.authContributions',
 	'include:games.gamesgamesgamesgames.authCustomFeeds',
 	'include:games.gamesgamesgamesgames.authGameBrowsing',
+	'include:dev.cartridge.authActor',
 ]
 
 const STUDIO_SCOPE_BUNDLES = [
 	'include:games.gamesgamesgamesgames.authGamesCatalog',
 	'include:games.gamesgamesgamesgames.authGamesOrg',
-	'include:dev.cartridge.authMigration',
+	'include:dev.cartridge.authClaims',
+	'blob:*/*',
 ]
 
 // Types
@@ -143,6 +145,11 @@ export async function loginWithRedirect(handle?: string, returnUrl?: string) {
 	const scopes = verified
 		? [...BASE_SCOPES, ...STUDIO_SCOPE_BUNDLES].join(' ')
 		: BASE_SCOPES.join(' ')
+
+	console.log('[oauth-debug] verified:', verified)
+	console.log('[oauth-debug] scopes:', scopes)
+	console.log('[oauth-debug] BASE_SCOPES:', BASE_SCOPES)
+	console.log('[oauth-debug] STUDIO_SCOPE_BUNDLES:', STUDIO_SCOPE_BUNDLES)
 
 	const client = getClient()
 	await client.login(handle, { scopes })

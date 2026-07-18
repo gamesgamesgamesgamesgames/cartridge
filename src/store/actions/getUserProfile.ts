@@ -10,9 +10,9 @@ export async function getUserProfile() {
 		throw new Error('Cannot get user profile before logging in.')
 	}
 
-	// Fetch Pentaract profile and Bluesky profile in parallel
-	const [{ profile, profileType }, blueskyProfile] = await Promise.all([
-		API.getProfile(),
+	// Fetch Cartridge profile (with roles) and Bluesky profile in parallel
+	const [{ profile, profileType, roles }, blueskyProfile] = await Promise.all([
+		API.getCartridgeProfile(),
 		API.getBlueskyProfile(),
 	])
 
@@ -25,6 +25,7 @@ export async function getUserProfile() {
 			description: profile?.description ?? blueskyProfile?.description,
 			avatarURL: rewriteImageUrl(blueskyProfile?.avatarURL),
 			verifiedAccountType: profile?.verifiedAccountType,
+			roles: roles ?? [],
 		},
 	}))
 }

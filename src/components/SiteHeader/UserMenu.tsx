@@ -115,7 +115,7 @@ export function UserMenu() {
 								{'Account Settings'}
 							</Link>
 						</DropdownMenuItem>
-						{isAdmin(user?.did) && (
+						{isAdmin(user) && (
 							<DropdownMenuItem asChild>
 								<Link href={'/admin/claims'}>
 									<ShieldCheck className={'size-4'} />

@@ -2,7 +2,7 @@
 
 // Module imports
 import { useCallback, useEffect, useState } from 'react'
-import { useParams, useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useStore } from 'statery'
 
 // Local imports
@@ -22,11 +22,9 @@ import { type ClaimView, type GameSummaryView } from '@/helpers/API'
 export function AdminClaimDetailPage() {
 	const { user } = useStore(store)
 	const router = useRouter()
-	const params = useParams<{ did: string; rkey: string }>()
+	const searchParams = useSearchParams()
 
-	const { did, rkey } = params
-
-	const claimUri = `at://${decodeURIComponent(did)}/dev.cartridge.claim/${rkey}`
+	const claimUri = searchParams.get('uri') ?? ''
 
 	const [claim, setClaim] = useState<ClaimView | null>(null)
 	const [orgGames, setOrgGames] = useState<GameSummaryView[]>([])
@@ -120,7 +118,7 @@ useEffect(() => {
 	}, [claim, reason, router])
 
 	// Auth guard — after all hooks
-	if (user !== null && !isAdmin(user?.did)) {
+	if (user !== null && !isAdmin(user)) {
 		router.replace('/')
 		return null
 	}

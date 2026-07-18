@@ -165,7 +165,7 @@ const fetchContributions = useCallback(
 	}, [contributions, handleContributionClick, isLoading])
 
 	// Auth guard — after all hooks
-	if (user !== null && !isAdmin(user?.did)) {
+	if (user !== null && !isAdmin(user)) {
 		router.replace('/')
 		return null
 	}

@@ -12,7 +12,7 @@ import { type PopfeedReview } from '@/helpers/lexicons/games/gamesgamesgamesgame
 import {
 	type ClaimView,
 	type ReviewView,
-} from '@/helpers/lexicons/dev/cartridge/getClaim.defs'
+} from '@/helpers/lexicons/dev/cartridge/claims/getClaim.defs'
 import { type GameSummaryView } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 import { type ContributionView } from '@/helpers/lexicons/games/gamesgamesgamesgames/getContribution.defs'
 import {
@@ -259,6 +259,8 @@ export async function getReviews(
 	return resp.json()
 }
 
+export type UserRole = 'superadmin' | 'admin'
+
 export async function getProfile(): Promise<PentaractAPIGetProfileResult> {
 	const response = await queryAPI(
 		'/xrpc/games.gamesgamesgamesgames.getProfile',
@@ -267,6 +269,21 @@ export async function getProfile(): Promise<PentaractAPIGetProfileResult> {
 
 	if (!response.ok) {
 		return { profile: null, profileType: null }
+	}
+
+	return response.json()
+}
+
+export async function getCartridgeProfile(): Promise<
+	PentaractAPIGetProfileResult & { roles: UserRole[] }
+> {
+	const response = await queryAPI(
+		'/xrpc/dev.cartridge.actor.getProfile',
+		{ isAuthenticated: true },
+	)
+
+	if (!response.ok) {
+		return { profile: null, profileType: null, roles: [] }
 	}
 
 	return response.json()
@@ -862,11 +879,17 @@ export async function getMostListedGames(
 // Misc
 // ---------------------------------------------------------------------------
 
-export async function resolveHandle(_handle: string): Promise<DID | null> {
-	console.warn(
-		'[pentaract] API.resolveHandle is stubbed — HappyView data API not yet available',
-	)
-	return null
+export async function resolveHandle(handle: string): Promise<DID | null> {
+	const cleaned = handle.replace(/^@/, '')
+	try {
+		const resp = await fetch(`https://${cleaned}/.well-known/atproto-did`)
+		if (!resp.ok) return null
+		const text = (await resp.text()).trim()
+		if (text.startsWith('did:')) return text as DID
+		return null
+	} catch {
+		return null
+	}
 }
 
 export async function uploadBlob(
@@ -909,7 +932,7 @@ export async function createClaim(input: {
 	contact: string
 }): Promise<string> {
 	const response = await queryAPI(
-		'/xrpc/dev.cartridge.createClaim',
+		'/xrpc/dev.cartridge.claims.createClaim',
 		{
 			isAuthenticated: true,
 			method: 'POST',
@@ -942,7 +965,7 @@ export async function reviewClaim(input: {
 	reason?: string
 }): Promise<string> {
 	const response = await queryAPI(
-		'/xrpc/dev.cartridge.reviewClaim',
+		'/xrpc/dev.cartridge.claims.reviewClaim',
 		{
 			isAuthenticated: true,
 			method: 'POST',
@@ -964,7 +987,7 @@ export async function migrateClaim(input: {
 	claimReview: string
 }): Promise<{ jobId: string; status: string; gamesCount: number }> {
 	const response = await queryAPI(
-		'/xrpc/dev.cartridge.migrateClaim',
+		'/xrpc/dev.cartridge.claims.migrateClaim',
 		{
 			isAuthenticated: true,
 			method: 'POST',
@@ -997,15 +1020,15 @@ export interface MigrationJobStatus {
 	error?: string
 }
 
-export async function getMigrationJobStatus(jobId: string): Promise<MigrationJobStatus> {
+export async function getMigrationStatus(jobId: string): Promise<MigrationJobStatus> {
 	const response = await queryAPI(
-		`/xrpc/dev.cartridge.getMigrationJobStatus?jobId=${encodeURIComponent(jobId)}`,
+		`/xrpc/dev.cartridge.claims.getMigrationStatus?jobId=${encodeURIComponent(jobId)}`,
 		{ isAuthenticated: true },
 	)
 
 	if (!response.ok) {
 		const errorBody = await response.text()
-		throw new Error(`getMigrationJobStatus failed (${response.status}): ${errorBody}`)
+		throw new Error(`getMigrationStatus failed (${response.status}): ${errorBody}`)
 	}
 
 	return response.json()
@@ -1013,7 +1036,7 @@ export async function getMigrationJobStatus(jobId: string): Promise<MigrationJob
 
 export async function getClaim(uri: string): Promise<ClaimView | null> {
 	const response = await queryAPI(
-		`/xrpc/dev.cartridge.getClaim?uri=${encodeURI(uri)}`,
+		`/xrpc/dev.cartridge.claims.getClaim?uri=${encodeURI(uri)}`,
 		{ isAuthenticated: true },
 	)
 
@@ -1036,7 +1059,7 @@ export async function listClaims(options?: {
 	if (options?.cursor) params.set('cursor', options.cursor)
 
 	const response = await queryAPI(
-		`/xrpc/dev.cartridge.listClaims?${params}`,
+		`/xrpc/dev.cartridge.claims.listClaims?${params}`,
 		{ isAuthenticated: true },
 	)
 
@@ -1045,6 +1068,89 @@ export async function listClaims(options?: {
 	}
 
 	return response.json()
+}
+
+export async function createSpace(input: {
+	type: string
+	skey: string
+	config?: Record<string, unknown>
+}): Promise<{ uri: string }> {
+	const response = await queryAPI(
+		'/xrpc/com.atproto.simplespace.createSpace',
+		{
+			isAuthenticated: true,
+			method: 'POST',
+			body: JSON.stringify(input),
+		},
+	)
+
+	if (!response.ok) {
+		const errorBody = await response.text()
+		throw new Error(`createSpace failed (${response.status}): ${errorBody}`)
+	}
+
+	return response.json()
+}
+
+export interface SpaceMember {
+	did: string
+	access: string
+}
+
+export async function listSpaceMembers(
+	spaceUri: string,
+): Promise<{ members: SpaceMember[] }> {
+	const params = new URLSearchParams({ space: spaceUri })
+	const response = await queryAPI(
+		`/xrpc/com.atproto.simplespace.listMembers?${params}`,
+		{ isAuthenticated: true },
+	)
+
+	if (!response.ok) {
+		const errorBody = await response.text()
+		throw new Error(`listSpaceMembers failed (${response.status}): ${errorBody}`)
+	}
+
+	return response.json()
+}
+
+export async function addSpaceMember(
+	spaceUri: string,
+	did: string,
+	access = 'write',
+): Promise<void> {
+	const response = await queryAPI(
+		'/xrpc/com.atproto.simplespace.addMember',
+		{
+			isAuthenticated: true,
+			method: 'POST',
+			body: JSON.stringify({ space: spaceUri, did, access }),
+		},
+	)
+
+	if (!response.ok) {
+		const errorBody = await response.text()
+		throw new Error(`addSpaceMember failed (${response.status}): ${errorBody}`)
+	}
+}
+
+export async function removeSpaceMember(
+	spaceUri: string,
+	did: string,
+): Promise<void> {
+	const response = await queryAPI(
+		'/xrpc/com.atproto.simplespace.removeMember',
+		{
+			isAuthenticated: true,
+			method: 'POST',
+			body: JSON.stringify({ space: spaceUri, did }),
+		},
+	)
+
+	if (!response.ok) {
+		const errorBody = await response.text()
+		throw new Error(`removeSpaceMember failed (${response.status}): ${errorBody}`)
+	}
 }
 
 export async function listOrgGames(

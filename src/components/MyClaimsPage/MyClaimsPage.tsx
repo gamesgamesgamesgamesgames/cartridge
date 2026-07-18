@@ -22,11 +22,6 @@ import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
 type StatusFilter = 'all' | 'pending' | 'approved' | 'denied'
 
 // Helpers
-function parseAtUri(uri: string): { did: string; rkey: string } | null {
-	const match = uri.match(/^at:\/\/([^/]+)\/[^/]+\/([^/]+)$/)
-	if (!match) return null
-	return { did: match[1], rkey: match[2] }
-}
 
 function getClaimStatus(claim: ClaimView): 'pending' | 'approved' | 'denied' {
 	if (!claim.review) return 'pending'
@@ -169,9 +164,7 @@ export function MyClaimsPage() {
 
 	const handleClaimClick = useCallback(
 		(uri: string) => {
-			const parsed = parseAtUri(uri)
-			if (!parsed) return
-			router.push(`/claim/${parsed.did}/${parsed.rkey}`)
+			router.push(`/claim/detail?uri=${encodeURIComponent(uri)}`)
 		},
 		[router],
 	)

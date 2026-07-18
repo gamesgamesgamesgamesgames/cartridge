@@ -1,11 +1,11 @@
-const ADMIN_DIDS: Set<string> = new Set(
-	(process.env.NEXT_PUBLIC_ADMIN_DIDS ?? '')
-		.split(',')
-		.map((did) => did.trim())
-		.filter(Boolean),
-)
+import { type User } from '@/typedefs/User'
 
-export function isAdmin(did: string | null | undefined): boolean {
-	if (!did) return false
-	return ADMIN_DIDS.has(did)
+export function isAdmin(user: User | null | undefined): boolean {
+	if (!user?.roles) return false
+	return user.roles.includes('admin') || user.roles.includes('superadmin')
+}
+
+export function isSuperAdmin(user: User | null | undefined): boolean {
+	if (!user?.roles) return false
+	return user.roles.includes('superadmin')
 }

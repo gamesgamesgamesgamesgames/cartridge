@@ -1,9 +1,13 @@
 'use client'
 
-import { BadgeCheck, Gavel, Handshake } from 'lucide-react'
+import { BadgeCheck, Gavel, Handshake, Users } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
+import { useStore } from 'statery'
 import { twMerge } from 'tailwind-merge'
+
+import { isSuperAdmin } from '@/helpers/admin'
+import { store } from '@/store/store'
 
 const ADMIN_ITEMS = [
 	{ label: 'Claims', href: '/admin/claims', icon: Gavel },
@@ -13,6 +17,7 @@ const ADMIN_ITEMS = [
 
 export function AdminNav() {
 	const pathname = usePathname()
+	const { user } = useStore(store)
 
 	return (
 		<nav className={'border-b border-border bg-card/50'}>
@@ -38,6 +43,20 @@ export function AdminNav() {
 						</Link>
 					)
 				})}
+
+				{isSuperAdmin(user) && (
+					<Link
+						href={'/admin/users'}
+						className={twMerge(
+							'flex items-center gap-2 border-b-2 px-3 py-3 text-sm font-medium transition-colors',
+							pathname.startsWith('/admin/users')
+								? 'border-primary text-foreground'
+								: 'border-transparent text-muted-foreground hover:text-foreground',
+						)}>
+						<Users className={'size-4'} />
+						{'Users'}
+					</Link>
+				)}
 			</div>
 		</nav>
 	)

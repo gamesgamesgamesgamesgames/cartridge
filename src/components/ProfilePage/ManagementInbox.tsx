@@ -103,7 +103,6 @@ export function ManagementInbox(props: Props) {
 				<div className={'flex flex-col'}>
 					<h3 className={'mb-1 text-sm font-medium'}>{'Your claims'}</h3>
 					{claims.map((c) => {
-						const { did, rkey } = parseATURI(c.uri)
 						const label = c.type === 'game' && c.games?.length
 							? c.games.map((g) => g.name).join(', ')
 							: 'Organization Claim'
@@ -113,7 +112,7 @@ export function ManagementInbox(props: Props) {
 								type={'your-claim'}
 								label={label}
 								status={normalizeStatus(c.review?.status)}
-								href={`/admin/claims/${did}/${rkey}`}
+								href={`/admin/claims/detail?uri=${encodeURIComponent(c.uri)}`}
 								date={formatRelativeDate(c.createdAt)}
 							/>
 						)

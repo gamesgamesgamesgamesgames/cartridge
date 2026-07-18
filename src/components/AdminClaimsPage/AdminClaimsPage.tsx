@@ -14,7 +14,6 @@ import { Header } from '@/components/Header/Header'
 import { Spinner } from '@/components/ui/spinner'
 import { UnderlineTabs } from '@/components/UnderlineTabs/UnderlineTabs'
 import { isAdmin } from '@/helpers/admin'
-import { parseATURI } from '@/helpers/parseATURI'
 import { store } from '@/store/store'
 import { type ClaimView } from '@/helpers/API'
 import { type AtUriString } from '@atproto/lex'
@@ -93,8 +92,7 @@ const fetchClaims = useCallback(
 
 	const handleClaimClick = useCallback(
 		(uri: AtUriString) => {
-			const { did, rkey } = parseATURI(uri)
-			router.push(`/admin/claims/${did}/${rkey}`)
+			router.push(`/admin/claims/detail?uri=${encodeURIComponent(uri)}`)
 		},
 		[router],
 	)
@@ -157,7 +155,7 @@ const fetchClaims = useCallback(
 	}, [claims, handleClaimClick, isLoading])
 
 	// Auth guard — after all hooks
-	if (user !== null && !isAdmin(user?.did)) {
+	if (user !== null && !isAdmin(user)) {
 		router.replace('/')
 		return null
 	}

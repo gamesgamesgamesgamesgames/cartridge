@@ -1,4 +1,5 @@
 import { type AccountType } from '@/constants/ACCOUNT_TYPES'
+import { type UserRole } from '@/helpers/API'
 
 export type User = {
 	did: string
@@ -7,4 +8,5 @@ export type User = {
 	description?: string
 	avatarURL?: string
 	verifiedAccountType?: AccountType
+	roles: UserRole[]
 }

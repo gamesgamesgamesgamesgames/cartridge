@@ -38,7 +38,7 @@ const ADMIN_ITEMS = [
 export function DashboardNav() {
 	const { user } = useStore(store)
 	const pathname = usePathname()
-	const showAdmin = isAdmin(user?.did)
+	const showAdmin = isAdmin(user)
 	const isAdminRoute = pathname.startsWith('/dashboard/admin')
 
 	return (

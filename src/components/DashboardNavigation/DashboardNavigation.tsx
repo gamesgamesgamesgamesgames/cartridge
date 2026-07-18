@@ -95,7 +95,7 @@ export function DashboardNavigation() {
 					</SidebarGroupContent>
 				</SidebarGroup>
 
-				{isAdmin(user?.did) && (
+				{isAdmin(user) && (
 					<SidebarGroup>
 						<SidebarGroupLabel>{'Admin'}</SidebarGroupLabel>
 						<SidebarGroupContent>

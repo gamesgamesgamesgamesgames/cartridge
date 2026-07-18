@@ -16,7 +16,7 @@ export default function AdminLayout(props: Props) {
 	const { children } = props
 	const { user } = useStore(store)
 
-	if (!isAdmin(user?.did)) {
+	if (!isAdmin(user)) {
 		return (
 			<Suspense>
 				<ScrollToTop />
