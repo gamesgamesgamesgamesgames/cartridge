@@ -1,5 +1,8 @@
-import { redirect } from 'next/navigation'
+import { type Metadata } from 'next'
 
-export default function DashboardPage() {
-	redirect('/dashboard/catalog')
-}
+// Local imports
+import { DashboardOverview } from '@/components/DashboardOverview/DashboardOverview'
+
+export const metadata: Metadata = { title: 'Dashboard' }
+
+export default DashboardOverview

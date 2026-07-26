@@ -240,6 +240,23 @@ export default function PrivacyPolicyPage() {
 					<li>Google Analytics</li>
 				</ul>
 
+				<h2>First-Party Product Analytics</h2>
+				<p>
+					We collect privacy-preserving, aggregate usage analytics to help game
+					owners understand how their games are discovered — for example how
+					often a game appears in search or feeds, how visitors arrive, and how
+					long they spend on a game page. This data is collected first-party and
+					stored on our own infrastructure; it is not sold or shared.
+				</p>
+				<p>
+					We do <strong>not</strong> store your raw IP address or user agent for
+					analytics. To count unique visitors and filter out bots, we derive a
+					one-way hash that combines a secret key with a value that rotates every
+					day, which means a visitor cannot be tracked from one day to the next.
+					We honor the Do-Not-Track and Global Privacy Control signals: when
+					either is enabled, we collect no product analytics from your browser.
+				</p>
+
 				<h2>International Transfers of Personal Information</h2>
 				<p>
 					The personal information we collect is stored and/or processed in

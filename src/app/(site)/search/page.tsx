@@ -1,7 +1,6 @@
 'use client'
 
 import { ChevronDown, Loader2, SlidersHorizontal } from 'lucide-react'
-import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import {
 	useCallback,
@@ -13,6 +12,8 @@ import {
 } from 'react'
 
 import { BoxArt } from '@/components/BoxArt/BoxArt'
+import { ImpressionSurfaceProvider } from '@/components/analytics/ImpressionSurface'
+import { TrackedGameLink } from '@/components/analytics/TrackedGameLink'
 import { SuggestedQueries } from '@/components/HomeSearchInput/SuggestedQueries'
 import { Button } from '@/components/ui/button'
 import {
@@ -701,13 +702,14 @@ function SearchPageContent() {
 
 				{gameResults.length > 0 && (
 					<>
+						<ImpressionSurfaceProvider
+							value={{ surface: 'search', query }}>
 						<div
 							className={
 								'grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4'
 							}>
-							{gameResults.map((item) => {
+							{gameResults.map((item, index) => {
 								const staggerIndex = staggerMap.get(item.uri)
-								const gameHref = `/game/${item.slug}`
 								const transitionName = item.slug ?? item.uri.split('/').pop()!
 								return (
 									<ViewTransition
@@ -720,8 +722,10 @@ function SearchPageContent() {
 												: 'search-result-enter-0'
 										}
 										exit={'search-result-exit'}>
-										<Link
-											href={gameHref}
+										<TrackedGameLink
+											gameUri={item.uri}
+											gameSlug={transitionName}
+											position={index}
 											onClick={cancelAll}
 											className={'block'}>
 											<TiltCard>
@@ -749,11 +753,12 @@ function SearchPageContent() {
 													)}
 												</div>
 											</div>
-										</Link>
+										</TrackedGameLink>
 									</ViewTransition>
 								)
 							})}
 						</div>
+						</ImpressionSurfaceProvider>
 
 						<div ref={sentinelRef} />
 

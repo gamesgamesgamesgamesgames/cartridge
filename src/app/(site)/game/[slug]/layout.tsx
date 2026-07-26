@@ -2,6 +2,7 @@ import { type Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
 import * as API from '@/helpers/API'
+import { GameAnalytics } from '@/components/analytics/GameAnalytics'
 import { GameLayoutContent } from '@/components/GamePage/GameLayoutContent'
 
 type Props = Readonly<{
@@ -51,14 +52,17 @@ export default async function GameLayout(props: Props) {
 	}
 
 	return (
-		<GameLayoutContent
-			basePath={`/game/${slug}`}
-			gameRecord={gameRecord}
-			likes={likes}
-			parentGame={parentGame}
-			reviews={reviews}
-			similarGames={similarGames}
-			transitionName={slug}
-		/>
+		<>
+			<GameAnalytics gameUri={gameRecord.uri} gameSlug={slug} />
+			<GameLayoutContent
+				basePath={`/game/${slug}`}
+				gameRecord={gameRecord}
+				likes={likes}
+				parentGame={parentGame}
+				reviews={reviews}
+				similarGames={similarGames}
+				transitionName={slug}
+			/>
+		</>
 	)
 }

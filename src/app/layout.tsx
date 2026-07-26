@@ -12,6 +12,7 @@ import { type PropsWithChildren } from 'react'
 import '@radix-ui/themes/styles.css'
 
 // Local imports
+import { AnalyticsIdentity } from '@/components/analytics/AnalyticsIdentity'
 import { StoreInitializer } from '@/components/StoreInitializer/StoreInitializer'
 import { ThemeProvider } from '@/context/ThemeProvider/ThemeProvider'
 import { Toaster } from '@/components/ui/sonner'
@@ -83,6 +84,7 @@ export default function RootLayoutWrapper(props: Props) {
 					enableSystem
 					disableTransitionOnChange>
 					<StoreInitializer />
+					<AnalyticsIdentity />
 					{children}
 					<Toaster />
 				</ThemeProvider>

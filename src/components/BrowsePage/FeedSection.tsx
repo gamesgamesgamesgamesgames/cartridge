@@ -4,6 +4,7 @@ import Link from 'next/link'
 
 import { BrowseGameCard } from './BrowseGameCard'
 import { Header } from '@/components/Header/Header'
+import { ImpressionSurfaceProvider } from '@/components/analytics/ImpressionSurface'
 import { Scroller } from '@/components/ui/scroller'
 import { type CommunityFeedItem, type GameFeedGame } from '@/helpers/API'
 
@@ -18,12 +19,16 @@ type Props = Readonly<{
 	seeAllHref?: string
 	showGenres?: boolean
 	activityMap?: ActivityMap
+	/** Canonical feed identifier for analytics; defaults to `id`/`title`. */
+	feedName?: string
 }>
 
 export function FeedSection(props: Props) {
-	const { id, title, games, cardSize = 'default', badge, seeAllHref, showGenres, activityMap } = props
+	const { id, title, games, cardSize = 'default', badge, seeAllHref, showGenres, activityMap, feedName } = props
 
 	if (games.length === 0) return null
+
+	const feed = feedName ?? id ?? title
 
 	return (
 		<section id={id} className={'scroll-mt-32'}>
@@ -42,25 +47,28 @@ export function FeedSection(props: Props) {
 				)}
 			</div>
 
-			<Scroller
-				aria-label={`${title} games`}
-				orientation={'horizontal'}
-				hideScrollbar
-				withNavigation
-				size={60}
-				scrollStep={cardSize === 'large' ? 240 : 176}
-				className={'flex gap-4 px-4 py-4 md:px-10 lg:px-16'}>
-				{games.map((game) => (
-					<BrowseGameCard
-						key={game.uri}
-						game={game}
-						size={cardSize}
-						badge={badge}
-						showGenres={showGenres}
-						recentActivity={activityMap?.get(game.uri)}
-					/>
-				))}
-			</Scroller>
+			<ImpressionSurfaceProvider value={{ surface: 'feed', feedName: feed }}>
+				<Scroller
+					aria-label={`${title} games`}
+					orientation={'horizontal'}
+					hideScrollbar
+					withNavigation
+					size={60}
+					scrollStep={cardSize === 'large' ? 240 : 176}
+					className={'flex gap-4 px-4 py-4 md:px-10 lg:px-16'}>
+					{games.map((game, index) => (
+						<BrowseGameCard
+							key={game.uri}
+							game={game}
+							size={cardSize}
+							badge={badge}
+							showGenres={showGenres}
+							recentActivity={activityMap?.get(game.uri)}
+							position={index}
+						/>
+					))}
+				</Scroller>
+			</ImpressionSurfaceProvider>
 		</section>
 	)
 }

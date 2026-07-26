@@ -12,6 +12,7 @@ import {
 import { toast } from 'sonner'
 
 import * as API from '@/helpers/API'
+import { track } from '@/helpers/analytics/client'
 import { consumePendingLike, isAuthenticated, setPendingLike } from '@/helpers/oauth'
 
 type LikeState = {
@@ -26,12 +27,13 @@ const LikeContext = createContext<LikeState | null>(null)
 type Props = Readonly<PropsWithChildren<{
 	gameUri: string
 	gameName: string
+	gameSlug?: string
 	initialCount: number
 	initialLiked: boolean
 }>>
 
 export function LikeProvider(props: Props) {
-	const { children, gameUri, gameName, initialCount, initialLiked } = props
+	const { children, gameUri, gameName, gameSlug, initialCount, initialLiked } = props
 
 	const [liked, setLiked] = useState(initialLiked)
 	const [count, setCount] = useState(initialCount)
@@ -48,6 +50,10 @@ export function LikeProvider(props: Props) {
 
 		try {
 			await API.toggleLike(gameUri)
+			// Count only a new like (not an unlike) as a conversion.
+			if (!wasLiked && gameSlug) {
+				track({ type: 'action', gameUri, gameSlug, actionType: 'like' })
+			}
 		} catch {
 			setLiked(wasLiked)
 			setCount(prevCount)
@@ -55,7 +61,7 @@ export function LikeProvider(props: Props) {
 		} finally {
 			setPending(false)
 		}
-	}, [gameUri, liked, count, pending])
+	}, [gameUri, gameSlug, liked, count, pending])
 
 	const toggle = useCallback(() => {
 		if (!isAuthenticated()) {

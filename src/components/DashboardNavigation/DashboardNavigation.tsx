@@ -3,6 +3,7 @@
 // Module import
 import {
 	faBook,
+	faChartLine,
 	faCircleCheck,
 	faClipboardList,
 	faGavel,
@@ -62,6 +63,15 @@ export function DashboardNavigation() {
 								<Link href={'/dashboard/catalog'}>
 									<FontAwesomeIcon icon={faBook} />
 									<span>{'Games Catalog'}</span>
+								</Link>
+							</SidebarMenuButton>
+						</SidebarMenuItem>
+
+						<SidebarMenuItem>
+							<SidebarMenuButton asChild>
+								<Link href={'/dashboard/analytics'}>
+									<FontAwesomeIcon icon={faChartLine} />
+									<span>{'Analytics'}</span>
 								</Link>
 							</SidebarMenuButton>
 						</SidebarMenuItem>

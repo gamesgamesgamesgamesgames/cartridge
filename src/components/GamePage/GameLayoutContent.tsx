@@ -135,6 +135,7 @@ export function GameLayoutContent(props: Props) {
 		<LikeProvider
 			gameUri={gameRecord.uri}
 			gameName={gameRecord.name}
+			gameSlug={gameRecord.slug}
 			initialCount={likes.count}
 			initialLiked={likes.liked}>
 		<div className={'flex min-h-screen flex-col'}>

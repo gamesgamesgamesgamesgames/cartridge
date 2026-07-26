@@ -1,9 +1,9 @@
 'use client'
 
 import { Heart } from 'lucide-react'
-import Link from 'next/link'
 
 import { BoxArt } from '@/components/BoxArt/BoxArt'
+import { TrackedGameLink } from '@/components/analytics/TrackedGameLink'
 import { TiltCard } from '@/components/TiltCard/TiltCard'
 import { GAME_APPLICATION_TYPES } from '@/constants/GAME_APPLICATION_TYPES'
 import { GAME_GENRES } from '@/constants/GAME_GENRES'
@@ -18,6 +18,8 @@ type Props = Readonly<{
 	subtitle?: string
 	showGenres?: boolean
 	recentActivity?: CommunityFeedItem[]
+	/** Zero-based index within its feed, for impression/click position. */
+	position?: number
 }>
 
 const ACTION_LABELS: Record<CommunityFeedItem['type'], string> = {
@@ -111,7 +113,7 @@ function getFirstReleaseYear(game: GameFeedGame): string | undefined {
 }
 
 export function BrowseGameCard(props: Props) {
-	const { game, size = 'default', badge, subtitle, showGenres, recentActivity } = props
+	const { game, size = 'default', badge, subtitle, showGenres, recentActivity, position } = props
 	const year = getFirstReleaseYear(game)
 	const href = game.slug ? `/game/${game.slug}` : undefined
 	const likeCount = game.likeCount ?? 0
@@ -173,10 +175,12 @@ export function BrowseGameCard(props: Props) {
 	}
 
 	return (
-		<Link
-			href={href}
+		<TrackedGameLink
+			gameUri={game.uri}
+			gameSlug={game.slug!}
+			position={position}
 			className={`block shrink-0 snap-start rounded-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary ${isLarge ? 'w-44 sm:w-56' : 'w-36 sm:w-40'}`}>
 			{content}
-		</Link>
+		</TrackedGameLink>
 	)
 }

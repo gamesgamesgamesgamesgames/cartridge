@@ -19,6 +19,11 @@ import {
 	type ContributionStats,
 	type Badge,
 } from '@/helpers/lexicons/games/gamesgamesgamesgames/getContributionStats.defs'
+import { type AnalyticsRange } from '@/helpers/analytics/constants'
+import {
+	type GameAnalytics,
+	type MyGamesAnalytics,
+} from '@/helpers/analytics/types'
 import { getSession } from '@/helpers/oauth'
 import { type PentaractAPICreateGameOptions } from '@/typedefs/PentaractAPICreateGameOptions'
 import { type PentaractAPICreateProfileResult } from '@/typedefs/PentaractAPICreateProfileResult'
@@ -1840,6 +1845,48 @@ export async function reviewVerificationRequest(input: {
 	if (!response.ok) {
 		const errorBody = await response.text()
 		throw new Error(`reviewVerificationRequest failed (${response.status}): ${errorBody}`)
+	}
+
+	return response.json()
+}
+
+// ---------------------------------------------------------------------------
+// Analytics (owner-facing)
+// ---------------------------------------------------------------------------
+
+/**
+ * Per-game analytics for the owner dashboard. Backed by the HappyView Lua
+ * read-proxy, which verifies the caller owns the game before returning data.
+ */
+export async function getGameAnalytics(
+	slug: string,
+	range: AnalyticsRange = '30d',
+): Promise<GameAnalytics | null> {
+	const params = new URLSearchParams({ slug, range })
+	const response = await queryAPI(
+		`/xrpc/dev.cartridge.analytics.getGameAnalytics?${params}`,
+		{ isAuthenticated: true },
+	)
+
+	if (!response.ok) {
+		return null
+	}
+
+	return response.json()
+}
+
+/** Headline analytics for every game the caller owns (dashboard overview). */
+export async function listMyGamesAnalytics(
+	range: AnalyticsRange = '30d',
+): Promise<MyGamesAnalytics> {
+	const params = new URLSearchParams({ range })
+	const response = await queryAPI(
+		`/xrpc/dev.cartridge.analytics.listMyGamesAnalytics?${params}`,
+		{ isAuthenticated: true },
+	)
+
+	if (!response.ok) {
+		return { range, games: [] }
 	}
 
 	return response.json()

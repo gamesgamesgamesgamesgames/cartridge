@@ -2,6 +2,7 @@
 
 import {
 	BadgeCheck,
+	BarChart3,
 	BookOpen,
 	ChevronDown,
 	ClipboardList,
@@ -24,6 +25,7 @@ import { store } from '@/store/store'
 
 const NAV_ITEMS = [
 	{ label: 'Catalog', href: '/dashboard/catalog', icon: BookOpen },
+	{ label: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
 	{ label: 'Claims', href: '/dashboard/claims', icon: ClipboardList },
 	{ label: 'Contributions', href: '/dashboard/contributions', icon: Handshake },
 	{ label: 'Verification', href: '/verify', icon: BadgeCheck },
