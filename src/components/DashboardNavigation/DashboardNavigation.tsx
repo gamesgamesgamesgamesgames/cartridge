@@ -60,7 +60,7 @@ export function DashboardNavigation() {
 					<SidebarGroupContent>
 						<SidebarMenuItem>
 							<SidebarMenuButton asChild>
-								<Link href={'/dashboard/catalog'}>
+								<Link href={'/studio/catalog'}>
 									<FontAwesomeIcon icon={faBook} />
 									<span>{'Games Catalog'}</span>
 								</Link>
@@ -69,7 +69,7 @@ export function DashboardNavigation() {
 
 						<SidebarMenuItem>
 							<SidebarMenuButton asChild>
-								<Link href={'/dashboard/analytics'}>
+								<Link href={'/studio/analytics'}>
 									<FontAwesomeIcon icon={faChartLine} />
 									<span>{'Analytics'}</span>
 								</Link>
@@ -78,7 +78,7 @@ export function DashboardNavigation() {
 
 						<SidebarMenuItem>
 							<SidebarMenuButton asChild>
-								<Link href={'/dashboard/claims'}>
+								<Link href={'/studio/claims'}>
 									<FontAwesomeIcon icon={faClipboardList} />
 									<span>{'My Claims'}</span>
 								</Link>
@@ -87,7 +87,7 @@ export function DashboardNavigation() {
 
 						<SidebarMenuItem>
 							<SidebarMenuButton asChild>
-								<Link href={'/dashboard/contributions'}>
+								<Link href={'/studio/contributions'}>
 									<FontAwesomeIcon icon={faHandshake} />
 									<span>{'My Contributions'}</span>
 								</Link>

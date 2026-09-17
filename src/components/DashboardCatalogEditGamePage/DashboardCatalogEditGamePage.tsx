@@ -29,7 +29,7 @@ function DashboardCatalogEditGamePageInner() {
 		() => [
 			{
 				label: 'My Catalog',
-				url: '/dashboard/catalog',
+				url: '/studio/catalog',
 			},
 			{
 				label: isEditMode ? (name || 'Loading...') : 'New Game',

@@ -395,7 +395,7 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 						if (updatedGame?.record.slug) {
 							router.push(`/game/${updatedGame.record.slug}`)
 						} else {
-							router.push('/dashboard/catalog')
+							router.push('/studio/catalog')
 						}
 					} else {
 						const recordURI = await createGame(gameData, { shouldPublish })
@@ -403,7 +403,7 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 						if (createdGame?.record.slug) {
 							router.push(`/game/${createdGame.record.slug}`)
 						} else {
-							router.push('/dashboard/catalog')
+							router.push('/studio/catalog')
 						}
 					}
 				} catch (error) {

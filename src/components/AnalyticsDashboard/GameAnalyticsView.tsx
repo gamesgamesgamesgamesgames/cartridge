@@ -75,10 +75,10 @@ export function GameAnalyticsView(props: Props) {
 
 	const breadcrumbs = useMemo(
 		() => [
-			{ label: 'Analytics', url: '/dashboard/analytics' },
+			{ label: 'Analytics', url: '/studio/analytics' },
 			{
 				label: analytics?.name ?? slug,
-				url: `/dashboard/analytics/${slug}`,
+				url: `/studio/analytics/${slug}`,
 			},
 		],
 		[analytics?.name, slug],

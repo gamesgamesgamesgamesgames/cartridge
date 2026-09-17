@@ -3,6 +3,8 @@ import { HappyViewBrowserClient } from '@happyview/oauth-client-browser'
 import type { HappyViewSession } from '@happyview/oauth-client-browser'
 
 // Local imports
+import { baseScopes, studioScopes } from '@/helpers/oauthScopes'
+import { coversScopes, missingScopes } from '@/helpers/grantedScopes'
 import { getVerificationStatus } from '@/helpers/API'
 import { REQUIRED_SCOPES, STUDIO_SCOPES } from '@/constants/REQUIRED_SCOPES'
 import { store } from '@/store/store'
@@ -15,23 +17,6 @@ const RETURN_URL_KEY = 'pentaract_return_url'
 const PENDING_HANDLE_KEY = 'pending_login_handle'
 const PENDING_LIKE_KEY = 'pentaract_pending_like'
 const PENDING_LIST_ADD_KEY = 'pentaract_pending_list_add'
-
-const BASE_SCOPES = [
-	'atproto',
-	'include:games.gamesgamesgamesgames.authProfiles',
-	'include:games.gamesgamesgamesgames.authGameInteractions',
-	'include:games.gamesgamesgamesgames.authContributions',
-	'include:games.gamesgamesgamesgames.authCustomFeeds',
-	'include:games.gamesgamesgamesgames.authGameBrowsing',
-	'include:dev.cartridge.authActor',
-]
-
-const STUDIO_SCOPE_BUNDLES = [
-	'include:games.gamesgamesgamesgames.authGamesCatalog',
-	'include:games.gamesgamesgamesgames.authGamesOrg',
-	'include:dev.cartridge.authClaims',
-	'blob:*/*',
-]
 
 // Types
 export type MeResponse = {
@@ -46,7 +31,13 @@ export function getClient(): HappyViewBrowserClient {
 	if (!_client) {
 		const isLoopback = /^(?:localhost|127\.0\.0\.1)/giu.test(PUBLIC_URL)
 		const protocol = isLoopback ? 'http' : 'https'
-		const allScopes = [...BASE_SCOPES, ...STUDIO_SCOPE_BUNDLES]
+		// Built here rather than at module load: these parse INSTANCE_URL, and a
+		// throw during import would take down every module that transitively
+		// pulls in this one.
+		const allScopes = [
+			...baseScopes(INSTANCE_URL),
+			...studioScopes(INSTANCE_URL),
+		]
 		const scopes = allScopes.join(' ')
 		const loopbackUrl = PUBLIC_URL.replace(/^localhost/, '127.0.0.1')
 		const redirectUri = isLoopback
@@ -143,13 +134,11 @@ export async function loginWithRedirect(handle?: string, returnUrl?: string) {
 
 	const verified = await isHandleVerified(handle)
 	const scopes = verified
-		? [...BASE_SCOPES, ...STUDIO_SCOPE_BUNDLES].join(' ')
-		: BASE_SCOPES.join(' ')
+		? [...baseScopes(INSTANCE_URL), ...studioScopes(INSTANCE_URL)].join(' ')
+		: baseScopes(INSTANCE_URL).join(' ')
 
 	console.log('[oauth-debug] verified:', verified)
 	console.log('[oauth-debug] scopes:', scopes)
-	console.log('[oauth-debug] BASE_SCOPES:', BASE_SCOPES)
-	console.log('[oauth-debug] STUDIO_SCOPE_BUNDLES:', STUDIO_SCOPE_BUNDLES)
 
 	const client = getClient()
 	await client.login(handle, { scopes })
@@ -185,39 +174,22 @@ export function isAuthenticated(): boolean {
 	return store.state.authDid !== null
 }
 
-function normalizeScopes(scopes: string[]): Set<string> {
-	const normalized = new Set<string>()
-	for (const scope of scopes) {
-		if (scope.startsWith('repo?collection=')) {
-			const params = new URLSearchParams(scope.slice(4))
-			for (const collection of params.getAll('collection')) {
-				normalized.add(`repo:${collection}`)
-			}
-		} else {
-			normalized.add(scope)
-		}
-	}
-	return normalized
-}
+export function hasRequiredScopes(
+	scopes: string | readonly string[] | null | undefined,
+): boolean {
+	const missing = missingScopes(scopes, REQUIRED_SCOPES)
 
-export function hasRequiredScopes(scopes: string[]): boolean {
-	const normalized = normalizeScopes(scopes)
-	const missing = REQUIRED_SCOPES.filter((scope) => {
-		const base = scope.split('?')[0]!
-		return !normalized.has(base) && !normalized.has(scope)
-	})
 	if (missing.length > 0) {
 		console.log('[auth] missing scopes:', missing)
 	}
+
 	return missing.length === 0
 }
 
-export function hasStudioScopes(scopes: string[]): boolean {
-	const normalized = normalizeScopes(scopes)
-	return STUDIO_SCOPES.every((scope) => {
-		const base = scope.split('?')[0]!
-		return normalized.has(base) || normalized.has(scope)
-	})
+export function hasStudioScopes(
+	scopes: string | readonly string[] | null | undefined,
+): boolean {
+	return coversScopes(scopes, STUDIO_SCOPES)
 }
 
 export function getReturnUrl(): string | null {

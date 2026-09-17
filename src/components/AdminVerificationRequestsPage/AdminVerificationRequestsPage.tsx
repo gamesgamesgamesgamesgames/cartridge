@@ -13,7 +13,10 @@ import { Button } from '@/components/ui/button'
 import { Container } from '@/components/Container/Container'
 import { Header } from '@/components/Header/Header'
 import { Spinner } from '@/components/ui/spinner'
-import { UnderlineTabs } from '@/components/UnderlineTabs/UnderlineTabs'
+import {
+	REVIEW_STATUS_OPTIONS,
+	StatusFilterBar,
+} from '@/components/StudioShell/StatusFilterBar'
 import { isAdmin } from '@/helpers/admin'
 import { store } from '@/store/store'
 import { ACCOUNT_TYPE_LABELS } from '@/constants/ACCOUNT_TYPES'
@@ -209,15 +212,11 @@ const fetchRequests = useCallback(
 						</p>
 					</div>
 
-					<UnderlineTabs
-						tabs={[
-							{ id: 'all', label: 'All' },
-							{ id: 'pending', label: 'Pending' },
-							{ id: 'approved', label: 'Approved' },
-							{ id: 'denied', label: 'Denied' },
-						]}
+					<StatusFilterBar
+						options={REVIEW_STATUS_OPTIONS}
 						value={statusFilter}
 						onValueChange={handleFilterChange}
+						label={'Filter verification requests by status'}
 					/>
 
 					{requestsList}

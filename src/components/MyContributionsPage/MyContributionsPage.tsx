@@ -13,7 +13,10 @@ import { Container } from '@/components/Container/Container'
 import { DashboardHeader } from '@/components/DashboardHeader/DashboardHeader'
 import { Header } from '@/components/Header/Header'
 import { Spinner } from '@/components/ui/spinner'
-import { UnderlineTabs } from '@/components/UnderlineTabs/UnderlineTabs'
+import {
+	CONTRIBUTION_STATUS_OPTIONS,
+	StatusFilterBar,
+} from '@/components/StudioShell/StatusFilterBar'
 import { store } from '@/store/store'
 import { type ContributionView } from '@/helpers/API'
 
@@ -32,7 +35,7 @@ export function MyContributionsPage() {
 	const [isLoadingMore, setIsLoadingMore] = useState(false)
 
 	const breadcrumbs = useMemo(
-		() => [{ label: 'My Contributions', url: '/dashboard/contributions' }],
+		() => [{ label: 'My Contributions', url: '/studio/contributions' }],
 		[],
 	)
 
@@ -181,16 +184,11 @@ export function MyContributionsPage() {
 						</p>
 					</div>
 
-					<UnderlineTabs
-						tabs={[
-							{ id: 'all', label: 'All' },
-							{ id: 'pending', label: 'Pending' },
-							{ id: 'approved', label: 'Approved' },
-							{ id: 'denied', label: 'Denied' },
-							{ id: 'needsRevision', label: 'Needs Revision' },
-						]}
+					<StatusFilterBar
+						options={CONTRIBUTION_STATUS_OPTIONS}
 						value={statusFilter}
 						onValueChange={handleFilterChange}
+						label={'Filter your contributions by status'}
 					/>
 
 					{list}

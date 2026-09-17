@@ -14,7 +14,11 @@ export default async function ProfileGamesPage(props: Props) {
 	const result = await API.getProfileByHandle(handle)
 	if (!result.profile) notFound()
 
-	const { games } = await API.listGames(100, undefined, undefined, undefined, result.profile.did)
+	// Public surface: published games only, so no `includeUnpublished`.
+	const { games } = await API.listGames({
+		limit: 100,
+		did: result.profile.did,
+	})
 
 	return <ProfileGamesTab games={games} />
 }

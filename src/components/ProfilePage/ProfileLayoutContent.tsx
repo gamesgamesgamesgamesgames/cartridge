@@ -221,7 +221,7 @@ function GamesTabContent(props: {
 			{isOwnProfile && (
 				<div className={'flex items-center gap-3'}>
 					<Button asChild size={'sm'}>
-						<Link href={'/dashboard/catalog/new-game'}>
+						<Link href={'/studio/catalog/new-game'}>
 							<Plus className={'size-4'} />
 							{'Add Game'}
 						</Link>

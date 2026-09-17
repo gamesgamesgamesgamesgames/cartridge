@@ -3,7 +3,7 @@
 // Module imports
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { useStore } from 'statery'
 
 // Local imports
@@ -12,11 +12,14 @@ import { type ClaimView } from '@/helpers/API'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Container } from '@/components/Container/Container'
-import { DashboardHeader } from '@/components/DashboardHeader/DashboardHeader'
 import { Check, Clock, X } from 'lucide-react'
 import { Spinner } from '@/components/ui/spinner'
 import { store } from '@/store/store'
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import {
+	REVIEW_STATUS_OPTIONS,
+	StatusFilterBar,
+} from '@/components/StudioShell/StatusFilterBar'
+import { StudioPageHeader } from '@/components/StudioShell/StudioPageHeader'
 
 // Types
 type StatusFilter = 'all' | 'pending' | 'approved' | 'denied'
@@ -103,11 +106,6 @@ export function MyClaimsPage() {
 	const [isLoadingMore, setIsLoadingMore] = useState(false)
 	const fetchIdRef = useRef(0)
 
-	const breadcrumbs = useMemo(
-		() => [{ label: 'My Claims', url: '/dashboard/claims' }],
-		[],
-	)
-
 	const fetchClaims = useCallback(async (status: StatusFilter) => {
 		const fetchId = ++fetchIdRef.current
 		setIsLoading(true)
@@ -182,7 +180,6 @@ export function MyClaimsPage() {
 	if (!user) {
 		return (
 			<>
-				<DashboardHeader breadcrumbs={breadcrumbs} />
 				<Container>
 					<div className={'flex flex-col items-center gap-4 py-16 text-center'}>
 						<p className={'text-muted-foreground'}>
@@ -200,30 +197,24 @@ export function MyClaimsPage() {
 
 	return (
 		<>
-			<DashboardHeader
-				breadcrumbs={breadcrumbs}
-				controls={
-					<Button
-						asChild
-						size={'sm'}>
-						<Link href={'/claim'}>{'New Claim'}</Link>
-					</Button>
-				}
-			/>
-
 			<Container>
 				<div className={'flex flex-col gap-6'}>
-					<ToggleGroup
-						type={'single'}
+					<StudioPageHeader
+						title={'Claims'}
+						description={'Ownership claims you’ve filed, and where each one stands.'}
+						actions={
+							<Button asChild>
+								<Link href={'/claim'}>{'New claim'}</Link>
+							</Button>
+						}
+					/>
+
+					<StatusFilterBar
+						options={REVIEW_STATUS_OPTIONS}
 						value={statusFilter}
 						onValueChange={handleFilterChange}
-						variant={'outline'}
-						size={'sm'}>
-						<ToggleGroupItem value={'all'}>{'All'}</ToggleGroupItem>
-						<ToggleGroupItem value={'pending'}>{'Pending'}</ToggleGroupItem>
-						<ToggleGroupItem value={'approved'}>{'Approved'}</ToggleGroupItem>
-						<ToggleGroupItem value={'denied'}>{'Denied'}</ToggleGroupItem>
-					</ToggleGroup>
+						label={'Filter claims by status'}
+					/>
 
 					<div aria-live={'polite'} aria-atomic={'true'}>
 						{isLoading && (

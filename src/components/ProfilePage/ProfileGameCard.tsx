@@ -64,7 +64,7 @@ export function ProfileGameCard(props: Props) {
 						variant={'secondary'}
 						className={'opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100'}
 						aria-label={`Edit ${game.name}`}>
-						<Link href={`/dashboard/catalog/${did}/${rkey}`}>
+						<Link href={`/studio/catalog/${did}/${rkey}`}>
 							<Pencil className={'size-3.5'} />
 						</Link>
 					</Button>

@@ -36,6 +36,9 @@ body {
   --color-warning: var(--warning);
   --color-warning-foreground: var(--warning-foreground);
   --color-liked: var(--liked);
+  --color-trend-up: var(--trend-up);
+  --color-trend-down: var(--trend-down);
+  --color-attention: var(--attention);
   --color-deep-navy: var(--deep-navy);
   --color-border: var(--border);
   --color-input: var(--input);
@@ -93,6 +96,18 @@ body {
   --warning-foreground: oklch(0.184 0.030 266);
   /* Hot Pink — liked state */
   --liked: oklch(0.684 0.248 349.8);
+  /* Trend direction — analytics deltas.
+     Jade/Crimson at their brand lightness only reach ~2.4:1 on a near-white
+     surface, so light mode uses darkened variants. Both hit WCAG AAA (7:1) as
+     small text on --background and --card in this mode. */
+  --trend-up: oklch(0.43 0.100 155.1);
+  --trend-down: oklch(0.45 0.170 19.3);
+  /* Attention — "this needs fixing", distinct from --primary.
+     Amber at its brand lightness is 1.4:1 on a near-white surface, so light
+     mode uses a deep bronze from the same hue family: AAA (7:1) as small text
+     on --background (7.5:1) and --card (7.3:1). Never use --primary for a
+     warning; that token means "action" everywhere else in the app. */
+  --attention: oklch(0.44 0.080 82.6);
   /* Deep Navy */
   --deep-navy: oklch(0.254 0.070 266.5);
   /* Navy-tinted chrome */
@@ -150,6 +165,13 @@ body {
   --warning-foreground: oklch(0.184 0.030 266);
   /* Hot Pink — liked state */
   --liked: oklch(0.684 0.248 349.8);
+  /* Trend direction — analytics deltas. Lightened Jade/Crimson; AAA (7:1) as
+     small text on both --background (9.9:1 / 9.6:1) and --card (8.5:1 / 8.2:1). */
+  --trend-up: oklch(0.78 0.150 155.1);
+  --trend-down: oklch(0.80 0.110 19.3);
+  /* Attention — Amber reads AAA on dark, so it keeps the brand value here:
+     12.1:1 on --background, 10.3:1 on --card. */
+  --attention: oklch(0.859 0.145 82.6);
   /* Deep Navy */
   --deep-navy: oklch(0.254 0.070 266.5);
   /* Navy Mid — borders */
@@ -329,6 +351,20 @@ body {
   ::view-transition-old(*),
   ::view-transition-new(*) {
     animation-duration: 0.01ms !important;
+  }
+
+  /* View transitions were the only thing honouring the preference; every
+     Tailwind `transition-*` and `animate-*` ignored it. Collapse them to
+     near-instant rather than zero, so transitionend/animationend listeners
+     still fire and nothing waits forever on an event that never arrives.
+     Scoped to motion properties, so colour and opacity crossfades survive. */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 

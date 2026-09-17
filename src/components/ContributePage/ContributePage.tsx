@@ -43,8 +43,8 @@ export function ContributePage() {
 	const [dirtyFields, setDirtyFields] = useState<Set<string>>(new Set())
 
 	const breadcrumbs = [
-		{ label: 'Dashboard', url: '/dashboard' },
-		{ label: 'Suggest Edit', url: `/dashboard/contribute/${params.slug}` },
+		{ label: 'Studio', url: '/studio' },
+		{ label: 'Suggest Edit', url: `/studio/contribute/${params.slug}` },
 	]
 
 	useEffect(() => {
@@ -169,7 +169,7 @@ export function ContributePage() {
 						</p>
 						<div className={'flex gap-3'}>
 							<Button
-								onClick={() => router.push('/dashboard/contributions')}
+								onClick={() => router.push('/studio/contributions')}
 								variant={'outline'}>
 								{'View My Contributions'}
 							</Button>

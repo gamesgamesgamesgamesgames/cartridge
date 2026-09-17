@@ -202,8 +202,8 @@ export function VerificationPage() {
               </Link>
             </Button>
             <Button asChild size={'lg'} variant={'outline'}>
-              <Link href={'/dashboard'}>
-                {'Go to Dashboard'}
+              <Link href={'/studio'}>
+                {'Go to Studio'}
                 <ArrowRight className={'size-4'} />
               </Link>
             </Button>

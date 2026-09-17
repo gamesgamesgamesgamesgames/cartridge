@@ -18,8 +18,17 @@ type Props = Readonly<{
 	controls?: ReactNode
 }>
 
+/**
+ * Breadcrumb strip for studio pages one or more levels deep.
+ *
+ * At the top level the studio nav already names the section, so a single-crumb
+ * strip would only repeat it — that case renders nothing unless the page has
+ * controls to hang here.
+ */
 export function DashboardHeader(props: Props) {
 	const { breadcrumbs, controls } = props
+
+	const showBreadcrumbs = breadcrumbs.length > 1
 
 	const breadcrumbElements = useMemo(() => {
 		return (
@@ -52,10 +61,14 @@ export function DashboardHeader(props: Props) {
 		)
 	}, [breadcrumbs])
 
+	if (!showBreadcrumbs && !controls) {
+		return null
+	}
+
 	return (
 		<header className={'flex h-12 shrink-0 items-center border-b'}>
-			<div className={'flex w-full items-center gap-2 px-4 lg:px-6'}>
-				{breadcrumbElements}
+			<div className={'mx-auto flex w-full max-w-6xl items-center gap-2 px-4'}>
+				{showBreadcrumbs && breadcrumbElements}
 
 				{Boolean(controls) && (
 					<div className={'ml-auto flex items-center gap-2'}>{controls}</div>

@@ -66,7 +66,8 @@ export default async function ProfilePage(props: Props) {
 	] = await Promise.all([
 		resolveAvatarUrl(profile, did),
 		API.getReviews(profile.uri).catch(() => ({ reviews: [] as never[] })),
-		API.listGames(20, undefined, undefined, undefined, did).catch(() => ({ games: [] as never[] })),
+		// Public surface: published games only, so no `includeUnpublished`.
+		API.listGames({ limit: 20, did }).catch(() => ({ games: [] as never[] })),
 		API.getGameCount(did).catch(() => ({ count: 0 })),
 		API.getReviewCount(did).catch(() => ({ count: 0 })),
 		API.getLikeCount(did).catch(() => ({ count: 0 })),

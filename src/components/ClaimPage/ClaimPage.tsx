@@ -839,7 +839,7 @@ export function ClaimPage() {
 
 					<div className={'flex gap-3'}>
 						<Button asChild>
-							<Link href={'/dashboard/claims'}>
+							<Link href={'/studio/claims'}>
 								{'View My Claims'}
 							</Link>
 						</Button>

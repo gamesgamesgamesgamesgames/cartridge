@@ -26,7 +26,7 @@ export function SuggestEditButton(props: Props) {
 			size={'default'}
 			variant={'outline'}
 			className={'hover:border-primary/50 hover:bg-primary/10 hover:text-primary dark:hover:bg-primary/10 dark:hover:border-primary/50'}>
-			<Link href={`/dashboard/contribute/${slug}`}>
+			<Link href={`/studio/contribute/${slug}`}>
 				<SquarePen />
 				{'Suggest Edit'}
 			</Link>

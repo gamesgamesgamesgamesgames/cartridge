@@ -132,7 +132,7 @@ export function ManagementInbox(props: Props) {
 								label={c.subjectName ?? 'Game edit'}
 								sublabel={c.contributionType}
 								status={normalizeStatus(c.review?.status)}
-								href={`/dashboard/contributions`}
+								href={`/studio/contributions`}
 								date={formatRelativeDate(c.createdAt)}
 							/>
 						)

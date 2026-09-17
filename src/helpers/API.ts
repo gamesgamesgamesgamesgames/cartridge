@@ -169,13 +169,39 @@ export async function createGame(
 	return data.uri as AtUriString
 }
 
+/** Sort keys the endpoint accepts; anything else is rejected server-side. */
+export type ListGamesSort = 'indexed_at' | 'createdAt' | 'name'
+
+export type ListGamesOptions = {
+	limit?: number
+	cursor?: string
+	sort?: ListGamesSort
+	sortDirection?: 'asc' | 'desc'
+	/**
+	 * Restrict to one repo. **Omitting this returns games from every repo** —
+	 * the endpoint does not fall back to the authenticated caller.
+	 */
+	did?: string
+	/**
+	 * Include the caller's own unpublished drafts. Requires `did` to be the
+	 * caller's own DID and forces an authenticated request; the server rejects
+	 * it otherwise.
+	 */
+	includeUnpublished?: boolean
+}
+
 export async function listGames(
-	limit = 20,
-	cursor?: string,
-	sort?: string,
-	sortDirection?: 'asc' | 'desc',
-	did?: string,
+	options: ListGamesOptions = {},
 ): Promise<{ cursor?: string; games: GameRecord[] }> {
+	const {
+		cursor,
+		did,
+		includeUnpublished,
+		limit = 20,
+		sort,
+		sortDirection,
+	} = options
+
 	const params = new URLSearchParams({ limit: String(limit) })
 	if (cursor) {
 		params.set('cursor', cursor)
@@ -189,10 +215,16 @@ export async function listGames(
 	if (did) {
 		params.set('did', did)
 	}
+	if (includeUnpublished) {
+		params.set('includeUnpublished', 'true')
+	}
 
 	const response = await queryAPI(
 		`/xrpc/games.gamesgamesgamesgames.listGames?${params}`,
-		{ isAuthenticated: !did },
+		// Drafts are owner-only, so they need the session. A plain public listing
+		// doesn't — auth is tied to what's being asked for, not to whether a
+		// `did` filter happens to be present.
+		{ isAuthenticated: Boolean(includeUnpublished) },
 	)
 
 	if (!response.ok) {
@@ -1497,7 +1529,7 @@ export async function reviewContribution(input: {
 }
 
 export async function acceptContribution(input: {
-	patch: string
+	contributionPatch: string
 }): Promise<string> {
 	const response = await queryAPI(
 		'/xrpc/games.gamesgamesgamesgames.acceptContribution',

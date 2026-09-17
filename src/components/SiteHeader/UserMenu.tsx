@@ -1,7 +1,7 @@
 'use client'
 
 // Module imports
-import { ChevronDown, LogOut, MessageSquare, Monitor, Moon, Settings, ShieldCheck, Sun, User } from 'lucide-react'
+import { ChevronDown, Gamepad2, LogOut, MessageSquare, Monitor, Moon, Settings, ShieldCheck, Sun, User } from 'lucide-react'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
 import { usePathname, useSearchParams } from 'next/navigation'
@@ -109,6 +109,17 @@ export function UserMenu() {
 								{'View Profile'}
 							</Link>
 						</DropdownMenuItem>
+						{/* Verified accounts only: the studio manages games in your own
+						    repo, and an unverified creator's submissions live in the
+						    shared repo instead — so the surface would be empty for them. */}
+						{Boolean(user?.verifiedAccountType) && (
+							<DropdownMenuItem asChild>
+								<Link href={'/studio'}>
+									<Gamepad2 className={'size-4'} />
+									{'Studio'}
+								</Link>
+							</DropdownMenuItem>
+						)}
 						<DropdownMenuItem asChild>
 							<Link href={'/settings/accounts'}>
 								<Settings className={'size-4'} />

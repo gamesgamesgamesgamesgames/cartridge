@@ -1,5 +1,6 @@
 // Local imports
 import { handleCallback, hasRequiredScopes, hasStudioScopes, restoreSession } from '@/helpers/oauth'
+import { toScopeList } from '@/helpers/grantedScopes'
 import { setAuthCookie } from '@/helpers/setAuthCookie'
 import { setProfileTypeCookie } from '@/helpers/setProfileTypeCookie'
 import { getUserProfile } from '@/store/actions/getUserProfile'
@@ -15,7 +16,7 @@ function updateStudioReauth(scopes: string[]) {
 
 export async function loginFromCallback() {
 	const session = await handleCallback()
-	const scopes = session.scopes ?? []
+	const scopes = toScopeList(session.scopes)
 
 	store.set(() => ({
 		authDid: session.did,
@@ -40,7 +41,7 @@ export async function loginFromStorage() {
 		throw new Error('Not authenticated')
 	}
 
-	const scopes = session.scopes ?? []
+	const scopes = toScopeList(session.scopes)
 	store.set(() => ({
 		authDid: session.did,
 		authScopes: scopes,

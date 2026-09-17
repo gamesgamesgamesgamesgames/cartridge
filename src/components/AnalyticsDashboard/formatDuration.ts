@@ -6,6 +6,15 @@
  */
 
 /**
+ * Stand-in for a metric that has no value rather than a value of zero.
+ *
+ * CTR with no impressions and dwell with no pageviews are undefined, not zero;
+ * printing `0.0%` or `0:00` would claim a measurement nobody took. Counts are
+ * different — zero impressions really is zero — so they keep their digits.
+ */
+export const NO_VALUE = '—'
+
+/**
  * Format a dwell time in milliseconds as `m:ss` (e.g. 92000 → '1:32').
  *
  * Non-finite or negative input formats as '0:00' rather than throwing — the
