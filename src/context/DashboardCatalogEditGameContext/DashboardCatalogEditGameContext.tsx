@@ -210,7 +210,7 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 	useEffect(() => {
 		if (!gameURI) return
 
-		getGame({ uri: gameURI }).then((game) => {
+		getGame({ uri: gameURI }).catch(() => undefined).then((game) => {
 			if (!game?.record) {
 				setState('error')
 				return
@@ -391,7 +391,8 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 
 					if (gameURI) {
 						await putGame(gameURI, gameData, { shouldPublish })
-						const updatedGame = await getGame({ uri: gameURI })
+						// The save succeeded; only the redirect depends on reading it back.
+						const updatedGame = await getGame({ uri: gameURI }).catch(() => undefined)
 						if (updatedGame?.record.slug) {
 							router.push(`/game/${updatedGame.record.slug}`)
 						} else {
@@ -399,7 +400,7 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 						}
 					} else {
 						const recordURI = await createGame(gameData, { shouldPublish })
-						const createdGame = await getGame({ uri: recordURI })
+						const createdGame = await getGame({ uri: recordURI }).catch(() => undefined)
 						if (createdGame?.record.slug) {
 							router.push(`/game/${createdGame.record.slug}`)
 						} else {

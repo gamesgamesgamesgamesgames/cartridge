@@ -62,7 +62,35 @@ export function getLocalNow(): string {
 // Core
 // ---------------------------------------------------------------------------
 
+// HappyView rate-limits by client key, and every visitor, server render and
+// crawler shares this app's key. When the bucket is momentarily empty it
+// answers 429 with a short Retry-After; one patient retry turns most of those
+// into a normal answer instead of an error.
+const RATE_LIMIT_MAX_WAIT_SECONDS = 2
+
+function sleep(ms: number, signal?: AbortSignal | null) {
+	return new Promise<void>((resolve, reject) => {
+		const timer = setTimeout(resolve, ms)
+		signal?.addEventListener('abort', () => {
+			clearTimeout(timer)
+			reject(signal.reason ?? new DOMException('Aborted', 'AbortError'))
+		}, { once: true })
+	})
+}
+
 async function queryAPI(path: string, options: PentaractAPIQueryOptions = {}) {
+	const response = await sendQuery(path, options)
+	if (response.status !== 429) return response
+
+	const retryAfter = Number(response.headers.get('retry-after'))
+	if (!Number.isFinite(retryAfter) || retryAfter < 0 || retryAfter > RATE_LIMIT_MAX_WAIT_SECONDS) {
+		return response
+	}
+	await sleep(Math.max(retryAfter, 0.25) * 1000, options.signal)
+	return sendQuery(path, options)
+}
+
+async function sendQuery(path: string, options: PentaractAPIQueryOptions = {}) {
 	const { isAuthenticated = false, ...fetchOptions } = options
 	const url = `${API_URL}${path}`
 	const headers: Record<string, string> = {
@@ -268,12 +296,23 @@ export async function getGame(
 		`/xrpc/games.gamesgamesgamesgames.getGame?${params}`,
 	)
 
+	// HappyView answers a missing game with 200 and no `game`. Anything that
+	// isn't OK (a rate limit, a server error) is a failure, not a missing game,
+	// so it throws: the page then shows an error, never a 404.
 	if (!resp.ok) {
-		return undefined
+		throw new GameUnavailableError(`getGame answered ${resp.status}`)
 	}
 
-	const data = await resp.json()
-	return data.game as GameRecord
+	const data = (await resp.json()) as { game?: GameRecord } | null
+	return data?.game ?? undefined
+}
+
+/** The game could not be loaded (as opposed to not existing). */
+export class GameUnavailableError extends Error {
+	constructor(message: string) {
+		super(message)
+		this.name = 'GameUnavailableError'
+	}
 }
 
 export async function getReviews(
@@ -431,11 +470,26 @@ export async function search(
 		{ signal: options.signal },
 	)
 
+	// A failed search must not look like an empty one: callers show "no
+	// results" for an empty list, so an error answer has to throw instead.
 	if (!response.ok) {
-		return { results: [] }
+		throw new SearchUnavailableError(`search answered ${response.status}`)
 	}
 
-	return response.json()
+	const body = (await response.json()) as Partial<PentaractAPISearchResult> | null
+	if (!body || !Array.isArray(body.results)) {
+		throw new SearchUnavailableError('search answered without results')
+	}
+
+	return body as PentaractAPISearchResult
+}
+
+/** Search could not be reached or answered with an error. */
+export class SearchUnavailableError extends Error {
+	constructor(message: string) {
+		super(message)
+		this.name = 'SearchUnavailableError'
+	}
 }
 
 export async function searchProfilesTypeahead(

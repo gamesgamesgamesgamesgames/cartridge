@@ -297,7 +297,7 @@ function SearchPageContent() {
 	const activeFilterCount = genres.length + themes.length + modes.length + playerPerspectives.length + ageRatings.length
 
 	const hasFilters = activeFilterCount > 0
-	const { results, totalResults, cursor, isLoading, loadMore, cancelAll } = useSearch(query, {
+	const { results, totalResults, cursor, isLoading, hasError, loadMore, retry, cancelAll } = useSearch(query, {
 		limit: 25,
 		types: SEARCH_TYPES,
 		applicationTypes,
@@ -694,7 +694,18 @@ function SearchPageContent() {
 					</div>
 				)}
 
-				{!isLoading && (query.trim() || hasFilters) && gameResults.length === 0 && (
+				{!isLoading && hasError && (
+					<div className={'flex flex-col items-center gap-3 py-12 text-center'} role={'alert'}>
+						<p className={'text-muted-foreground'}>
+							{'Search is having trouble right now.'}
+						</p>
+						<Button onClick={retry} variant={'outline'}>
+							{'Try again'}
+						</Button>
+					</div>
+				)}
+
+				{!isLoading && !hasError && (query.trim() || hasFilters) && gameResults.length === 0 && (
 					<p className={'py-12 text-center text-muted-foreground'}>
 						{query.trim() ? `No results found for "${query}"` : 'No results found'}
 					</p>
