@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 
+import { gameRecordRedirect } from '@/helpers/gameRecordRedirect'
+
 /**
  * Legacy `/dashboard` paths and where they live now, longest prefix first.
  *
@@ -34,8 +36,14 @@ export function legacyPathTarget(pathname: string): string | null {
 	return null
 }
 
-export function middleware(request: NextRequest) {
+export async function middleware(request: NextRequest) {
 	const { pathname } = request.nextUrl
+
+	// Public game pages: only the record-key redirect applies here, never the
+	// auth gates below.
+	if (pathname.startsWith('/game/')) {
+		return gameRecordRedirect(request)
+	}
 
 	// ATProto loopback OAuth redirects to root with ?code=&state= params
 	if (
@@ -88,5 +96,8 @@ export const config = {
 		'/dashboard',
 		'/dashboard/:path*',
 		'/profile-setup',
+		// Record-key game URLs: /game/<rkey> and /game/<rkey>/<section>.
+		'/game/:param',
+		'/game/:param/:section',
 	],
 }
