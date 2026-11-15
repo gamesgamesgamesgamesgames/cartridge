@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { Header } from '@/components/Header/Header'
 import { parseATURI } from '@/helpers/parseATURI'
 import { type GameRecord } from '@/typedefs/GameRecord'
+import { gameHref } from '@/helpers/gameRoute'
 
 // Types
 type Props = Readonly<{
@@ -19,12 +20,12 @@ type Props = Readonly<{
 
 export function ProfileGameCard(props: Props) {
 	const { game, isOwnProfile } = props
-	const gameHref = `/game/${game.slug ?? game.uri}`
+	const gameLink = gameHref(game) ?? '#'
 
 	if (!isOwnProfile) {
 		return (
 			<Link
-				href={gameHref}
+				href={gameLink}
 				className={'group flex flex-col gap-2'}>
 				<BoxArt gameRecord={game} className={'rounded-md'} />
 				<Header
@@ -53,7 +54,7 @@ export function ProfileGameCard(props: Props) {
 						variant={'secondary'}
 						className={'opacity-0 transition-opacity group-hover:opacity-100 group-focus-within:opacity-100'}
 						aria-label={`View ${game.name}`}>
-						<Link href={gameHref}>
+						<Link href={gameLink}>
 							<Eye className={'size-3.5'} />
 						</Link>
 					</Button>

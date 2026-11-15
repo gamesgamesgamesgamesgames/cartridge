@@ -93,7 +93,7 @@ type Props = Readonly<{
 	gameRecord: GameRecord
 	likes: { count: number; liked: boolean }
 	nonFranchiseCollections?: CollectionWithGames[]
-	parentGame?: { name: string; slug: string } | null
+	parentGame?: { name: string; href: string } | null
 	reviews: PopfeedReview[]
 	similarGames: GameFeedGame[]
 	transitionName: string
@@ -297,7 +297,7 @@ export function GameLayoutContent(props: Props) {
 												{'DLC for '}
 												<Link
 													className={'text-foreground underline hover:no-underline'}
-													href={`/game/${parentGame.slug}`}>
+													href={parentGame.href}>
 													{parentGame.name}
 												</Link>
 											</p>

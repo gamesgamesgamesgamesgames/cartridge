@@ -2,6 +2,7 @@ import { Gamepad2, Monitor, FolderOpen, Cog, User } from 'lucide-react'
 import Link from 'next/link'
 
 import { type SearchResultItem } from '@/typedefs/PentaractAPISearchResult'
+import { gameHref } from '@/helpers/gameRoute'
 
 type Props = {
 	item: SearchResultItem
@@ -10,10 +11,10 @@ type Props = {
 export function SearchResult({ item }: Props) {
 	switch (item.$type) {
 		case 'games.gamesgamesgamesgames.defs#gameSummaryView': {
-			const gameHref = `/game/${item.slug}`
+			const gameLink = gameHref(item) ?? '#'
 			return (
 				<Link
-					href={gameHref}
+					href={gameLink}
 					className={'flex items-center gap-4 rounded-lg border border-border bg-card p-4 transition-colors hover:bg-accent'}>
 					<div className={'flex size-10 shrink-0 items-center justify-center rounded-md bg-muted'}>
 						<Gamepad2 className={'size-5 text-muted-foreground'} />

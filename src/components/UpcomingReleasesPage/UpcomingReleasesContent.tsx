@@ -15,6 +15,7 @@ import { formatLikeCount } from '@/helpers/formatLikeCount'
 import { useBlobUrl } from '@/hooks/use-blob-url'
 import { Skeleton } from '@/components/ui/skeleton'
 import { type ApplicationType } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
+import { gameHref } from '@/helpers/gameRoute'
 
 const SECTION_FETCH_LIMIT = 100
 
@@ -192,7 +193,7 @@ function distributeInitialGames(
 
 function UpcomingGameCard({ game }: { game: GameFeedGame }) {
 	const releaseDate = getFirstReleaseDate(game)
-	const href = game.slug ? `/game/${game.slug}` : undefined
+	const href = gameHref(game)
 	const likeCount = game.likeCount ?? 0
 
 	const content = (
@@ -279,7 +280,7 @@ function SectionHeadliner({ game }: { game: GameFeedGame }) {
 	const blobUrl = useBlobUrl(game.uri, artworkItem?.blob as { ref: unknown } | undefined)
 	const releaseDate = getFirstReleaseDate(game)
 	const likeCount = game.likeCount ?? 0
-	const href = game.slug ? `/game/${game.slug}` : undefined
+	const href = gameHref(game)
 
 	if (!blobUrl) return null
 

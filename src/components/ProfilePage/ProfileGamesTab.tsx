@@ -3,6 +3,7 @@ import { BoxArt } from '@/components/BoxArt/BoxArt'
 import { Header } from '@/components/Header/Header'
 import { type GameRecord } from '@/typedefs/GameRecord'
 import Link from 'next/link'
+import { gameHref } from '@/helpers/gameRoute'
 
 // Types
 type Props = Readonly<{
@@ -25,7 +26,7 @@ export function ProfileGamesTab(props: Props) {
 			{games.map((game) => (
 				<Link
 					key={game.uri}
-					href={`/game/${game.slug ?? game.uri}`}
+					href={gameHref(game) ?? '#'}
 					className={'group flex flex-col gap-2'}>
 					<BoxArt gameRecord={game} />
 					<Header

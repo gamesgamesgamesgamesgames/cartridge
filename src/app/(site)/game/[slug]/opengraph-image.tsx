@@ -2,7 +2,7 @@ import { ImageResponse } from 'next/og'
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
 
-import * as API from '@/helpers/API'
+import { loadGameForRoute } from '@/helpers/loadGameForRoute'
 import { getBlobUrl } from '@/helpers/getBlobUrl'
 import { parseATURI } from '@/helpers/parseATURI'
 import { resolvePds } from '@/helpers/resolvePds'
@@ -98,7 +98,7 @@ export default async function GameOGImage({
 }) {
 	const { slug } = await params
 	// Fall back to the generic card if the game can't be loaded right now.
-	const game = await API.getGame({ slug }).catch(() => undefined)
+	const game = await loadGameForRoute(slug).then((r) => r.game, () => undefined)
 
 	const cartridgeFont = await readFile(
 		join(process.cwd(), 'public/fonts/cartridge/Cartridge-Bold.ttf'),

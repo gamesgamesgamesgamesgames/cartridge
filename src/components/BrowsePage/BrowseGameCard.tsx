@@ -10,6 +10,7 @@ import { GAME_GENRES } from '@/constants/GAME_GENRES'
 import { type CommunityFeedItem, type GameFeedGame } from '@/helpers/API'
 import { formatLikeCount } from '@/helpers/formatLikeCount'
 import { type ApplicationType } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
+import { gameHref } from '@/helpers/gameRoute'
 
 type Props = Readonly<{
 	game: GameFeedGame
@@ -115,7 +116,7 @@ function getFirstReleaseYear(game: GameFeedGame): string | undefined {
 export function BrowseGameCard(props: Props) {
 	const { game, size = 'default', badge, subtitle, showGenres, recentActivity, position } = props
 	const year = getFirstReleaseYear(game)
-	const href = game.slug ? `/game/${game.slug}` : undefined
+	const href = gameHref(game)
 	const likeCount = game.likeCount ?? 0
 	const isLarge = size === 'large'
 

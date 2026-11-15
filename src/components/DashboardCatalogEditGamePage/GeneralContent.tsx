@@ -13,6 +13,7 @@ import { NameField } from '@/components/NameField/NameField'
 import { Scroller } from '@/components/ui/scroller'
 import { SummaryField } from '@/components/SummaryField/SummaryField'
 import { useDashboardCatalogEditGameContext } from '@/context/DashboardCatalogEditGameContext/DashboardCatalogEditGameContext'
+import { gameHref } from '@/helpers/gameRoute'
 
 export function GeneralContent() {
 	const {
@@ -113,7 +114,7 @@ export function GeneralContent() {
 									{titleMatches.map((match) => (
 										<Link
 											key={match.uri}
-											href={match.slug ? `/game/${match.slug}` : '#'}
+											href={gameHref(match) ?? '#'}
 											className={'text-sm text-primary hover:underline truncate'}>
 											{match.name}
 										</Link>

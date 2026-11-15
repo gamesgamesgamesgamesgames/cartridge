@@ -8,6 +8,7 @@ import { Header } from '@/components/Header/Header'
 import { GAME_GENRES } from '@/constants/GAME_GENRES'
 import { type GameFeedGame } from '@/helpers/API'
 import { formatLikeCount } from '@/helpers/formatLikeCount'
+import { gameHref } from '@/helpers/gameRoute'
 
 type Props = Readonly<{
 	id?: string
@@ -67,7 +68,7 @@ function BuzzStats({ game, rank }: { game: GameFeedGame; rank: number }) {
 }
 
 function FeaturedCard({ game, rank }: { game: GameFeedGame; rank: number }) {
-	const href = game.slug ? `/game/${game.slug}` : undefined
+	const href = gameHref(game)
 
 	const inner = (
 		<div className={'flex items-center gap-1'}>

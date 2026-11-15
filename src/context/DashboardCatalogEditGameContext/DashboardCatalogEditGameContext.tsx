@@ -44,6 +44,7 @@ import { type StepperStep } from '@/typedefs/StepperStep'
 import { SummaryError } from '@/context/DashboardCatalogEditGameContext/SummaryError'
 import { generateUUID } from '@/helpers/generateUUID'
 import { uploadBlob } from '@/store/actions/uploadBlob'
+import { gameHref } from '@/helpers/gameRoute'
 
 // Types
 type Props = Readonly<PropsWithChildren>
@@ -393,19 +394,13 @@ export function DashboardCatalogEditGameContextProvider(props: Props) {
 						await putGame(gameURI, gameData, { shouldPublish })
 						// The save succeeded; only the redirect depends on reading it back.
 						const updatedGame = await getGame({ uri: gameURI }).catch(() => undefined)
-						if (updatedGame?.record.slug) {
-							router.push(`/game/${updatedGame.record.slug}`)
-						} else {
-							router.push('/studio/catalog')
-						}
+						// The game's page, by slug or by record; the catalogue if neither is known.
+						router.push(gameHref(updatedGame?.record) ?? '/studio/catalog')
 					} else {
 						const recordURI = await createGame(gameData, { shouldPublish })
 						const createdGame = await getGame({ uri: recordURI }).catch(() => undefined)
-						if (createdGame?.record.slug) {
-							router.push(`/game/${createdGame.record.slug}`)
-						} else {
-							router.push('/studio/catalog')
-						}
+						// The game's page, by slug or by record; the catalogue if neither is known.
+						router.push(gameHref(createdGame?.record) ?? '/studio/catalog')
 					}
 				} catch (error) {
 					isDirtyRef.current = true

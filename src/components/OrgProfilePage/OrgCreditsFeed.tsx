@@ -12,6 +12,7 @@ import * as API from '@/helpers/API'
 import { type GameFeedGame } from '@/helpers/API'
 import { GAME_APPLICATION_TYPES } from '@/constants/GAME_APPLICATION_TYPES'
 import { type ApplicationType } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
+import { gameHref } from '@/helpers/gameRoute'
 
 // Types
 type Props = Readonly<{
@@ -120,7 +121,7 @@ export function OrgCreditsFeed(props: Props) {
 				}>
 				{games.map((game) => {
 					const year = getFirstReleaseYear(game)
-					const href = game.slug ? `/game/${game.slug}` : '#'
+					const href = gameHref(game) ?? '#'
 
 					return (
 						<Link

@@ -25,6 +25,7 @@ import { type GameFeedGame } from '@/helpers/API'
 import { formatLikeCount } from '@/helpers/formatLikeCount'
 import { type MediaItem } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 import { useBlobUrl } from '@/hooks/use-blob-url'
+import { gameHref } from '@/helpers/gameRoute'
 
 export type HeroSlide = {
 	game: GameFeedGame
@@ -266,7 +267,7 @@ function SlideContent({
 	const { game, category } = slide
 	const description = useGameDescription(game)
 	const likeCount = game.likeCount ?? 0
-	const href = game.slug ? `/game/${game.slug}` : undefined
+	const href = gameHref(game)
 
 	return (
 		<div

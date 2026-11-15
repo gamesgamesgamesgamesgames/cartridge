@@ -8,6 +8,7 @@ import { TiltCard } from '@/components/TiltCard/TiltCard'
 import { Scroller } from '@/components/ui/scroller'
 
 import type { GameFeedGame } from '@/helpers/API'
+import { gameHref } from '@/helpers/gameRoute'
 
 type Props = Readonly<{
 	games: GameFeedGame[]
@@ -36,7 +37,7 @@ export function PopularRightNow({ games }: Props) {
 				{games.map((game) => (
 					<Link
 						key={game.uri}
-						href={`/game/${game.slug}`}
+						href={gameHref(game) ?? '#'}
 						className={'group w-40 shrink-0'}>
 						<TiltCard>
 							<BoxArt gameRecord={game} />

@@ -22,6 +22,7 @@ import { type OrgProfileDetailView } from '@/helpers/lexicons/games/gamesgamesga
 import { VerifiedBadge } from '@/components/VerifiedBadge/VerifiedBadge'
 import { type GameFeedGame, type GenrePreference } from '@/helpers/API'
 import { type AccountType } from '@/constants/ACCOUNT_TYPES'
+import { gameHref } from '@/helpers/gameRoute'
 
 type Props = Readonly<{
 	avatarUrl?: string
@@ -307,7 +308,7 @@ export function ProfileHeader(props: Props) {
 											{favorites.slice(0, 6).map((game) => (
 												<Link
 													key={game.uri}
-													href={`/game/${game.slug ?? game.uri}`}
+													href={gameHref(game) ?? '#'}
 													className={'group'}>
 													<BoxArt
 														className={'rounded-md transition-transform motion-safe:group-hover:scale-105'}
@@ -328,7 +329,7 @@ export function ProfileHeader(props: Props) {
 									{favorites.slice(0, 8).map((game) => (
 										<Link
 											key={game.uri}
-											href={`/game/${game.slug ?? game.uri}`}
+											href={gameHref(game) ?? '#'}
 											className={'group shrink-0'}>
 											<BoxArt
 												className={'w-20 rounded-md transition-transform motion-safe:group-hover:scale-105'}

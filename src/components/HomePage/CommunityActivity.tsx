@@ -9,6 +9,7 @@ import { Header } from '@/components/Header/Header'
 import { Skeleton } from '@/components/ui/skeleton'
 import { StarRating } from '@/components/StarRating/StarRating'
 import { type CommunityFeedItem, type PlatformStats } from '@/helpers/API'
+import { gameHref } from '@/helpers/gameRoute'
 
 type Props = Readonly<{
 	feed: CommunityFeedItem[]
@@ -66,7 +67,7 @@ function ActorName({ actor }: { actor: CommunityFeedItem['actor'] }) {
 }
 
 function ActivityItemContent({ item }: { item: CommunityFeedItem }) {
-	const gameHref = item.game?.slug ? `/game/${item.game.slug}` : undefined
+	const gameLink = gameHref(item.game)
 
 	switch (item.type) {
 		case 'like':
@@ -74,8 +75,8 @@ function ActivityItemContent({ item }: { item: CommunityFeedItem }) {
 				<p className={'min-w-0 truncate text-sm'}>
 					<ActorName actor={item.actor} />
 					<span className={'text-muted-foreground'}>{' liked '}</span>
-					{item.game && gameHref ? (
-						<Link href={gameHref} className={'font-medium hover:text-primary'}>{item.game.name}</Link>
+					{item.game && gameLink ? (
+						<Link href={gameLink} className={'font-medium hover:text-primary'}>{item.game.name}</Link>
 					) : null}
 				</p>
 			)
@@ -84,8 +85,8 @@ function ActivityItemContent({ item }: { item: CommunityFeedItem }) {
 				<p className={'min-w-0 truncate text-sm'}>
 					<ActorName actor={item.actor} />
 					<span className={'text-muted-foreground'}>{' reviewed '}</span>
-					{item.game && gameHref ? (
-						<Link href={gameHref} className={'font-medium hover:text-primary'}>{item.game.name}</Link>
+					{item.game && gameLink ? (
+						<Link href={gameLink} className={'font-medium hover:text-primary'}>{item.game.name}</Link>
 					) : null}
 				</p>
 			)
@@ -94,8 +95,8 @@ function ActivityItemContent({ item }: { item: CommunityFeedItem }) {
 				<p className={'min-w-0 truncate text-sm'}>
 					<ActorName actor={item.actor} />
 					<span className={'text-muted-foreground'}>{' added '}</span>
-					{item.game && gameHref ? (
-						<Link href={gameHref} className={'font-medium hover:text-primary'}>{item.game.name}</Link>
+					{item.game && gameLink ? (
+						<Link href={gameLink} className={'font-medium hover:text-primary'}>{item.game.name}</Link>
 					) : null}
 					{item.list && (
 						<>
@@ -119,12 +120,12 @@ function ActivityItemContent({ item }: { item: CommunityFeedItem }) {
 }
 
 function ActivityItem({ item }: { item: CommunityFeedItem }) {
-	const gameHref = item.game?.slug ? `/game/${item.game.slug}` : undefined
+	const gameLink = gameHref(item.game)
 
 	return (
 		<article className={'flex items-center gap-3 py-2.5'}>
-			{item.game && gameHref && (
-				<Link href={gameHref} className={'shrink-0'}>
+			{item.game && gameLink && (
+				<Link href={gameLink} className={'shrink-0'}>
 					<BoxArt
 						className={'w-8 rounded-sm'}
 						gameRecord={item.game}
