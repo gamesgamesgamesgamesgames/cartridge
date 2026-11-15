@@ -9,6 +9,7 @@ import { toast } from 'sonner'
 import { Button } from '@/components/ui/button'
 import { Container } from '@/components/Container/Container'
 import { store } from '@/store/store'
+import { gameHref } from '@/helpers/gameRoute'
 
 type Props = Readonly<{
 	gameName: string
@@ -25,7 +26,7 @@ export function GamePageCTA(props: Props) {
 	const isSignedIn = Boolean(user?.did)
 
 	const handleShare = useCallback(async () => {
-		const url = `${window.location.origin}/game/${slug ?? gameUri}`
+		const url = `${window.location.origin}${gameHref({ slug, uri: gameUri }) ?? ''}`
 		try {
 			if (navigator.share) {
 				await navigator.share({ title: gameName, url })

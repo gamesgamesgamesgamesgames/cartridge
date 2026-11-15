@@ -7,6 +7,7 @@ import { useState } from 'react'
 import { BoxArt } from '@/components/BoxArt/BoxArt'
 import { StarRating } from '@/components/ui/star-rating'
 import { type ActivityFeedItem } from '@/helpers/API'
+import { gameHref } from '@/helpers/gameRoute'
 
 type Props = Readonly<{
 	item: ActivityFeedItem
@@ -28,9 +29,8 @@ function formatRelativeTime(dateString: string): string {
 	return new Date(dateString).toLocaleDateString()
 }
 
-function gameHref(item: ActivityFeedItem): string {
-	if (!item.game?.slug) return `/game/${encodeURIComponent(item.game?.uri ?? '')}`
-	return `/game/${item.game.slug}`
+function activityGameHref(item: ActivityFeedItem): string {
+	return gameHref(item.game) ?? '#'
 }
 
 function LikeItem(props: Props) {
@@ -39,7 +39,7 @@ function LikeItem(props: Props) {
 
 	return (
 		<article className={'flex items-center gap-3 py-3'}>
-			<Link href={gameHref(item)} className={'shrink-0'}>
+			<Link href={activityGameHref(item)} className={'shrink-0'}>
 				<BoxArt
 					className={'w-10 rounded-sm'}
 					gameRecord={item.game}
@@ -49,7 +49,7 @@ function LikeItem(props: Props) {
 			<div className={'flex min-w-0 flex-1 items-center justify-between gap-2'}>
 				<p className={'truncate text-sm'}>
 					{'Liked '}
-					<Link href={gameHref(item)} className={'font-semibold text-foreground hover:text-primary'}>
+					<Link href={activityGameHref(item)} className={'font-semibold text-foreground hover:text-primary'}>
 						{item.game.name}
 					</Link>
 				</p>
@@ -80,7 +80,7 @@ function ReviewItem(props: Props) {
 	return (
 		<article className={'rounded-lg bg-card/50 p-4 my-2'}>
 			<div className={'flex gap-4'}>
-				<Link href={gameHref(item)} className={'shrink-0'}>
+				<Link href={activityGameHref(item)} className={'shrink-0'}>
 					<BoxArt
 						className={'w-16 rounded-md shadow-md'}
 						gameRecord={item.game}
@@ -92,7 +92,7 @@ function ReviewItem(props: Props) {
 						<div>
 							<p className={'text-sm font-medium'}>
 								{'Reviewed '}
-								<Link href={gameHref(item)} className={'text-foreground hover:text-primary'}>
+								<Link href={activityGameHref(item)} className={'text-foreground hover:text-primary'}>
 									{item.game.name}
 								</Link>
 							</p>
@@ -161,7 +161,7 @@ function ListAddGameItem(props: Props) {
 	return (
 		<article className={'flex items-center gap-3 py-3'}>
 			{item.game && (
-				<Link href={gameHref(item)} className={'shrink-0'}>
+				<Link href={activityGameHref(item)} className={'shrink-0'}>
 					<BoxArt
 						className={'w-10 rounded-sm'}
 						gameRecord={item.game}
@@ -173,7 +173,7 @@ function ListAddGameItem(props: Props) {
 				<p className={'truncate text-sm'}>
 					{'Added '}
 					{item.game && (
-						<Link href={gameHref(item)} className={'font-semibold text-foreground hover:text-primary'}>
+						<Link href={activityGameHref(item)} className={'font-semibold text-foreground hover:text-primary'}>
 							{item.game.name}
 						</Link>
 					)}

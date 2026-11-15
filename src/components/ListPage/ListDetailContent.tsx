@@ -11,6 +11,7 @@ import { Container } from '@/components/Container/Container'
 import { Header } from '@/components/Header/Header'
 import * as API from '@/helpers/API'
 import { type ListDetailView, type ListItemView } from '@/helpers/API'
+import { gameHref } from '@/helpers/gameRoute'
 
 type Props = Readonly<{
 	list: ListDetailView
@@ -151,7 +152,7 @@ export function ListDetailContent(props: Props) {
 									{items.map((item) => (
 										<Link
 											key={item.uri}
-											href={`/game/${item.game.slug ?? item.game.uri}`}
+											href={gameHref(item.game) ?? '#'}
 											className={'group flex flex-col gap-2 rounded-md outline-none focus-visible:ring-[3px] focus-visible:ring-ring/50'}>
 											<BoxArt gameRecord={item.game} className={'rounded-md transition-shadow group-hover:shadow-lg'} />
 											<span className={'line-clamp-2 text-sm font-medium text-foreground transition-colors group-hover:text-primary'}>

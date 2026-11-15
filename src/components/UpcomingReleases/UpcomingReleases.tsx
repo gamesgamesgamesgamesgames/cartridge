@@ -10,6 +10,7 @@ import { Scroller } from '@/components/ui/scroller'
 import { Skeleton } from '@/components/ui/skeleton'
 import * as API from '@/helpers/API'
 import { type GameFeedGame } from '@/helpers/API'
+import { gameHref } from '@/helpers/gameRoute'
 
 function getFirstReleaseDate(game: GameFeedGame): string | undefined {
 	if (game.firstReleaseDate) return game.firstReleaseDate
@@ -111,7 +112,7 @@ export function UpcomingReleases() {
 						className={'flex gap-4 px-4 py-4 md:px-10 lg:px-16'}>
 						{games.map((game) => {
 							const releaseDate = getFirstReleaseDate(game)
-							const href = game.slug ? `/game/${game.slug}` : '#'
+							const href = gameHref(game) ?? '#'
 
 							return (
 								<Link

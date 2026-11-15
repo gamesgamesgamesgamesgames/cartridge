@@ -12,6 +12,7 @@ import * as API from '@/helpers/API'
 import { type GameFeedGame } from '@/helpers/API'
 import { GAME_APPLICATION_TYPES } from '@/constants/GAME_APPLICATION_TYPES'
 import { type ApplicationType } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
+import { gameHref } from '@/helpers/gameRoute'
 
 type RoleFeed = {
 	role: 'developer' | 'publisher'
@@ -69,7 +70,7 @@ function GameGrid(props: {
 			<div className={'grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5'}>
 				{games.map((game) => {
 					const year = getFirstReleaseYear(game)
-					const href = game.slug ? `/game/${game.slug}` : '#'
+					const href = gameHref(game) ?? '#'
 
 					return (
 						<Link key={game.uri} href={href} className={'block'}>

@@ -7,6 +7,7 @@ import { Header } from '@/components/Header/Header'
 // Types
 import type { CollectionSummaryView } from '@/helpers/lexicons/games/gamesgamesgamesgames/defs.defs'
 import type { GameFeedGame } from '@/helpers/API'
+import { gameHref } from '@/helpers/gameRoute'
 
 type CollectionWithGames = {
 	collection: CollectionSummaryView
@@ -30,7 +31,7 @@ export function CollectionsTab(props: Props) {
 							<Link
 								key={game.uri}
 								className={'group transition-transform duration-200 hover:scale-105'}
-								href={`/game/${game.slug ?? game.uri}`}>
+								href={gameHref(game) ?? '#'}>
 								<BoxArt
 									className={'mb-2'}
 									gameRecord={game} />

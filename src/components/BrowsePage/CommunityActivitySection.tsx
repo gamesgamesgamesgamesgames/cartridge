@@ -8,6 +8,7 @@ import { Header } from '@/components/Header/Header'
 import { Scroller } from '@/components/ui/scroller'
 import { StarRating } from '@/components/StarRating/StarRating'
 import { type CommunityFeedItem } from '@/helpers/API'
+import { gameHref } from '@/helpers/gameRoute'
 
 type Props = Readonly<{
 	id?: string
@@ -46,7 +47,7 @@ function formatTimeAgo(dateStr: string): string {
 
 function ActivityCard({ item }: { item: CommunityFeedItem }) {
 	const game = item.game
-	const href = game?.slug ? `/game/${game.slug}` : undefined
+	const href = gameHref(game)
 	const actorName = item.actor.displayName ?? item.actor.handle ?? 'Someone'
 
 	const inner = (
