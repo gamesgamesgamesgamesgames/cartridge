@@ -100,11 +100,14 @@ function useGameDescription(game: GameFeedGame): string | undefined {
 		if (game.summary) return
 
 		let cancelled = false
-		API.getGame({ uri: game.uri }).then((full) => {
-			if (cancelled) return
-			const text = full?.summary ?? full?.description
-			if (text) setDescription(text)
-		})
+		API.getGame({ uri: game.uri })
+			.then((full) => {
+				if (cancelled) return
+				const text = full?.summary ?? full?.description
+				if (text) setDescription(text)
+			})
+			// The hero keeps its short summary if the full game can't be loaded.
+			.catch(() => {})
 		return () => {
 			cancelled = true
 		}

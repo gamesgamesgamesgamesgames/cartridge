@@ -97,7 +97,8 @@ export default async function GameOGImage({
 	params: Promise<{ slug: string }>
 }) {
 	const { slug } = await params
-	const game = await API.getGame({ slug })
+	// Fall back to the generic card if the game can't be loaded right now.
+	const game = await API.getGame({ slug }).catch(() => undefined)
 
 	const cartridgeFont = await readFile(
 		join(process.cwd(), 'public/fonts/cartridge/Cartridge-Bold.ttf'),

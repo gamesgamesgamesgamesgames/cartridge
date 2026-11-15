@@ -41,6 +41,8 @@ export function ContributePage() {
 
 	// Track which fields the user actually changed
 	const [dirtyFields, setDirtyFields] = useState<Set<string>>(new Set())
+	// True when the game couldn't be loaded (as opposed to not existing)
+	const [loadFailed, setLoadFailed] = useState(false)
 
 	const breadcrumbs = [
 		{ label: 'Studio', url: '/studio' },
@@ -52,7 +54,15 @@ export function ContributePage() {
 
 		async function load() {
 			setIsLoading(true)
-			const result = await API.getGame({ slug: params.slug })
+			let result: Awaited<ReturnType<typeof API.getGame>>
+			try {
+				result = await API.getGame({ slug: params.slug })
+			} catch {
+				if (cancelled) return
+				setLoadFailed(true)
+				setIsLoading(false)
+				return
+			}
 			if (cancelled) return
 
 			if (result) {
@@ -150,7 +160,9 @@ export function ContributePage() {
 				<DashboardHeader breadcrumbs={breadcrumbs} />
 				<Container>
 					<div className={'flex items-center justify-center py-16'}>
-						<p className={'text-muted-foreground text-sm'}>{'Game not found.'}</p>
+						<p className={'text-muted-foreground text-sm'}>
+							{loadFailed ? 'This game couldn’t load right now. Try again in a moment.' : 'Game not found.'}
+						</p>
 					</div>
 				</Container>
 			</>
