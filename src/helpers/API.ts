@@ -431,11 +431,26 @@ export async function search(
 		{ signal: options.signal },
 	)
 
+	// A failed search must not look like an empty one: callers show "no
+	// results" for an empty list, so an error answer has to throw instead.
 	if (!response.ok) {
-		return { results: [] }
+		throw new SearchUnavailableError(`search answered ${response.status}`)
 	}
 
-	return response.json()
+	const body = (await response.json()) as Partial<PentaractAPISearchResult> | null
+	if (!body || !Array.isArray(body.results)) {
+		throw new SearchUnavailableError('search answered without results')
+	}
+
+	return body as PentaractAPISearchResult
+}
+
+/** Search could not be reached or answered with an error. */
+export class SearchUnavailableError extends Error {
+	constructor(message: string) {
+		super(message)
+		this.name = 'SearchUnavailableError'
+	}
 }
 
 export async function searchProfilesTypeahead(

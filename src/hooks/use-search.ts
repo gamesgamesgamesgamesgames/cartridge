@@ -28,6 +28,10 @@ export function useSearch(
 	const [totalResults, setTotalResults] = useState<number | undefined>(undefined)
 	const [cursor, setCursor] = useState<string | undefined>(undefined)
 	const [isLoading, setIsLoading] = useState(false)
+	// True when the latest search failed (as opposed to finding nothing).
+	const [hasError, setHasError] = useState(false)
+	// Bumped by retry() to run the current search again.
+	const [attempt, setAttempt] = useState(0)
 	const seqRef = useRef(0)
 	const controllersRef = useRef<Map<number, AbortController>>(new Map())
 	const loadMoreAbortRef = useRef<AbortController | null>(null)
@@ -60,6 +64,7 @@ export function useSearch(
 			setTotalResults(undefined)
 			setCursor(undefined)
 			setIsLoading(false)
+			setHasError(false)
 			return
 		}
 
@@ -77,6 +82,7 @@ export function useSearch(
 					controllersRef.current.delete(seq)
 
 					startTransition(() => {
+						setHasError(false)
 						setResults(result.results)
 						setTotalResults(result.totalResults)
 						setCursor(result.cursor)
@@ -88,6 +94,7 @@ export function useSearch(
 				controllersRef.current.delete(seq)
 				if (seq >= seqRef.current) {
 					startTransition(() => {
+						setHasError(true)
 						setResults([])
 						setTotalResults(undefined)
 						setCursor(undefined)
@@ -100,7 +107,7 @@ export function useSearch(
 				}
 			})
 
-	}, [query, limit, types, applicationTypes, sort, genres, themes, modes, playerPerspectives, ageRatings, includeUnrated, includeCancelled, minLength])
+	}, [query, limit, types, applicationTypes, sort, genres, themes, modes, playerPerspectives, ageRatings, includeUnrated, includeCancelled, minLength, attempt])
 
 	// Cancel all on unmount
 	useEffect(() => {
@@ -135,5 +142,7 @@ export function useSearch(
 			})
 	}
 
-	return { results, totalResults, cursor, isLoading, loadMore, cancelAll }
+	const retry = () => setAttempt((n) => n + 1)
+
+	return { results, totalResults, cursor, isLoading, hasError, loadMore, retry, cancelAll }
 }
