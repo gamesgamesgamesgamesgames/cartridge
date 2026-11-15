@@ -1,10 +1,10 @@
 import { NextRequest } from 'next/server'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
-import { gameRecordRedirect } from '@/helpers/gameRecordRedirect'
+import { clearGameLookupCache, gameRecordRedirect } from '@/helpers/gameRecordRedirect'
 
 function happyview(answers: Record<string, unknown>) {
-	const fetchMock = vi.fn(async (url: URL) => {
+	const fetchMock = vi.fn(async (url: URL, _init?: RequestInit) => {
 		const key = url.searchParams.get('slug') ? `slug:${url.searchParams.get('slug')}` : `uri:${url.searchParams.get('uri')}`
 		if (!(key in answers)) throw new Error(`unexpected ${key}`)
 		const a = answers[key]
@@ -20,6 +20,7 @@ const CAT = (rkey: string) => `uri:at://did:web:gamesgamesgamesgames.games/games
 
 beforeEach(() => {
 	vi.stubEnv('NEXT_PUBLIC_HAPPYVIEW_URL', 'https://hv.test')
+	clearGameLookupCache()
 })
 afterEach(() => {
 	vi.unstubAllGlobals()
@@ -59,6 +60,31 @@ describe('gameRecordRedirect', () => {
 			expect((await gameRecordRedirect(req(path))).headers.get('location')).toBeNull()
 		}
 		expect(fetchMock).not.toHaveBeenCalled()
+	})
+
+	test('lookups are cached, including a game without a slug', async () => {
+		const fetchMock = happyview({ 'slug:3moaektlwki2x': {}, [CAT('3moaektlwki2x')]: { game: {} } })
+		await gameRecordRedirect(req('/game/3moaektlwki2x'))
+		await gameRecordRedirect(req('/game/3moaektlwki2x'))
+		await gameRecordRedirect(req('/game/3moaektlwki2x/reviews'))
+		expect(fetchMock).toHaveBeenCalledTimes(2)
+	})
+
+	test('a failure is not cached', async () => {
+		const fetchMock = happyview({ 'slug:3moaektlwki2x': 'down' })
+		await gameRecordRedirect(req('/game/3moaektlwki2x'))
+		await gameRecordRedirect(req('/game/3moaektlwki2x'))
+		expect(fetchMock).toHaveBeenCalledTimes(2)
+	})
+
+	test('the lookup uses the server client when it is configured', async () => {
+		vi.stubEnv('HAPPYVIEW_SERVER_CLIENT_KEY', 'hvc_server')
+		vi.stubEnv('HAPPYVIEW_SERVER_CLIENT_SECRET', 'shh')
+		const fetchMock = happyview({ 'slug:3moaektlwki2x': { game: { slug: 'x' } } })
+		await gameRecordRedirect(req('/game/3moaektlwki2x'))
+		const init = fetchMock.mock.calls[0][1] as RequestInit
+		expect((init.headers as Record<string, string>)['x-client-key']).toBe('hvc_server')
+		expect((init.headers as Record<string, string>)['x-client-secret']).toBe('shh')
 	})
 
 	test('a lookup failure leaves it to the page', async () => {

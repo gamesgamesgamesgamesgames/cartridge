@@ -32,6 +32,10 @@ describe('gameUriFromParam', () => {
 })
 
 describe('gameHref', () => {
+	test('encodes the slug', () => {
+		expect(gameHref({ slug: 'café & co' })).toBe(`/game/${encodeURIComponent('café & co')}`)
+	})
+
 	test('prefers the slug', () => {
 		expect(gameHref({ slug: 'dark-souls', uri: `at://${CATALOGUE_DID}/${G}/3moaektlwki2x` })).toBe('/game/dark-souls')
 	})

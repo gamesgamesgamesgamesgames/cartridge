@@ -14,7 +14,7 @@ export default async function GamePage(props: Props) {
 	const { slug } = await props.params
 	const { game, viaRecord } = await loadGameForRoute(slug)
 	if (viaRecord && game?.slug) {
-		permanentRedirect(`/game/${game.slug}`)
+		permanentRedirect(`/game/${encodeURIComponent(game.slug)}`)
 	}
 	return null
 }

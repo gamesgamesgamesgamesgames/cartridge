@@ -26,7 +26,9 @@ export function GamePageCTA(props: Props) {
 	const isSignedIn = Boolean(user?.did)
 
 	const handleShare = useCallback(async () => {
-		const url = `${window.location.origin}${gameHref({ slug, uri: gameUri }) ?? ''}`
+		// The game's canonical page, or the page being viewed if there's none.
+		const path = gameHref({ slug, uri: gameUri })
+		const url = path ? `${window.location.origin}${path}` : window.location.href
 		try {
 			if (navigator.share) {
 				await navigator.share({ title: gameName, url })

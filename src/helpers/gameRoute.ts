@@ -64,7 +64,7 @@ export function encodeGameParam(param: string): string {
  */
 export function gameHref(game: { slug?: string | null; uri?: string | null } | null | undefined): string | undefined {
 	if (!game) return undefined
-	if (game.slug) return `/game/${game.slug}`
+	if (game.slug) return `/game/${encodeURIComponent(game.slug)}`
 	const param = game.uri ? gameParamFromUri(game.uri) : undefined
 	return param ? `/game/${param}` : undefined
 }

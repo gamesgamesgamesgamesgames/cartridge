@@ -2,7 +2,7 @@ import { type Metadata } from 'next'
 import { notFound } from 'next/navigation'
 
 import * as API from '@/helpers/API'
-import { encodeGameParam, gameParamFromUri } from '@/helpers/gameRoute'
+import { encodeGameParam, gameHref } from '@/helpers/gameRoute'
 import { loadGameForRoute } from '@/helpers/loadGameForRoute'
 import { GameAnalytics } from '@/components/analytics/GameAnalytics'
 import { GameLayoutContent } from '@/components/GamePage/GameLayoutContent'
@@ -48,12 +48,12 @@ export default async function GameLayout(props: Props) {
 	])
 
 	// Resolve parent game if this is DLC/expansion
-	let parentGame: { name: string; slug: string } | null = null
+	let parentGame: { name: string; href: string } | null = null
 	if (gameRecord.parent) {
 		const parent = await API.getGame({ uri: gameRecord.parent }).catch(() => undefined)
-		if (parent) {
-			// The parent's slug, or its record path when it has no slug.
-			parentGame = { name: parent.name, slug: parent.slug ?? gameParamFromUri(parent.uri) ?? '' }
+		const parentHref = parent ? gameHref(parent) : undefined
+		if (parent && parentHref) {
+			parentGame = { name: parent.name, href: parentHref }
 		}
 	}
 

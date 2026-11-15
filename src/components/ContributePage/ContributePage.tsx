@@ -21,6 +21,7 @@ import { SummaryField } from '@/components/SummaryField/SummaryField'
 import { Textarea } from '@/components/ui/textarea'
 import { store } from '@/store/store'
 import { type GameRecord } from '@/typedefs/GameRecord'
+import { encodeGameParam } from '@/helpers/gameRoute'
 
 export function ContributePage() {
 	const { user } = useStore(store)
@@ -185,7 +186,7 @@ export function ContributePage() {
 								variant={'outline'}>
 								{'View My Contributions'}
 							</Button>
-							<Button onClick={() => router.push(`/game/${params.slug}`)}>
+							<Button onClick={() => router.push(`/game/${encodeGameParam(params.slug)}`)}>
 								{'Back to Game'}
 							</Button>
 						</div>
@@ -253,7 +254,7 @@ export function ContributePage() {
 					<div className={'flex gap-3 justify-end'}>
 						<Button
 							disabled={isSubmitting}
-							onClick={() => router.push(`/game/${params.slug}`)}
+							onClick={() => router.push(`/game/${encodeGameParam(params.slug)}`)}
 							variant={'outline'}>
 							{'Cancel'}
 						</Button>
