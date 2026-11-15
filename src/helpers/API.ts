@@ -25,6 +25,7 @@ import {
 	type MyGamesAnalytics,
 } from '@/helpers/analytics/types'
 import { getSession } from '@/helpers/oauth'
+import { happyviewClientHeaders } from '@/helpers/happyviewClient'
 import { type PentaractAPICreateGameOptions } from '@/typedefs/PentaractAPICreateGameOptions'
 import { type PentaractAPICreateProfileResult } from '@/typedefs/PentaractAPICreateProfileResult'
 import { type PentaractAPIGetBlueskyProfileResult } from '@/typedefs/PentaractAPIGetBlueskyProfileResult'
@@ -93,12 +94,6 @@ async function queryAPI(path: string, options: PentaractAPIQueryOptions = {}) {
 async function sendQuery(path: string, options: PentaractAPIQueryOptions = {}) {
 	const { isAuthenticated = false, ...fetchOptions } = options
 	const url = `${API_URL}${path}`
-	const headers: Record<string, string> = {
-		'Content-Type': 'application/json',
-		'x-client-key': CLIENT_KEY,
-		...(fetchOptions.headers as Record<string, string>),
-	}
-
 	const session = getSession()
 
 	if (isAuthenticated && !session) {
@@ -106,15 +101,27 @@ async function sendQuery(path: string, options: PentaractAPIQueryOptions = {}) {
 	}
 
 	if (session) {
+		// A signed-in browser session is bound to the public client it was
+		// created with, so it always sends the public key.
 		return session.fetchHandler(url, {
 			...fetchOptions,
-			headers,
+			headers: {
+				'Content-Type': 'application/json',
+				'x-client-key': CLIENT_KEY,
+				...(fetchOptions.headers as Record<string, string>),
+			},
 		})
 	}
 
+	// Anonymous requests: the public key in the browser, the app's own
+	// confidential client on the server (see happyviewClient.ts).
 	return fetch(url, {
 		...fetchOptions,
-		headers,
+		headers: {
+			'Content-Type': 'application/json',
+			...happyviewClientHeaders(),
+			...(fetchOptions.headers as Record<string, string>),
+		},
 	})
 }
 
